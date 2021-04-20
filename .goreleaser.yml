@@ -8,7 +8,7 @@ before:
     - go mod tidy
 
 builds:
-  - main: cmd/pdk/main.go
+  - main: main.go
     binary: pdk
     mod_timestamp: '{{ .CommitTimestamp }}'
     env:
