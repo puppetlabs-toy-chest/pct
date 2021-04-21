@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/puppetlabs/pdkgo/pkg/cmd/completion"
-	"github.com/puppetlabs/pdkgo/pkg/cmd/root"
-	appver "github.com/puppetlabs/pdkgo/pkg/cmd/version"
+	"github.com/puppetlabs/pdkgo/cmd/completion"
+	"github.com/puppetlabs/pdkgo/cmd/root"
+	appver "github.com/puppetlabs/pdkgo/cmd/version"
 	"github.com/spf13/cobra"
 )
 

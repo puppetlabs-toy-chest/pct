@@ -1,4 +1,4 @@
-# pdk
+# PDK
 
 This is a prototype PDK implementation using the Puppet Content Template system
 
