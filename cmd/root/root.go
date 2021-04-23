@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -50,7 +51,7 @@ func CreateRootCommand() *cobra.Command {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 		var levels = []string{"debug", "info", "warn", "error", "fatal", "panic"}
-		return find(levels, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+		return utils.Find(levels, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
 
 	return tmp
@@ -72,24 +73,4 @@ func InitConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Using config file: %s", viper.ConfigFileUsed())
 	}
-}
-
-// finds a string present in a slice
-func find(s []string, str string) []string {
-	var matches []string
-	if contains(s, str) {
-		matches = append(matches, str)
-	}
-	return matches
-}
-
-// contains checks if a string is present in a slice
-func contains(s []string, str string) bool {
-	for _, v := range s {
-		if v == str {
-			return true
-		}
-	}
-
-	return false
 }
