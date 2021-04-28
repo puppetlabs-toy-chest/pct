@@ -12,6 +12,7 @@
     "editor.insertSpaces": false,
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
+      "source.fixAll": true,
       "source.organizeImports": true
     }
   },
@@ -19,5 +20,17 @@
   "go.lintTool":"golangci-lint",
   "go.lintFlags": [
     "--fast"
-  ]
+  ],
+  "go.testOnSave": true,
+  "go.lintOnSave": "file",
+  "go.coverOnSave": false,
+  "go.coverageOptions": "showBothCoveredAndUncoveredCode",
+  "go.coverOnTestPackage": true,
+  "go.coverOnSingleTest": true,
+  "go.delveConfig": {
+    "dlvLoadConfig": {
+      "maxStringLen": 1024,
+    },
+    "apiVersion": 2,
+  },
 }

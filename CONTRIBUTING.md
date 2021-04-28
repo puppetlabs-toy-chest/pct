@@ -24,12 +24,12 @@ To build the PDK, run the following command:
 
 ```bash
 > # on nix
-> go build -v cmd/pdk
+> go build -o pdk
 ```
 
 ```powershell
 # on windows
-> go build -v cmd/pdk -o pdk.exe
+> go build -o pdk.exe
 ```
 
 To run the new binary:
