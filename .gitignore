@@ -15,4 +15,6 @@
 # vendor/
 dist/
 
+.DS_Store
+
 pdk
