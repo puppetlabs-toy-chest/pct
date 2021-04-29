@@ -56,15 +56,7 @@ func FlagsToIgnore() []string {
 
 // ExecutePDKCommand is a helper for executing the pdk commandline
 func ExecutePDKCommand(cmd *cobra.Command, args []string) error {
-	log.Trace().Msg("test unit Run")
-	// argsV := []string{"test", "unit"}
-	var argsV []string
-
-	if cmd.HasParent() {
-		argsV = append(argsV, cmd.Parent().Name(), cmd.Name())
-	} else {
-		argsV = append(argsV, cmd.Name())
-	}
+	argsV := buildPDKCommandName(cmd)
 
 	argsV = append(argsV, args...)
 
@@ -75,4 +67,14 @@ func ExecutePDKCommand(cmd *cobra.Command, args []string) error {
 	_, err := pdkshell.Execute(argsV)
 
 	return err
+}
+
+func buildPDKCommandName(cmd *cobra.Command) []string {
+	var argsV []string
+	if cmd.HasParent() && cmd.Parent().Name() != "pdk" {
+		argsV = append(argsV, cmd.Parent().Name(), cmd.Name())
+	} else {
+		argsV = append(argsV, cmd.Name())
+	}
+	return argsV
 }

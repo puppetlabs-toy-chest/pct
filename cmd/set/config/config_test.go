@@ -1,4 +1,4 @@
-package unit
+package config
 
 import (
 	"bytes"
@@ -31,7 +31,7 @@ func TestCreateCommand(t *testing.T) {
 		},
 		{
 			name:    "executes without error for valid flag",
-			args:    []string{"--clean-fixtures"},
+			args:    []string{"bundle"},
 			f:       nullFunction,
 			out:     "",
 			wantErr: false,

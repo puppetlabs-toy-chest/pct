@@ -1,4 +1,4 @@
-package unit
+package definedtype
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ func nullFunction(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func TestCreateCommand(t *testing.T) {
+func TestCreateDefinedTypeCommand(t *testing.T) {
 	tests := []struct {
 		name       string
 		args       []string
@@ -31,7 +31,7 @@ func TestCreateCommand(t *testing.T) {
 		},
 		{
 			name:    "executes without error for valid flag",
-			args:    []string{"--clean-fixtures"},
+			args:    []string{"defined_type"},
 			f:       nullFunction,
 			out:     "",
 			wantErr: false,

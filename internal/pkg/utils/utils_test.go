@@ -108,7 +108,8 @@ func TestGetListOfFlags(t *testing.T) {
 					c.Flags().String("bar", "", "run unit tests in parallel")
 					return c
 				},
-				argsV: []string{"--parallel"},
+				argsV:         []string{"--parallel"},
+				flagsToIgnore: []string{"log-level"},
 			},
 		},
 	}
