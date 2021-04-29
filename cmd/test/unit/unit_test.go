@@ -46,7 +46,7 @@ func TestCreateTestUnitCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := CreateTestUnitCommand()
+			cmd := CreateCommand()
 			b := bytes.NewBufferString("")
 			cmd.SetOut(b)
 			cmd.SetErr(b)

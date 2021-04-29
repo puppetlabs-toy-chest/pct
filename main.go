@@ -27,7 +27,7 @@ func main() {
 	rootCmd.AddCommand(completion.CreateCompletionCommand())
 
 	testCmd := test.CreateTestCommand()
-	testCmd.AddCommand(unit.CreateTestUnitCommand())
+	testCmd.AddCommand(unit.CreateCommand())
 	rootCmd.AddCommand(testCmd)
 
 	cobra.OnInitialize(root.InitConfig)

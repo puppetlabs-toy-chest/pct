@@ -114,7 +114,7 @@ func TestGetListOfFlags(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetListOfFlags(tt.args.cmd(), tt.args.argsV, tt.args.flagsToIgnore); !reflect.DeepEqual(got, tt.want) {
+			if got := GetListOfFlags(tt.args.cmd(), tt.args.argsV); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetListOfFlags() = %v, want %v", got, tt.want)
 			}
 		})

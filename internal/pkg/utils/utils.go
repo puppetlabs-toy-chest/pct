@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 
+	"github.com/puppetlabs/pdkgo/internal/pkg/pdkshell"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -27,7 +29,10 @@ func Find(source []string, match string) []string {
 	return matches
 }
 
-func GetListOfFlags(cmd *cobra.Command, argsV []string, flagsToIgnore []string) []string {
+// GetListOfFlags returns a filtered list of arguments provided by the user,
+// removing the flags that are not used by PDK Ruby
+func GetListOfFlags(cmd *cobra.Command, argsV []string) []string {
+	flagsToIgnore := FlagsToIgnore()
 	cmd.Flags().VisitAll(func(f *pflag.Flag) {
 		if !Contains(flagsToIgnore, f.Name) {
 			if f.Changed {
@@ -41,4 +46,33 @@ func GetListOfFlags(cmd *cobra.Command, argsV []string, flagsToIgnore []string) 
 		}
 	})
 	return argsV
+}
+
+// FlagsToIgnore list of pdkgo flags not for use in pdk ruby
+func FlagsToIgnore() []string {
+	flagsToIgnore := []string{"log-level"}
+	return flagsToIgnore
+}
+
+// ExecutePDKCommand is a helper for executing the pdk commandline
+func ExecutePDKCommand(cmd *cobra.Command, args []string) error {
+	log.Trace().Msg("test unit Run")
+	// argsV := []string{"test", "unit"}
+	var argsV []string
+
+	if cmd.HasParent() {
+		argsV = append(argsV, cmd.Parent().Name(), cmd.Name())
+	} else {
+		argsV = append(argsV, cmd.Name())
+	}
+
+	argsV = append(argsV, args...)
+
+	argsV = GetListOfFlags(cmd, argsV)
+
+	log.Trace().Msgf("args: %v", argsV)
+
+	_, err := pdkshell.Execute(argsV)
+
+	return err
 }
