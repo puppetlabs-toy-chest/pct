@@ -1,0 +1,37 @@
+FROM debian:buster-slim
+
+RUN apt-get update && apt-get install -y curl binutils xz-utils \
+  && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+ARG tarball=pdk_2.1.0.0.pre-1buster_amd64.deb
+
+WORKDIR /tmp
+
+RUN curl -O http://builds.delivery.puppetlabs.net/pdk/2.1.0.0.pre/artifacts/deb/buster/PC1/$tarball \
+  && ar x $tarball && tar -xf data.tar.xz \
+  && rm debian-binary && rm control.tar.xz && rm data.tar.xz && rm $tarball \
+  && mv opt / \
+  && rm -rf /opt/puppetlabs/pdk/bin \
+  && rm -rf /opt/puppetlabs/pdk/include \
+  && rm -rf /opt/puppetlabs/pdk/lib \
+  && rm -rf /opt/puppetlabs/pdk/PDK_VERSION \
+  && rm -rf /opt/puppetlabs/pdk/private/puppet/ruby/2.5.0 \
+  && rm -rf /opt/puppetlabs/pdk/private/puppet/ruby/2.7.0 \
+  && rm -rf /opt/puppetlabs/pdk/private/ruby/2.5.8 \
+  && rm -rf /opt/puppetlabs/pdk/private/ruby/2.7.2 \
+  && rm /opt/puppetlabs/pdk/share/cache/Gemfile-2.5.8.lock \
+  && rm /opt/puppetlabs/pdk/share/cache/Gemfile-2.7.2.lock \
+  && rm /opt/puppetlabs/pdk/share/cache/Gemfile.lock \
+  && rm -rf /opt/puppetlabs/pdk/share/cache/pdk-templates.git \
+  && rm -rf /opt/puppetlabs/pdk/share/cache/pe_versions.json \
+  && rm -rf /opt/puppetlabs/pdk/share/cache/ruby/2.5.0 \
+  && rm -rf /opt/puppetlabs/pdk/share/cache/ruby/2.7.0 \
+  && rm -rf /tmp/usr
+
+# cleanup
+RUN apt-get purge -y curl binutils xz-utils \
+  && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -r pdk --gid=9001 && useradd -r -g pdk --uid=9001 -m pdk \
+  && chown -R pdk:pdk /opt/puppetlabs
+USER pdk
