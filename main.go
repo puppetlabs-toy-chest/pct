@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/puppetlabs/pdkgo/cmd/completion"
+	"github.com/puppetlabs/pdkgo/cmd/get"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	"github.com/puppetlabs/pdkgo/cmd/test"
 	"github.com/puppetlabs/pdkgo/cmd/test/unit"
+	"github.com/puppetlabs/pdkgo/cmd/set"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
 	"github.com/spf13/cobra"
 )
@@ -25,6 +27,8 @@ func main() {
 	rootCmd.AddCommand(verCmd)
 
 	rootCmd.AddCommand(completion.CreateCompletionCommand())
+	rootCmd.AddCommand(set.CreateSetCommand())
+	rootCmd.AddCommand(get.CreateGetCommand())
 
 	testCmd := test.CreateTestCommand()
 	testCmd.AddCommand(unit.CreateTestUnitCommand())

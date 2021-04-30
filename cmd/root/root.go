@@ -1,8 +1,8 @@
 package root
 
 import (
+	"fmt"
 	"os"
-	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
@@ -10,6 +10,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/puppetlabs/pdkgo/cmd/get"
+	"github.com/puppetlabs/pdkgo/internal/pkg/config"
 )
 
 var (
@@ -43,7 +46,7 @@ func CreateRootCommand() *cobra.Command {
 			return nil
 		},
 	}
-	tmp.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pdk.yaml)")
+	tmp.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pdk.yaml)")
 
 	tmp.PersistentFlags().StringVar(&LogLevel, "log-level", zerolog.InfoLevel.String(), "Log level (debug, info, warn, error, fatal, panic)")
 	tmp.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint:errcheck
@@ -58,19 +61,25 @@ func CreateRootCommand() *cobra.Command {
 }
 
 func InitConfig() {
+	viper.SetDefault(config.PuppetVersion, "7")
+
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		home, _ := homedir.Dir()
-		viper.SetConfigName(".pdk")
+		viper.SetConfigName(".pdk.yaml")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(home)
-		viper.AddConfigPath(filepath.Join(home, ".config"))
+		defaultConfigFile := fmt.Sprintf("%s/.pdk.yaml", home)
+		if err:= viper.SafeWriteConfigAs(defaultConfigFile); err != nil {
+			log.Error().Msgf("Failed to create config at `%s`: %s", defaultConfigFile,  err.Error())
+		}
 	}
 
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Using config file: %s", viper.ConfigFileUsed())
+		get.LogPuppetVersion()
 	}
 }
