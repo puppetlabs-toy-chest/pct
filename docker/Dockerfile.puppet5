@@ -28,6 +28,17 @@ RUN curl -O http://builds.delivery.puppetlabs.net/pdk/2.1.0.0.pre/artifacts/deb/
   && rm -rf /opt/puppetlabs/pdk/share/cache/ruby/2.7.0 \
   && rm -rf /tmp/usr
 
+
+RUN mkdir -p /toolchain/private/puppet/ \
+  && mkdir -p /toolchain/cache/ \
+  && mv /opt/puppetlabs/pdk/private/puppet/ruby/2.4.0 /toolchain/private/puppet/ruby \
+  && mv /opt/puppetlabs/pdk/private/ruby/2.4.10 /toolchain/private/ruby \
+  && mv /opt/puppetlabs/pdk/share/cache/ruby/2.4.0 /toolchain/cache/ruby \
+  && mv /opt/puppetlabs/pdk/share/cache/Gemfile-2.4.10.lock /toolchain/cache/Gemfile.lock \
+  && mv /opt/puppetlabs/pdk/ssl /toolchain
+
+VOLUME /toolchain
+
 # cleanup
 RUN apt-get purge -y curl binutils xz-utils \
   && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
