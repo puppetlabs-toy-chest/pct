@@ -3,6 +3,7 @@ package set
 import (
 	"github.com/puppetlabs/pdkgo/cmd/get"
 	"github.com/puppetlabs/pdkgo/internal/pkg/config"
+	"github.com/puppetlabs/pdkgo/internal/pkg/puppet"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -51,5 +52,7 @@ func configurePuppet(args []string) {
 		log.Error().Msg(err.Error())
 	}
 
+	puppet.StopContainer()
+	puppet.StartContainer(viper.GetInt(config.PuppetVersion))
 	get.LogPuppetVersion()
 }

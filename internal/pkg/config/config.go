@@ -5,4 +5,5 @@ package config
 
 const (
 	PuppetVersion = "puppet.version"
+	ToolchainMount = "pdk.toolchain.mount"
 )
