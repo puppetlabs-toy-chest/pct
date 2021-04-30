@@ -121,3 +121,54 @@ func TestGetListOfFlags(t *testing.T) {
 		})
 	}
 }
+
+// :( All gone to waste
+
+// type osFileOps interface {
+// 	Getwd() (string, bool)
+// 	Stat(string) (fs.FileInfo, error)
+// }
+
+// type osFO struct{}
+
+// func(osFO) Getwd() (string, error){
+// 	return "/foo/bar", nil
+// }
+
+// var statFilePathReturn fs.FileInfo
+
+
+// func (osFO) Stat(string) (fs.FileInfo, error) {
+// 	return statFilePathReturn, nil
+// }
+
+// func TestValidModuleRoot(t *testing.T) {
+// 	var tests []struct {
+// 		name 		string
+// 		want 		string
+// 		wantErr bool
+// 	}
+
+// 	tests = append(tests, struct{
+// 		name 		string
+// 		want 		string
+// 		wantErr bool
+// 	}{
+// 			name: "Should return current working dir if valid module root",
+// 			want: "/foo/bar",
+// 			wantErr: false,
+// 		},
+// 	)
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			gotModuleRoot, err := ValidModuleRoot()
+// 			if (err != nil) != tt.wantErr {
+// 				t.Errorf("ValidModuleRoot() error = %v, wantErr %v", err, tt.wantErr)
+// 				return
+// 			}
+// 			if gotModuleRoot != tt.want {
+// 				t.Errorf("ValidModuleRoot() = %v, want %v", gotModuleRoot, tt.want)
+// 			}
+// 		})
+// 	}
+// }

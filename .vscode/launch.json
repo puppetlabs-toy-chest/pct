@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "pdk validate ruby",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "cwd": "/Users/ciaran.mccrisken/puppetlabs/puppetlabs-motd",
+      "args": [
+        "validate",
+        "ruby",
+        "${input:validate_flags}"
+      ]
+    },
+    {
+      "name": "pdk validate",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "cwd": "/Users/ciaran.mccrisken/puppetlabs/puppetlabs-motd",
+      "args": [
+        "validate",
+        "${input:validate_flags}"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "validate_flags",
+      "type": "promptString",
+      "description": "Validate flags"
+    }
+  ]
+}

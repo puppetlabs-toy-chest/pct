@@ -31,6 +31,7 @@ import (
 	"github.com/puppetlabs/pdkgo/cmd/test/unit"
 	"github.com/puppetlabs/pdkgo/cmd/update"
 	"github.com/puppetlabs/pdkgo/cmd/validate"
+	"github.com/puppetlabs/pdkgo/cmd/validate/external_validator/ruby"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
 
 	"github.com/spf13/cobra"
@@ -57,6 +58,7 @@ func main() {
 	testCmd.AddCommand(unit.CreateCommand())
 	rootCmd.AddCommand(testCmd)
 
+
 	rootCmd.AddCommand(build.CreateCommand())
 	rootCmd.AddCommand(convert.CreateCommand())
 	rootCmd.AddCommand(update.CreateCommand())
@@ -67,7 +69,10 @@ func main() {
 	rootCmd.AddCommand(releaseCmd)
 
 	rootCmd.AddCommand(env.CreateCommand())
-	rootCmd.AddCommand(validate.CreateCommand())
+
+	validateCmd := validate.CreateCommand()
+	validateCmd.AddCommand(ruby.CreateCommand())
+	rootCmd.AddCommand(validateCmd)
 
 	setCmd := set.CreateCommand()
 	setCmd.AddCommand(setConfig.CreateCommand())

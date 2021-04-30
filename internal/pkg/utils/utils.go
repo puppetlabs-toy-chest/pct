@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pdkshell"
 	"github.com/rs/zerolog/log"
@@ -77,4 +79,30 @@ func buildPDKCommandName(cmd *cobra.Command) []string {
 		argsV = append(argsV, cmd.Name())
 	}
 	return argsV
+}
+
+func getContext() (context string) {
+	return "module"
+}
+
+func getModuleRoot() (moduleRoot string) {
+	moduleRoot, _ = os.Getwd()
+
+	return moduleRoot
+}
+
+func ValidModuleRoot() (moduleRoot string, err error) {
+	currentWd, err := os.Getwd()
+	if err != nil {
+		log.Error().Msgf("Error determining current working dir: %v", err)
+		return "", err
+	}
+
+	_, err = os.Stat(filepath.Join(currentWd, "metadata.json"))
+	if err != nil {
+		log.Error().Msgf("Error determining if valid module root: %v", err)
+		return "", nil
+	}
+
+	return currentWd, err
 }
