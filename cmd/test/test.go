@@ -4,12 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	debug  bool
-	format string
-)
+var ()
 
-func CreateTestCommand() *cobra.Command {
+func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:   "test [flags]",
 		Short: "Run tests",
@@ -18,7 +15,6 @@ func CreateTestCommand() *cobra.Command {
 
 		},
 	}
-	tmp.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug output")
-	tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "formating (default is junit)")
+
 	return tmp
 }

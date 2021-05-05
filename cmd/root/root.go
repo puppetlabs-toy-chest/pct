@@ -16,6 +16,9 @@ var (
 	cfgFile            string
 	LogLevel           string
 	LocalTemplateCache string
+
+	debug  bool
+	format string
 )
 
 func CreateRootCommand() *cobra.Command {
@@ -53,6 +56,9 @@ func CreateRootCommand() *cobra.Command {
 		var levels = []string{"debug", "info", "warn", "error", "fatal", "panic"}
 		return utils.Find(levels, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
+
+	tmp.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug output")
+	tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "formating (default is junit)")
 
 	return tmp
 }

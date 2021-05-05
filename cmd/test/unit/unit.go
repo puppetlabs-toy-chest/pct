@@ -1,9 +1,7 @@
 package unit
 
 import (
-	"github.com/puppetlabs/pdkgo/internal/pkg/pdkshell"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -17,12 +15,12 @@ var (
 	verboseUnitTestOutput  bool
 )
 
-func CreateTestUnitCommand() *cobra.Command {
+func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:   "unit [flags]",
 		Short: "Run unit tests",
 		Long:  `Run unit tests`,
-		RunE:  executeTestUnit,
+		RunE:  utils.ExecutePDKCommand,
 	}
 
 	tmp.Flags().BoolVarP(&cleanFixtures, "clean-fixtures", "c", false, "clean up downloaded fixtures after the test run")
@@ -36,19 +34,4 @@ func CreateTestUnitCommand() *cobra.Command {
 	tmp.Flags().BoolVar(&verboseUnitTestOutput, "verbose", false,
 		"more verbose --list output. displays a list of examples in each unit test file")
 	return tmp
-}
-
-func executeTestUnit(cmd *cobra.Command, args []string) error {
-	log.Trace().Msg("test unit Run")
-	argsV := []string{"test", "unit"}
-
-	flagsToIgnore := []string{"log-level"}
-
-	argsV = utils.GetListOfFlags(cmd, argsV, flagsToIgnore)
-
-	log.Trace().Msgf("args: %v", argsV)
-
-	_, err := pdkshell.Execute(argsV)
-
-	return err
 }
