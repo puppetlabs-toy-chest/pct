@@ -1,0 +1,13 @@
+---
+template:
+  name: good-project
+  type: project
+  display: Good Project
+  version: 0.1.0
+  url: https://github.com/puppetlabs/pct-good-project
+
+puppet_module:
+  # author: "james"
+  license: "Apache-2.0"
+  version: "0.1.0"
+  summary: "A New Puppet Module"

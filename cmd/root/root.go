@@ -38,9 +38,12 @@ func CreateRootCommand() *cobra.Command {
 
 			zerolog.SetGlobalLevel(lvl)
 
-			log.Logger = log.
-				Output(zerolog.ConsoleWriter{Out: os.Stdout}).
-				With().Caller().Logger()
+			if lvl == zerolog.InfoLevel {
+				log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+			} else {
+				log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Caller().Logger()
+			}
+
 			log.Trace().Msg("PersistentPreRunE")
 
 			return nil
