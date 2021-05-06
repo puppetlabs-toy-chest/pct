@@ -10,15 +10,6 @@ import (
 	"github.com/puppetlabs/pdkgo/cmd/get"
 	getConfig "github.com/puppetlabs/pdkgo/cmd/get/config"
 	"github.com/puppetlabs/pdkgo/cmd/new"
-	"github.com/puppetlabs/pdkgo/cmd/new/class"
-	"github.com/puppetlabs/pdkgo/cmd/new/definedtype"
-	"github.com/puppetlabs/pdkgo/cmd/new/fact"
-	"github.com/puppetlabs/pdkgo/cmd/new/function"
-	"github.com/puppetlabs/pdkgo/cmd/new/module"
-	"github.com/puppetlabs/pdkgo/cmd/new/provider"
-	"github.com/puppetlabs/pdkgo/cmd/new/task"
-	newTest "github.com/puppetlabs/pdkgo/cmd/new/test"
-	"github.com/puppetlabs/pdkgo/cmd/new/transport"
 	"github.com/puppetlabs/pdkgo/cmd/release"
 	"github.com/puppetlabs/pdkgo/cmd/release/prep"
 	"github.com/puppetlabs/pdkgo/cmd/release/publish"
@@ -82,15 +73,6 @@ func main() {
 	rootCmd.AddCommand(removeCmd)
 
 	newCmd := new.CreateCommand()
-	newCmd.AddCommand(class.CreateCommand())
-	newCmd.AddCommand(definedtype.CreateCommand())
-	newCmd.AddCommand(fact.CreateCommand())
-	newCmd.AddCommand(function.CreateCommand())
-	newCmd.AddCommand(module.CreateCommand())
-	newCmd.AddCommand(provider.CreateCommand())
-	newCmd.AddCommand(task.CreateCommand())
-	newCmd.AddCommand(newTest.CreateCommand())
-	newCmd.AddCommand(transport.CreateCommand())
 	rootCmd.AddCommand(newCmd)
 
 	rootCmd.AddCommand(bundle.CreateCommand())
