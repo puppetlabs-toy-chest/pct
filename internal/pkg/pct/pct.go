@@ -47,7 +47,20 @@ type PuppetContentTemplateInfo struct {
 	URL     string `mapstructure:"url"`
 }
 
-func List(templatePath string, templateName string) ([]PuppetContentTemplateInfo, error) {
+type PCT struct {
+}
+
+type PctApi interface {
+	List(string, string) ([]PuppetContentTemplateInfo, error)
+
+	FormatTemplates([]PuppetContentTemplateInfo, bool) error
+
+	FormatDeployment(deployed []string, jsonOutput bool) error
+
+	Deploy(string, string, string, string, PDKInfo) []string
+}
+
+func (PCT) List(templatePath string, templateName string) ([]PuppetContentTemplateInfo, error) {
 	matches, _ := filepath.Glob(templatePath + "/**/" + TemplateConfigFileName)
 	var tmpls []PuppetContentTemplateInfo
 	for _, file := range matches {
@@ -64,7 +77,7 @@ func List(templatePath string, templateName string) ([]PuppetContentTemplateInfo
 	return tmpls, nil
 }
 
-func FormatTemplates(tmpls []PuppetContentTemplateInfo, jsonOutput bool) error {
+func (PCT) FormatTemplates(tmpls []PuppetContentTemplateInfo, jsonOutput bool) error {
 	if jsonOutput {
 		j := jsoniter.ConfigFastest
 		prettyJSON, err := j.MarshalIndent(&tmpls, "", "  ")
@@ -94,7 +107,7 @@ func FormatTemplates(tmpls []PuppetContentTemplateInfo, jsonOutput bool) error {
 	return nil
 }
 
-func FormatDeployment(deployed []string, jsonOutput bool) error {
+func (PCT) FormatDeployment(deployed []string, jsonOutput bool) error {
 	if jsonOutput {
 		j := jsoniter.ConfigFastest
 		prettyJSON, _ := j.MarshalIndent(deployed, "", "  ")
@@ -108,7 +121,7 @@ func FormatDeployment(deployed []string, jsonOutput bool) error {
 	return nil
 }
 
-func Deploy(selectedTemplate string, localTemplateCache string, targetOutput string, targetName string, pdkInfo PDKInfo) []string {
+func (PCT) Deploy(selectedTemplate string, localTemplateCache string, targetOutput string, targetName string, pdkInfo PDKInfo) []string {
 
 	log.Trace().Msgf("PDKInfo: %+v", pdkInfo)
 

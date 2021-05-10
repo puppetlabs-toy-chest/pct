@@ -21,6 +21,12 @@ var (
 	targetOutput       string
 )
 
+var template pct.PctApi
+
+func init(){
+	template = pct.PCT{}
+}
+
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:               "new <template> [args] [flags]",
@@ -75,7 +81,7 @@ func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]str
 }
 
 func completeName(cache string, match string) []string {
-	tmpls, _ := pct.List(cache, "")
+	tmpls, _ := template.List(cache, "")
 	var names []string
 	for _, tmpl := range tmpls {
 		if strings.HasPrefix(tmpl.Name, match) {
@@ -107,12 +113,12 @@ func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
 	if listTemplates {
-		tmpls, err := pct.List(localTemplateCache, selectedTemplate)
+		tmpls, err := template.List(localTemplateCache, selectedTemplate)
 		if err != nil {
 			return err
 		}
 
-		err = pct.FormatTemplates(tmpls, jsonOutput)
+		err = template.FormatTemplates(tmpls, jsonOutput)
 		if err != nil {
 			return err
 		}
@@ -123,7 +129,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	appVersionString := cmd.Parent().Version
 	pdkInfo := getApplicationInfo(appVersionString)
 
-	deployed := pct.Deploy(
+	deployed := template.Deploy(
 		selectedTemplate,
 		localTemplateCache,
 		targetOutput,
@@ -131,7 +137,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		pdkInfo,
 	)
 
-	err := pct.FormatDeployment(deployed, jsonOutput)
+	err := template.FormatDeployment(deployed, jsonOutput)
 	if err != nil {
 		return err
 	}
