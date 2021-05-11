@@ -1,3 +1,3 @@
 #!/bin/bash
 
-go build -v -o pdk
+go build -v -o pct

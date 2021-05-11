@@ -1,3 +1,3 @@
 #!/usr/bin/env pwsh
 
-go build -v -o pdk.exe
+go build -v -o pct.exe

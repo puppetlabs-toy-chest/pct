@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -22,14 +23,21 @@ func CreateVersionCommand(version, buildDate string, commit string) *cobra.Comma
 }
 
 func Format(version, buildDate string, commit string) string {
-	version = strings.TrimPrefix(version, "v")
+	version = strings.TrimSpace(strings.TrimPrefix(version, "v"))
 
 	var dateStr string
 	if buildDate != "" {
-		dateStr = fmt.Sprintf(" (%s)", buildDate)
+		t, _ := time.Parse(time.RFC3339, buildDate)
+		dateStr = t.Format("2006/01/02")
 	}
 
-	return fmt.Sprintf("pdk %s%s\npdk-ruby 2.2.0\n\n%s", version, dateStr, changelogURL(version))
+	if commit != "" && len(commit) > 7 {
+		length := len(commit) - 7
+		commit = strings.TrimSpace(commit[:len(commit)-length])
+	}
+
+	return fmt.Sprintf("pdk %s %s %s\npdk-ruby 2.2.0\n\n%s",
+		version, commit, dateStr, changelogURL(version))
 }
 
 func changelogURL(version string) string {
