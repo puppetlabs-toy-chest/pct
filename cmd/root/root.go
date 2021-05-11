@@ -18,12 +18,12 @@ var (
 	LocalTemplateCache string
 
 	debug  bool
-	format string
+	// format string
 )
 
 func CreateRootCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:   "pdk",
+		Use:   "pct",
 		Short: "pdk - Puppet Development Kit",
 		Long:  `Puppet development tooling, content creation, and testing framework`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -58,7 +58,7 @@ func CreateRootCommand() *cobra.Command {
 	})
 
 	tmp.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug output")
-	tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "formating (default is junit)")
+	// tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "formating (default is junit)")
 
 	return tmp
 }

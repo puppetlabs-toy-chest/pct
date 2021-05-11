@@ -96,15 +96,9 @@ func List(templatePath string, templateName string) ([]PuppetContentTemplate, er
 
 // FormatTemplates formats one or more templates to display on the console in
 // table format or json format.
-func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput bool) error {
-	if jsonOutput {
-		j := jsoniter.ConfigFastest
-		prettyJSON, err := j.MarshalIndent(&tmpls, "", "  ")
-		if err != nil {
-			log.Error().Msgf("Error converting to json: %v", err)
-		}
-		fmt.Printf("%s\n", string(prettyJSON))
-	} else {
+func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
+	switch jsonOutput {
+	case "table":
 		fmt.Println("")
 		if len(tmpls) == 1 {
 			fmt.Printf("DisplayName:     %v\n", tmpls[0].Display)
@@ -121,24 +115,30 @@ func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput bool) error {
 			}
 			table.Render()
 		}
+	case "json":
+		j := jsoniter.ConfigFastest
+		prettyJSON, err := j.MarshalIndent(&tmpls, "", "  ")
+		if err != nil {
+			log.Error().Msgf("Error converting to json: %v", err)
+		}
+		fmt.Printf("%s\n", string(prettyJSON))
 	}
-
 	return nil
 }
 
 // FormatDeployment formats the files returned by the Deploy method to display
 // on the console in table format or json format.
-func FormatDeployment(deployed []string, jsonOutput bool) error {
-	if jsonOutput {
-		j := jsoniter.ConfigFastest
-		prettyJSON, _ := j.MarshalIndent(deployed, "", "  ")
-		fmt.Printf("%s\n", prettyJSON)
-	} else {
+func FormatDeployment(deployed []string, jsonOutput string) error {
+	switch jsonOutput {
+	case "table":
 		for _, d := range deployed {
 			log.Info().Msgf("Deployed: %v", d)
 		}
+	case "json":
+		j := jsoniter.ConfigFastest
+		prettyJSON, _ := j.MarshalIndent(deployed, "", "  ")
+		fmt.Printf("%s\n", prettyJSON)
 	}
-
 	return nil
 }
 
