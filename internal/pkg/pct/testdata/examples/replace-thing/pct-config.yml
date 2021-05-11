@@ -1,0 +1,10 @@
+---
+template:
+  id: replace-thing
+  type: item
+  display: replace the thing
+  version: 0.1.0
+  url: https://github.com/puppetlabs/pct-replace-thing
+
+example_replace:
+  summary: "This should replace the file name correctly"
