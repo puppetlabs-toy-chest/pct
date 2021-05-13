@@ -1,7 +1,6 @@
 package new
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -40,9 +39,8 @@ func CreateCommand() *cobra.Command {
 
 	tmp.Flags().SortFlags = false
 
-	cwd, _ := os.Getwd()
-	tmp.Flags().StringVarP(&targetName, "name", "n", filepath.Base(cwd), "the name for the created output.")
-	tmp.Flags().StringVarP(&targetOutput, "output", "o", cwd, "location to place the generated output.")
+	tmp.Flags().StringVarP(&targetName, "name", "n", "", "the name for the created output.")
+	tmp.Flags().StringVarP(&targetOutput, "output", "o", "", "location to place the generated output.")
 
 	tmp.Flags().BoolVarP(&listTemplates, "list", "l", false, "list templates")
 	tmp.RegisterFlagCompletionFunc("list", flagCompletion) //nolint:errcheck
