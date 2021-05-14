@@ -13,6 +13,7 @@ var (
 	puppetVersion          string
 	unitTestsToRun         string
 	verboseUnitTestOutput  bool
+	format                 string
 )
 
 func CreateCommand() *cobra.Command {
@@ -33,5 +34,7 @@ func CreateCommand() *cobra.Command {
 
 	tmp.Flags().BoolVar(&verboseUnitTestOutput, "verbose", false,
 		"more verbose --list output. displays a list of examples in each unit test file")
+
+	tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "Specify desired output format. Valid formats are 'junit', 'text'. You may also specify a file to which the formatted output is sent, for example: '--format=junit:report.xml'. This option may be specified multiple times if each option specifies a distinct target file")
 	return tmp
 }
