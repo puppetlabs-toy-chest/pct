@@ -1,3 +1,4 @@
 #!/bin/bash
 
-go build -v -o pct
+# Set goreleaser to build for current platform only
+goreleaser build --snapshot --rm-dist --single-target
