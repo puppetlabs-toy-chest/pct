@@ -1,7 +1,8 @@
 project_name: pdk
 
 release:
-  name_template: "PDK {{.Version}}"
+  name_template: "PCT {{.Version}}"
+  prerelease: auto
 
 before:
   hooks:
