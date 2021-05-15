@@ -8,9 +8,7 @@ before:
     - go mod tidy
 
 builds:
-  - main: main.go
-    binary: pct
-    mod_timestamp: '{{ .CommitTimestamp }}'
+  - binary: pct
     env:
       - CGO_ENABLED=0
     goos:
@@ -21,8 +19,13 @@ builds:
       - amd64
       - arm
       - arm64
+    asmflags:
+      - all=-trimpath={{.Env.GOPATH}}
+    gcflags:
+      - all=-trimpath={{.Env.GOPATH}}
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
+    mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
   - replacements:
