@@ -22,23 +22,25 @@ Prerequisites:
 
 To build the PDK, run the following command:
 
+> These build scripts produce a binary for the current platform only. These scripts are meant for local testing. We use a Github Action to release this product.
+
 ```bash
 > # on nix
-> go build -o pdk
+> ./build.sh
 ```
 
 ```powershell
 # on windows
-> go build -o pdk.exe
+> ./build.ps1
 ```
 
 To run the new binary:
 
 ```bash
-> ./pdk
+> ./pct [command]
 ```
 
-To test the PDK, run the following command.
+To test the PCT command, run the following command.
 
 ```bash
 > go test ./...
@@ -47,8 +49,7 @@ To test the PDK, run the following command.
 ## Running the project
 
 ```bash
-> # on nix
-> go run cmd/pdk/main.go
+> go run main.go
 ```
 
 ## Building Cross Platform binaries
@@ -58,7 +59,7 @@ Prerequisites:
 - Go 1.16+
 - goreleaser 0.16+
 
-To build the PDK for more than your current platform, use [`GoReleaser`](https://goreleaser.com/quick-start/#dry-run):
+To build the PCT for more than your current platform, use [`GoReleaser`](https://goreleaser.com/quick-start/#dry-run):
 
 ```bash
 > goreleaser --snapshot --skip-publish --rm-dist
