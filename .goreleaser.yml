@@ -1,4 +1,4 @@
-project_name: pdk
+project_name: pct
 
 release:
   name_template: "PCT {{.Version}}"
@@ -29,7 +29,8 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
-  - replacements:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+    replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
@@ -44,7 +45,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: "{{ .Tag }}-{{.ShortCommit}}"
 
 changelog:
   sort: asc
