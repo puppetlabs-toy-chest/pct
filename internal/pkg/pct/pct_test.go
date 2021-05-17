@@ -69,6 +69,52 @@ func TestDeploy(t *testing.T) {
 	}
 }
 
+func TestGet(t *testing.T) {
+	type args struct {
+		templateCache    string
+		selectedTemplate string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    PuppetContentTemplate
+		wantErr bool
+	}{
+		{
+			name:    "returns error for non-existent template",
+			args:    args{},
+			wantErr: true,
+		},
+		{
+			name: "returns tmpl for existent template",
+			args: args{
+				templateCache:    "testdata/examples",
+				selectedTemplate: "full-project",
+			},
+			want: PuppetContentTemplate{
+				Id:      "full-project",
+				Type:    "project",
+				Display: "Full Project",
+				Version: "0.1.0",
+				URL:     "https://github.com/puppetlabs/pct-full-project",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Get(tt.args.templateCache, tt.args.selectedTemplate)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Get() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_createTemplateFile(t *testing.T) {
 	type args struct {
 		targetName   string

@@ -10,3 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (GH-2) Created Puppet Content Templates package and modified pdk new to use PCT
 - (GH-7) Added wrapper to all existing PDK commands
+
+### Fixed
+
+- (GH-29) Error if template not found
