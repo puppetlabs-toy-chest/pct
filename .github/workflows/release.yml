@@ -13,10 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Checkout
+        name: Checkout pdkgo
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      -
+        name: Checkout PCT Templates
+        uses: actions/checkout@v2
+        with:
+          repository: puppetlabs/baker-round
+          fetch-depth: 0
+          path: templates
       -
         name: Set up Go
         uses: actions/setup-go@v2

@@ -1,13 +1,13 @@
 package new
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,12 +29,8 @@ func CreateCommand() *cobra.Command {
 		Long:              `Creates a Puppet project or other artifact based on a template`,
 		Args:              validateArgCount,
 		ValidArgsFunction: flagCompletion,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			log.Trace().Msg("PreRunE")
-			localTemplateCache = viper.GetString("templatepath")
-			return nil
-		},
-		RunE: execute,
+		PreRunE:           preExecute,
+		RunE:              execute,
 	}
 
 	tmp.Flags().SortFlags = false
@@ -54,11 +50,20 @@ func CreateCommand() *cobra.Command {
 		return utils.Find(formats, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
 
-	home, _ := homedir.Dir()
 	tmp.Flags().StringVar(&localTemplateCache, "templatepath", "", "location of installed templates")
 	viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath")) //nolint:errcheck
-	viper.SetDefault("templatepath", filepath.Join(home, ".pdk", "pct"))
 	return tmp
+}
+
+func preExecute(cmd *cobra.Command, args []string) error {
+	defaultTemplatePath, err := getDefaultTemplatePath()
+	if err != nil {
+		return err
+	}
+
+	viper.SetDefault("templatepath", defaultTemplatePath)
+	localTemplateCache = viper.GetString("templatepath")
+	return nil
 }
 
 func validateArgCount(cmd *cobra.Command, args []string) error {
@@ -153,4 +158,15 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func getDefaultTemplatePath() (string, error) {
+	execDir, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	defaultTemplatePath := filepath.Join(filepath.Dir(execDir), "templates")
+	log.Trace().Msgf("Default template path: %v", defaultTemplatePath)
+	return defaultTemplatePath, nil
 }
