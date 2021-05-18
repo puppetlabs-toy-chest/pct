@@ -74,6 +74,16 @@ type DeployInfo struct {
 	PdkInfo          PDKInfo
 }
 
+func Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
+	file := filepath.Join(templateCache, selectedTemplate, TemplateConfigFileName)
+	_, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		return PuppetContentTemplate{}, fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
+	}
+	i := readTemplateConfig(file)
+	return i, nil
+}
+
 // List lists all templates in a given path and parses their configuration. Does
 // not return any errors from parsing invalid templates, but returns them as
 // debug log events

@@ -133,6 +133,11 @@ func execute(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	_, err := pct.Get(localTemplateCache, selectedTemplate)
+	if err != nil {
+		return err
+	}
+
 	appVersionString := cmd.Parent().Version
 	pdkInfo := getApplicationInfo(appVersionString)
 
@@ -144,7 +149,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		PdkInfo:          pdkInfo,
 	})
 
-	err := pct.FormatDeployment(deployed, format)
+	err = pct.FormatDeployment(deployed, format)
 	if err != nil {
 		return err
 	}
