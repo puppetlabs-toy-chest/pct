@@ -100,7 +100,9 @@ func Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, 
 // not return any errors from parsing invalid templates, but returns them as
 // debug log events
 func List(templatePath string, templateName string) ([]PuppetContentTemplate, error) {
+	log.Debug().Msgf("Searching %+v for templates", templatePath)
 	matches, _ := filepath.Glob(templatePath + "/**/" + TemplateConfigFileName)
+
 	var tmpls []PuppetContentTemplate
 	for _, file := range matches {
 		log.Debug().Msgf("Found: %+v", file)
@@ -122,7 +124,11 @@ func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
 	switch jsonOutput {
 	case "table":
 		fmt.Println("")
-		if len(tmpls) == 1 {
+
+		count := len(tmpls)
+		if count < 1 {
+			log.Warn().Msgf("Could not locate any templates at %+v", viper.GetString("templatepath"))
+		} else if count == 1 {
 			fmt.Printf("DisplayName:     %v\n", tmpls[0].Display)
 			fmt.Printf("Name:            %v\n", tmpls[0].Id)
 			fmt.Printf("TemplateType:    %v\n", tmpls[0].Type)
