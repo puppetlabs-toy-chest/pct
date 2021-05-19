@@ -1,3 +1,4 @@
 #!/usr/bin/env pwsh
 
-go build -v -o pct.exe
+# Set goreleaser to build for current platform only
+goreleaser build --snapshot --rm-dist --single-target
