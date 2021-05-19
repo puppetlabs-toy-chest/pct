@@ -1,17 +1,44 @@
 package pct
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
+
+func TestMain(m *testing.M) {
+	// hide logging output
+	log.Logger = zerolog.New(ioutil.Discard).With().Timestamp().Logger()
+	os.Exit(m.Run())
+}
+
+type osMock struct {
+	GetwdFunc func() (dir string, err error)
+}
+
+func (osm osMock) Getwd() (dir string, err error) {
+	return osm.GetwdFunc()
+}
 
 func TestDeploy(t *testing.T) {
 	type args struct {
 		info DeployInfo
 	}
 	tmp := t.TempDir()
+
+	// this sets wrapper within pct.go
+	osUtils = osMock{
+		GetwdFunc: func() (dir string, err error) {
+			return tmp, nil
+		},
+	}
+
+	tmpFile := filepath.Base(tmp)
 
 	tests := []struct {
 		name string
@@ -39,6 +66,46 @@ func TestDeploy(t *testing.T) {
 			},
 		},
 		{
+			name: "deploy a project without a name or outputDir",
+			args: args{
+				info: DeployInfo{
+					SelectedTemplate: "full-project",
+					TemplateCache:    "testdata/examples",
+					TargetOutputDir:  "",
+					TargetName:       "",
+					PdkInfo: PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
+			},
+			want: []string{
+				tmp,
+				filepath.Join(tmp, "metadata.json"),
+			},
+		},
+		{
+			name: "deploy a project without an outputDir",
+			args: args{
+				info: DeployInfo{
+					SelectedTemplate: "full-project",
+					TemplateCache:    "testdata/examples",
+					TargetOutputDir:  "",
+					TargetName:       "wibble",
+					PdkInfo: PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
+			},
+			want: []string{
+				filepath.Join(tmp, "wibble"),
+				filepath.Join(tmp, "wibble", "metadata.json"),
+			},
+		},
+		{
 			name: "deploy a item and return the correctly named new files",
 			args: args{
 				info: DeployInfo{
@@ -56,6 +123,46 @@ func TestDeploy(t *testing.T) {
 			want: []string{
 				filepath.Join(tmp, "thing"),
 				filepath.Join(tmp, "thing", "woo.txt"),
+			},
+		},
+		{
+			name: "deploy a item without a name or outputDir",
+			args: args{
+				info: DeployInfo{
+					SelectedTemplate: "replace-thing",
+					TemplateCache:    "testdata/examples",
+					TargetOutputDir:  "",
+					TargetName:       "",
+					PdkInfo: PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
+			},
+			want: []string{
+				tmp,
+				filepath.Join(tmp, tmpFile + ".txt"),
+			},
+		},
+		{
+			name: "deploy a item without an outputDir",
+			args: args{
+				info: DeployInfo{
+					SelectedTemplate: "replace-thing",
+					TemplateCache:    "testdata/examples",
+					TargetOutputDir:  "",
+					TargetName:       "wibble",
+					PdkInfo: PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
+			},
+			want: []string{
+				tmp,
+				filepath.Join(tmp, "wibble.txt"),
 			},
 		},
 	}

@@ -74,6 +74,18 @@ type DeployInfo struct {
 	PdkInfo          PDKInfo
 }
 
+type osWrapper interface {
+	Getwd() (string, error)
+}
+type osFunc struct {
+}
+
+func (osf osFunc) Getwd() (dir string, err error) {
+	return os.Getwd()
+}
+
+var osUtils osWrapper = osFunc{}
+
 func Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
 	file := filepath.Join(templateCache, selectedTemplate, TemplateConfigFileName)
 	_, err := os.Stat(file)
@@ -164,59 +176,23 @@ func Deploy(info DeployInfo) []string {
 	tmpl := readTemplateConfig(file)
 	log.Trace().Msgf("Parsed: %+v", tmpl)
 
-	// pdk new foo-foo
-	if info.TargetName == "" && info.TargetOutputDir == "" {
-		cwd, _ := os.Getwd()
+	if info.TargetName == "" && info.TargetOutputDir == "" {// pdk new foo-foo
+		cwd, _ := osUtils.Getwd()
 		info.TargetName = filepath.Base(cwd)
 		info.TargetOutputDir = cwd
-	}
-
-	// pdk new foo-foo -n wakka
-	if info.TargetName != "" && info.TargetOutputDir == "" {
-		cwd, _ := os.Getwd()
-		info.TargetOutputDir = filepath.Join(cwd, info.TargetName)
-	}
-
-	// pdk new foo-foo -o /foo/bar/baz
-	if info.TargetName == "" && info.TargetOutputDir != "" {
-		info.TargetName = filepath.Base(info.TargetOutputDir)
-	}
-
-	// pdk new foo-foo
-	if info.TargetName == "" {
-		cwd, _ := os.Getwd()
-		info.TargetName = filepath.Base(cwd)
-	}
-
-	// pdk new foo-foo
-	// pdk new foo-foo -n wakka
-	// pdk new foo-foo -n wakka -o c:/foo
-	// pdk new foo-foo -n wakka -o c:/foo/wakka
-	switch tmpl.Type {
-	case "project":
-		if info.TargetOutputDir == "" {
-			cwd, _ := os.Getwd()
-			info.TargetOutputDir = cwd
-		} else if strings.HasSuffix(info.TargetOutputDir, info.TargetName) {
-			// user has specified outputpath with the info.Targetname in it
+	} else if info.TargetName != "" && info.TargetOutputDir == "" { // pdk new foo-foo -n wakka
+		cwd, _ := osUtils.Getwd()
+		if tmpl.Type == "project" {
+			info.TargetOutputDir = filepath.Join(cwd, info.TargetName)
 		} else {
+			info.TargetOutputDir = cwd
+		}
+	} else if info.TargetName == "" && info.TargetOutputDir != "" { // pdk new foo-foo -o /foo/bar/baz
+		info.TargetName = filepath.Base(info.TargetOutputDir)
+	}	else if info.TargetName != "" && info.TargetOutputDir != "" { // pdk new foo-foo -n wakka -o /foo/bar/baz
+		if tmpl.Type == "project" {
 			info.TargetOutputDir = filepath.Join(info.TargetOutputDir, info.TargetName)
 		}
-	case "item":
-		if info.TargetOutputDir == "" {
-			cwd, _ := os.Getwd()
-			info.TargetOutputDir = cwd
-		} else if strings.HasSuffix(info.TargetOutputDir, info.TargetName) {
-			// user has specified outputpath with the info.Targetname in it
-			info.TargetOutputDir, _ = filepath.Split(info.TargetOutputDir)
-			log.Debug().Msgf("Changing target to :%s", info.TargetOutputDir)
-			info.TargetOutputDir = filepath.Clean(info.TargetOutputDir)
-			log.Debug().Msgf("Changing target to :%s", info.TargetOutputDir)
-		}
-		// } else {
-		// 	// use what the user tells us
-		// }
-
 	}
 
 	contentDir := filepath.Join(info.TemplateCache, info.SelectedTemplate, "content")
