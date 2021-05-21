@@ -1,0 +1,39 @@
+name: Acceptance
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  go_version: 1.16
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      GOPATH: ${{ github.workspace }}
+      TEST_ACCEPTANCE: true
+    defaults:
+      run:
+        working-directory: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.go_version }}
+
+    - name: Build
+      run: |
+          go get github.com/goreleaser/goreleaser
+          goreleaser build --snapshot --rm-dist --single-target
+
+    - name: Test
+      run: go test -v github.com/puppetlabs/pdkgo/acceptance
