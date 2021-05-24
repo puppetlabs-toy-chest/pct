@@ -24,7 +24,18 @@ These are meant to be ready-to-run, which means they put everything needed for a
 
 ## Getting Started
 
-Install the `experimental` PCT release available from [github.com/puppetlabs/pdkgo/releases/](https://github.com/puppetlabs/pdkgo/releases/)
+Grab the `experimental` PCT release available from [github.com/puppetlabs/pdkgo/releases/](https://github.com/puppetlabs/pdkgo/releases/).
+
+Uncompress the archive to a location of your choosing - this will be refered to as `$INSTALLATION_ROOT` subsequently.
+
+This should contain the following file and directory:
+
+```bash
+pct[.exe]
+templates/
+```
+
+The `$INSTALLATION_ROOT/templates` directory will be subsequently referred to as the **Default Template Location**.
 
 Templates currently come in 2 flavours: `project` and `item`.
 
@@ -35,7 +46,7 @@ Templates currently come in 2 flavours: `project` and `item`.
 
 PCT is available through the `pct new` command.
 
-The `--list` or `-l` flag displays a list of locally available templates located in the default template location `$HOME/.pdk/pct/`. The list of templates is also available by calling `pct new` without flags.
+The `--list` or `-l` flag displays a list of locally available templates located in the **Default Template Location**. The list of templates is also available by calling `pct new` without flags.
 
 ``` bash
 pct new
@@ -125,6 +136,14 @@ pct completion --help
 
 A PCT is an archive containing a templated set of files and folders that represent a completed set of content. Files and folders stored in the template aren't limited to formal Puppet project types. Source files and folders may consist of any content that you wish to create when the template is used, even if the template engine produces just one file as its output.
 
+### Location
+
+You can specify the location of your templates using the `--templatepath` option:
+
+```bash
+pct new my-custom-project --templatepath /home/me/templates
+```
+
 ### Composition
 
 A PCT must contain a `pct-config.yml` in the root directory, alongside a `content` directory. The root directory must be named the same as the `id` value defined in  your `pct-config.yml`
@@ -177,8 +196,8 @@ template:
 Example structure for `example-template`:
 
 ``` bash
-> tree ~/.pdk/pct/example-template-params
-/Users/me/.pdk/pct/example-template-params
+> tree ~/templates/example-template-params
+/Users/me/templates/example-template-params
 ├── content
 │   └── example.txt.tmpl
 └── pct-config.yml
@@ -245,7 +264,7 @@ For most templates, we believe that you can do most of the things you would want
 {{range .example_template.colours}} {{.}} {{end}}
 ```
 
-For more examples look at the existing templates provided at `$HOME/.pdk/pct/`
+For more examples look at the existing templates provided in the **Default Template Location**.
 
 ### Dos and Don'ts
 
@@ -258,7 +277,7 @@ For more examples look at the existing templates provided at `$HOME/.pdk/pct/`
 Perhaps you use a template often and find that you set the same values over and over?
 As a template user, you can choose to override the default values specified by a template author.
 
-> :memo: To view the default parameters for a template, look at it's `pct-config.yaml`. You can find all the current installed templates in the default template location: `$HOME/.pdk/pct/`
+> :memo: To view the default parameters for a template, look at it's `pct-config.yaml`.
 
 To override these defaults you need to create a `pct.yml` within `$HOME/.pdk/`.  This file can contain overrides for multiple templates.
 
