@@ -17,6 +17,11 @@ jobs:
     env:
       GOPATH: ${{ github.workspace }}
       TEST_ACCEPTANCE: true
+      if: ${{ matrix.os }} == "windows-latest"
+        BUILD_SCRIPT: "build.ps1"
+      if: ${{ matrix.os }} == "ubuntu-latest" || ${{ matrix.os }} == "macos-latest"
+        BUILD_SCRIPT: "build.sh"
+
     defaults:
       run:
         working-directory: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
@@ -33,7 +38,7 @@ jobs:
     - name: Build
       run: |
           go get github.com/goreleaser/goreleaser
-          goreleaser build --snapshot --rm-dist --single-target
+          $BUILD_SCRIPT build
 
     - name: Test
       run: go test -v github.com/puppetlabs/pdkgo/acceptance
