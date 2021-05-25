@@ -83,6 +83,13 @@ func validateArgCount(cmd *cobra.Command, args []string) error {
 }
 
 func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	if localTemplateCache == "" {
+		err := preExecute(cmd, args)
+		if err != nil {
+			log.Error().Msgf("Unable to set template path: %s", err.Error())
+			return nil, cobra.ShellCompDirectiveError
+		}
+	}
 	if len(args) != 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
