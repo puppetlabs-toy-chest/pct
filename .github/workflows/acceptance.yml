@@ -24,16 +24,19 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
-
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: ${{ env.go_version }}
-
-    - name: Build
+    - name: Build nix
       run: |
-          go get github.com/goreleaser/goreleaser
-          goreleaser build --snapshot --rm-dist --single-target
-
+        go get github.com/goreleaser/goreleaser
+        ./build.sh
+      if: runner.os != 'Windows'
+    - name: Build Windows
+      run: |
+        go get github.com/goreleaser/goreleaser
+        ./build.ps1
+      if: runner.os == 'Windows'
     - name: Test
-      run: go test -v github.com/puppetlabs/pdkgo/acceptance
+      run: go test -v ./acceptance
