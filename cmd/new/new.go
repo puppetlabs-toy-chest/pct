@@ -1,6 +1,7 @@
 package new
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,12 +15,13 @@ import (
 )
 
 var (
-	localTemplateCache string
-	format             string
-	selectedTemplate   string
-	listTemplates      bool
-	targetName         string
-	targetOutput       string
+	localTemplateCache   string
+	format               string
+	selectedTemplate     string
+	selectedTemplateInfo string
+	listTemplates        bool
+	targetName           string
+	targetOutput         string
 )
 
 func CreateCommand() *cobra.Command {
@@ -40,6 +42,9 @@ func CreateCommand() *cobra.Command {
 
 	tmp.Flags().BoolVarP(&listTemplates, "list", "l", false, "list templates")
 	tmp.RegisterFlagCompletionFunc("list", flagCompletion) //nolint:errcheck
+
+	tmp.Flags().StringVarP(&selectedTemplateInfo, "info", "i", "", "display the selected template's configuration and default values")
+	tmp.RegisterFlagCompletionFunc("info", flagCompletion) //nolint:errcheck
 
 	tmp.Flags().StringVar(&format, "format", "table", "display output in table or json format")
 	tmp.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint:errcheck
@@ -67,6 +72,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func validateArgCount(cmd *cobra.Command, args []string) error {
+	// show available templates if user runs `pct new`
 	if len(args) == 0 && !listTemplates {
 		listTemplates = true
 	}
@@ -129,7 +135,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msgf("Template path: %v", localTemplateCache)
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
-	if listTemplates {
+	if listTemplates && selectedTemplateInfo == "" {
 		tmpls, err := pct.List(localTemplateCache, selectedTemplate)
 		if err != nil {
 			return err
@@ -139,6 +145,18 @@ func execute(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+
+		return nil
+	}
+
+	if selectedTemplateInfo != "" {
+		pctData, err := pct.GetInfo(localTemplateCache, selectedTemplateInfo)
+		if err != nil {
+			return err
+		}
+		log.Debug().Msgf("Template Defaults: %v", pctData.Defaults)
+		defaultString := pct.DisplayDefaults(pctData.Defaults, format)
+		fmt.Printf("%s\n", defaultString)
 
 		return nil
 	}
