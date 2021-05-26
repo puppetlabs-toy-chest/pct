@@ -24,6 +24,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -36,6 +37,7 @@ const (
 // PuppetContentTemplateInfo is the housing struct for marshaling YAML data
 type PuppetContentTemplateInfo struct {
 	Template PuppetContentTemplate `mapstructure:"template"`
+	Defaults map[string]interface{}
 }
 
 // PuppetContentTemplate houses the actual information about each template
@@ -87,10 +89,15 @@ func (osf osFunc) Getwd() (dir string, err error) {
 var osUtils osWrapper = osFunc{}
 
 func Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
+	info, err := GetInfo(templateCache, selectedTemplate)
+	return info.Template, err
+}
+
+func GetInfo(templateCache string, selectedTemplate string) (PuppetContentTemplateInfo, error) {
 	file := filepath.Join(templateCache, selectedTemplate, TemplateConfigFileName)
 	_, err := os.Stat(file)
 	if os.IsNotExist(err) {
-		return PuppetContentTemplate{}, fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
+		return PuppetContentTemplateInfo{}, fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
 	}
 	i := readTemplateConfig(file)
 	return i, nil
@@ -106,7 +113,7 @@ func List(templatePath string, templateName string) ([]PuppetContentTemplate, er
 	var tmpls []PuppetContentTemplate
 	for _, file := range matches {
 		log.Debug().Msgf("Found: %+v", file)
-		i := readTemplateConfig(file)
+		i := readTemplateConfig(file).Template
 		tmpls = append(tmpls, i)
 	}
 
@@ -154,6 +161,32 @@ func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
 	return nil
 }
 
+// DisplayDefaults returns the Default values from a Templates configuration file
+func DisplayDefaults(defaults map[string]interface{}, format string) string {
+	var err error
+	var prettyDefaults []byte
+
+	switch format {
+	case "table":
+		if len(defaults) == 0 {
+			return "This template has no configuration options."
+		}
+
+		prettyDefaults, err = yaml.Marshal(defaults)
+		if err != nil {
+			log.Error().Msgf("Error converting to yaml: %v", err)
+		}
+	case "json":
+		j := jsoniter.ConfigFastest
+		prettyDefaults, err = j.MarshalIndent(defaults, "", "  ")
+		if err != nil {
+			log.Error().Msgf("Error converting to json: %v", err)
+		}
+	}
+
+	return string(prettyDefaults)
+}
+
 // FormatDeployment formats the files returned by the Deploy method to display
 // on the console in table format or json format.
 func FormatDeployment(deployed []string, jsonOutput string) error {
@@ -182,21 +215,21 @@ func Deploy(info DeployInfo) []string {
 	tmpl := readTemplateConfig(file)
 	log.Trace().Msgf("Parsed: %+v", tmpl)
 
-	if info.TargetName == "" && info.TargetOutputDir == "" {// pdk new foo-foo
+	if info.TargetName == "" && info.TargetOutputDir == "" { // pdk new foo-foo
 		cwd, _ := osUtils.Getwd()
 		info.TargetName = filepath.Base(cwd)
 		info.TargetOutputDir = cwd
 	} else if info.TargetName != "" && info.TargetOutputDir == "" { // pdk new foo-foo -n wakka
 		cwd, _ := osUtils.Getwd()
-		if tmpl.Type == "project" {
+		if tmpl.Template.Type == "project" {
 			info.TargetOutputDir = filepath.Join(cwd, info.TargetName)
 		} else {
 			info.TargetOutputDir = cwd
 		}
 	} else if info.TargetName == "" && info.TargetOutputDir != "" { // pdk new foo-foo -o /foo/bar/baz
 		info.TargetName = filepath.Base(info.TargetOutputDir)
-	}	else if info.TargetName != "" && info.TargetOutputDir != "" { // pdk new foo-foo -n wakka -o /foo/bar/baz
-		if tmpl.Type == "project" {
+	} else if info.TargetName != "" && info.TargetOutputDir != "" { // pdk new foo-foo -n wakka -o /foo/bar/baz
+		if tmpl.Template.Type == "project" {
 			info.TargetOutputDir = filepath.Join(info.TargetOutputDir, info.TargetName)
 		}
 	}
@@ -247,7 +280,7 @@ func Deploy(info DeployInfo) []string {
 				deployed = append(deployed, templateFile.TargetFilePath)
 			}
 		} else {
-			err := createTemplateFile(info.TargetName, file, templateFile, tmpl, info.PdkInfo)
+			err := createTemplateFile(info.TargetName, file, templateFile, tmpl.Template, info.PdkInfo)
 			if err != nil {
 				log.Error().Msgf("%s", err)
 				continue
@@ -386,7 +419,7 @@ func processConfiguration(projectName string, configFile string, projectTemplate
 	return config
 }
 
-func readTemplateConfig(configFile string) PuppetContentTemplate {
+func readTemplateConfig(configFile string) PuppetContentTemplateInfo {
 	v := viper.New()
 	userConfigFileBase := filepath.Base(configFile)
 	v.AddConfigPath(filepath.Dir(configFile))
@@ -396,11 +429,24 @@ func readTemplateConfig(configFile string) PuppetContentTemplate {
 		log.Trace().Msgf("Using template config file: %v", v.ConfigFileUsed())
 	}
 	var config PuppetContentTemplateInfo
+	// unmarshall the known structure
 	err := v.Unmarshal(&config)
 	if err != nil {
 		log.Error().Msgf("unable to decode into struct, %v", err)
 	}
-	return config.Template
+
+	// unmarhsall everything
+	all := make(map[string]interface{})
+	err = v.Unmarshal(&all)
+	if err != nil {
+		log.Error().Msgf("unable to decode into struct, %v", err)
+	}
+	// remove the known structure, leaving the unknown...
+	delete(all, "template")
+	// store the unknown as part of the big config
+	config.Defaults = all
+
+	return config
 }
 
 func renderFile(fileName string, vars interface{}) string {

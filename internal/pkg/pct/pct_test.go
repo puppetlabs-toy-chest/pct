@@ -1,6 +1,7 @@
 package pct
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 func TestMain(m *testing.M) {
@@ -142,7 +145,7 @@ func TestDeploy(t *testing.T) {
 			},
 			want: []string{
 				tmp,
-				filepath.Join(tmp, tmpFile + ".txt"),
+				filepath.Join(tmp, tmpFile+".txt"),
 			},
 		},
 		{
@@ -378,19 +381,28 @@ func Test_readTemplateConfig(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want PuppetContentTemplate
+		want PuppetContentTemplateInfo
 	}{
 		{
 			name: "returns tmpl struct from good config file",
 			args: args{
 				configFile: "testdata/examples/good-project/pct-config.yml",
 			},
-			want: PuppetContentTemplate{
-				Id:      "good-project",
-				Display: "Good Project",
-				Type:    "project",
-				Version: "0.1.0",
-				URL:     "https://github.com/puppetlabs/pct-good-project",
+			want: PuppetContentTemplateInfo{
+				Template: PuppetContentTemplate{
+					Id:      "good-project",
+					Display: "Good Project",
+					Type:    "project",
+					Version: "0.1.0",
+					URL:     "https://github.com/puppetlabs/pct-good-project",
+				},
+				Defaults: map[string]interface{}{
+					"puppet_module": map[string]interface{}{
+						"license": "Apache-2.0",
+						"version": "0.1.0",
+						"summary": "A New Puppet Module",
+					},
+				},
 			},
 		},
 		{
@@ -398,7 +410,10 @@ func Test_readTemplateConfig(t *testing.T) {
 			args: args{
 				configFile: "testdata/examples/does-not-exist-project/pct.yml",
 			},
-			want: PuppetContentTemplate{},
+			want: PuppetContentTemplateInfo{
+				Template: PuppetContentTemplate{},
+				Defaults: map[string]interface{}{},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -446,6 +461,120 @@ func Test_renderFile(t *testing.T) {
 			if got := renderFile(tt.args.fileName, tt.args.vars); got != tt.want {
 				t.Errorf("renderFile() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestDisplayDefaults(t *testing.T) {
+	type args struct {
+		defaults map[string]interface{}
+	}
+	tests := []struct {
+		name   string
+		args   args
+		format string
+		want   string
+	}{
+		{
+			name: "table example",
+			args: args{
+				defaults: map[string]interface{}{
+					"foo": map[string]interface{}{
+						"bar": "wibble",
+						"wobble": []string{
+							"one", "two", "three",
+						},
+					},
+				},
+			},
+			format: "table",
+			want: `foo:
+  bar: wibble
+  wobble:
+  - one
+  - two
+  - three
+`,
+		},
+		{
+			name: "json example",
+			args: args{
+				defaults: map[string]interface{}{
+					"foo": map[string]interface{}{
+						"bar": "wibble",
+						"wobble": []string{
+							"one", "two", "three",
+						},
+					},
+				},
+			},
+			format: "json",
+			want: `{
+  "foo": {
+    "bar": "wibble",
+    "wobble": [
+      "one",
+      "two",
+      "three"
+    ]
+  }
+}`,
+		},
+		{
+			name: "empty table example",
+			args: args{
+				defaults: map[string]interface{}{
+				},
+			},
+			format: "table",
+			want: "This template has no configuration options.",
+		},
+		{
+			name: "empty json example",
+			args: args{
+				defaults: map[string]interface{}{
+				},
+			},
+			format: "json",
+			want: "{\n  \n}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			returnString := DisplayDefaults(tt.args.defaults, tt.format)
+
+			if len(tt.args.defaults) == 0 {
+				assert.Equal(t, returnString, tt.want)
+
+				return
+			}
+
+			var output map[string]interface{}
+			var expected map[string]interface{}
+
+			if tt.format == "table" {
+				err := yaml.Unmarshal([]byte(returnString), &output)
+				if err != nil {
+					assert.Fail(t, "returned data is not YAML")
+				}
+
+				err = yaml.Unmarshal([]byte(tt.want), &expected)
+				if err != nil {
+					assert.Fail(t, "expected data is not YAML")
+				}
+			} else if tt.format == "json" {
+				err := json.Unmarshal([]byte(returnString), &output)
+				if err != nil {
+					assert.Fail(t, "returned data is not JSON")
+				}
+
+				err = json.Unmarshal([]byte(tt.want), &expected)
+				if err != nil {
+					assert.Fail(t, "expected data is not JSON")
+				}
+			}
+
+			assert.Equal(t, expected, output)
 		})
 	}
 }
