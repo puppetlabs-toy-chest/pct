@@ -11,6 +11,8 @@ env:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    env:
+      GOPATH: ${{ github.workspace }}
     steps:
       -
         name: Checkout pdkgo
