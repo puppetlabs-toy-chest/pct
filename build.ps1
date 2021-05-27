@@ -7,6 +7,8 @@ param (
   [string]
   $Target = 'build'
 )
+$Env:WORKINGDIR = $PSScriptRoot
+
 switch ($Target) {
   'build' {
     $arch = go env GOHOSTARCH

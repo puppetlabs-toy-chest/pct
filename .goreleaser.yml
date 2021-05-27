@@ -21,9 +21,9 @@ builds:
       - arm
       - arm64
     asmflags:
-      - all=-trimpath={{.Env.GOPATH}}
+      - all=-trimpath={{.Env.WORKINGDIR}}
     gcflags:
-      - all=-trimpath={{.Env.GOPATH}}
+      - all=-trimpath={{.Env.WORKINGDIR}}
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
     mod_timestamp: '{{ .CommitTimestamp }}'

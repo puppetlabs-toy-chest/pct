@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export WORKINGDIR=$(pwd)
+
 target=${1:-build}
 if [ "$target" == "build" ]; then
   arch=$(go env GOHOSTARCH)
