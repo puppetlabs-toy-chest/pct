@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: puppetlabs/baker-round
-          fetch-depth: 0
+          fetch-depth: 1
           path: templates
       -
         name: Set up Go
