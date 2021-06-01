@@ -71,7 +71,7 @@ func ExecutePDKCommand(cmd *cobra.Command, args []string) error {
 
 func buildPDKCommandName(cmd *cobra.Command) []string {
 	var argsV []string
-	if cmd.HasParent() && cmd.Parent().Name() != "pdk" {
+	if cmd.HasParent() && cmd.Parent().Name() != "pct" {
 		argsV = append(argsV, cmd.Parent().Name(), cmd.Name())
 	} else {
 		argsV = append(argsV, cmd.Name())
