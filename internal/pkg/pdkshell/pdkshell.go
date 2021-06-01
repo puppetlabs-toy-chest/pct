@@ -31,6 +31,7 @@ func Execute(args []string) (int, error) {
 	cmd := &exec.Cmd{
 		Path:   executable,
 		Args:   args,
+		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 		Env:    env,
