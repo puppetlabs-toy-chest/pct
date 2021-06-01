@@ -314,13 +314,13 @@ func createTemplateFile(targetName string, configFile string, templateFile Puppe
 		pdkInfo,
 	)
 
-	text := renderFile(templateFile.TemplatePath, config)
-	if text == "" {
+	text, err := renderFile(templateFile.TemplatePath, config)
+	if err != nil {
 		return fmt.Errorf("Failed to create %s", templateFile.TargetFilePath)
 	}
 
 	log.Trace().Msgf("Writing: '%s' '%s'", templateFile.TargetFilePath, text)
-	err := os.MkdirAll(templateFile.TargetDir, os.ModePerm)
+	err = os.MkdirAll(templateFile.TargetDir, os.ModePerm)
 	if err != nil {
 		log.Error().Msgf("Error: %v", err)
 		return err
@@ -449,7 +449,7 @@ func readTemplateConfig(configFile string) PuppetContentTemplateInfo {
 	return config
 }
 
-func renderFile(fileName string, vars interface{}) string {
+func renderFile(fileName string, vars interface{}) (string, error) {
 	tmpl, err := template.
 		New(filepath.Base(fileName)).
 		Funcs(
@@ -463,10 +463,10 @@ func renderFile(fileName string, vars interface{}) string {
 
 	if err != nil {
 		log.Error().Msgf("Error parsing config: %v", err)
-		return ""
+		return "", err
 	}
 
-	return process(tmpl, vars)
+	return process(tmpl, vars), nil
 }
 
 func process(t *template.Template, vars interface{}) string {
