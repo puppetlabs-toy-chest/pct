@@ -40,7 +40,8 @@ func Execute(args []string) (int, error) {
 	log.Trace().Msgf("args: %s", args)
 	if err := cmd.Run(); err != nil {
 		log.Fatal().Msgf("pdk failed with '%s'\n", err)
-		return 1, err
+
+		return err.(*exec.ExitError).ExitCode(), err
 	}
 
 	return 0, nil
