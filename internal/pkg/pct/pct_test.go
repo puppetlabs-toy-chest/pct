@@ -434,6 +434,7 @@ func Test_renderFile(t *testing.T) {
 		name string
 		args args
 		want string
+		err bool
 	}{
 		{
 			name: "takes a template file and returns correct text",
@@ -444,6 +445,7 @@ func Test_renderFile(t *testing.T) {
 				},
 			},
 			want: "This is wakka data",
+			err: false,
 		},
 		{
 			name: "returns nil if file does not exist",
@@ -454,11 +456,15 @@ func Test_renderFile(t *testing.T) {
 				},
 			},
 			want: "",
+			err: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := renderFile(tt.args.fileName, tt.args.vars); got != tt.want {
+			got, err := renderFile(tt.args.fileName, tt.args.vars)
+			if tt.err && err == nil {
+				t.Fail()
+			} else if !tt.err && got != tt.want {
 				t.Errorf("renderFile() = %v, want %v", got, tt.want)
 			}
 		})
