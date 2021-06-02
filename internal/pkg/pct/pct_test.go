@@ -434,7 +434,7 @@ func Test_renderFile(t *testing.T) {
 		name string
 		args args
 		want string
-		err bool
+		err  bool
 	}{
 		{
 			name: "takes a template file and returns correct text",
@@ -445,7 +445,7 @@ func Test_renderFile(t *testing.T) {
 				},
 			},
 			want: "This is wakka data",
-			err: false,
+			err:  false,
 		},
 		{
 			name: "returns nil if file does not exist",
@@ -456,7 +456,7 @@ func Test_renderFile(t *testing.T) {
 				},
 			},
 			want: "",
-			err: true,
+			err:  true,
 		},
 	}
 	for _, tt := range tests {
@@ -529,20 +529,18 @@ func TestDisplayDefaults(t *testing.T) {
 		{
 			name: "empty table example",
 			args: args{
-				defaults: map[string]interface{}{
-				},
+				defaults: map[string]interface{}{},
 			},
 			format: "table",
-			want: "This template has no configuration options.",
+			want:   "This template has no configuration options.",
 		},
 		{
 			name: "empty json example",
 			args: args{
-				defaults: map[string]interface{}{
-				},
+				defaults: map[string]interface{}{},
 			},
 			format: "json",
-			want: "{\n  \n}",
+			want:   "{\n  \n}",
 		},
 	}
 	for _, tt := range tests {

@@ -17,7 +17,7 @@ var (
 	LogLevel           string
 	LocalTemplateCache string
 
-	debug  bool
+	debug bool
 	// format string
 )
 
