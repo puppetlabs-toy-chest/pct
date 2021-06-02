@@ -1,0 +1,40 @@
+name: codequality
+on: [pull_request]
+jobs:
+  golangci-lint:
+    name: golangci-lint, is a fast Go linters runner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1.10.1
+        with:
+          github_token: ${{ secrets.github_token }}
+          golangci_lint_flags: "--enable-all --exclude-use-default=false"
+  security:
+    name: gosec, Inspects source code for security problems
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
+  format:
+    name: fmt, makes sure there are no formatting issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Run fmt
+        run: make format
+  mod_tidy:
+    name: go mod tidy, makes sure are dependencies are cool
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Run go mod tidy
+        run: make tidy

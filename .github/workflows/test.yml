@@ -26,4 +26,16 @@ jobs:
       run: go build -v
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v -covermode=count -coverprofile=coverage.out ./...
+
+    - name: Convert  go coverage report to lcov format
+      uses: jandelgado/gcov2lcov-action@v1.0.0
+      with:
+        infile: coverage.out
+        outfile: coverage.lcov
+
+    - name: Report coverage
+      uses: vebr/jest-lcov-reporter@v0.2.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./coverage.lcov
