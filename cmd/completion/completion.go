@@ -15,13 +15,13 @@ func CreateCompletionCommand() *cobra.Command {
 
 Bash:
 
-	$ source <(pdk completion bash)
+	$ source <(pct completion bash)
 
 	# To load completions for each session, execute once:
 	# Linux:
-	$ pdk completion bash > /etc/bash_completion.d/pdk
+	$ pct completion bash > /etc/bash_completion.d/pct
 	# macOS:
-	$ pdk completion bash > /usr/local/etc/bash_completion.d/pdk
+	$ pct completion bash > /usr/local/etc/bash_completion.d/pct
 
 Zsh:
 
@@ -31,23 +31,23 @@ Zsh:
 	$ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
 	# To load completions for each session, execute once:
-	$ pdk completion zsh > "${fpath[1]}/_pdk"
+	$ pct completion zsh > "${fpath[1]}/_pct"
 
 	# You will need to start a new shell for this setup to take effect.
 
 fish:
 
-	$ pdk completion fish | source
+	$ pct completion fish | source
 
 	# To load completions for each session, execute once:
-	$ pdk completion fish > ~/.config/fish/completions/pdk.fish
+	$ pct completion fish > ~/.config/fish/completions/pct.fish
 
 PowerShell:
 
-	PS> pdk completion powershell | Out-String | Invoke-Expression
+	PS> pct completion powershell | Out-String | Invoke-Expression
 
 	# To load completions for every new session, run:
-	PS> pdk completion powershell > pdk.ps1
+	PS> pct completion powershell > pct.ps1
 	# and source this file from your PowerShell profile.`,
 		ValidArgs: []string{"bash", "fish", "pwsh", "zsh"},
 		Args:      cobra.ExactValidArgs(1),
