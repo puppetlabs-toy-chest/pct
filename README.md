@@ -1,6 +1,14 @@
 # Puppet Content Templates
 
 * [Overview](#overview)
+* [Installing](#installing)
+  * [Unix Systems](#unix-systems)
+  * [Windows Systems](#windows-systems)
+* [Setting up Tab Completion](#setting-up-tab-completion)
+* [Quick Start Guide](#quick-start-guide)
+  * [Step 1: Create a Puppet Module](#step-1-create-a-puppet-module)
+  * [Step 2: Add a New Class](#step-2-add-a-new-class)
+  * [Step 3: Add a Github Actions Workflow](#step-3-add-a-github-actions-workflow)
 * [Getting Started](#getting-started)
   * [pct new](#pct-new)
   * [Template Updates](#template-updates)
@@ -22,18 +30,68 @@ These are meant to be ready-to-run, which means they put everything needed for a
 
 > :warning: PCT is currently in an EXPERIMENTAL phase and feedback is encouraged via [pdkgo/discussions](https://github.com/puppetlabs/pdkgo/discussions) and starting a `feedback` post.
 
-## Getting Started
+## Installing
 
-Grab the `experimental` PCT release available from [github.com/puppetlabs/pdkgo/releases/](https://github.com/puppetlabs/pdkgo/releases/).
+While the PCT is in early release, we provide an archive and a simple script to unpack it. When we move closer to a full release we will add a platform specific installer. Use the `install.[ps1|sh]` script, depending upon your OS:
 
-Uncompress the archive to a location of your choosing - this will be refered to as `$INSTALLATION_ROOT` subsequently.
-
-This should contain the following file and directory:
+### Unix Systems
 
 ```bash
-pct[.exe]
-templates/
+curl -L https://pup.pt/pdkgo/install.sh | sh
 ```
+
+### Windows Systems
+
+```ps
+iex "&{ $(irm https://pup.pt/pdkgo/install.ps1) }"
+```
+
+This will install the latest release of PCT to `~/.puppetlabs/pct`.
+
+![install_pct](docs/_resources/install_and_export_path.gif)
+
+## Setting up Tab Completion
+
+After installation, we'd highly recommend setting up tab completion for your shell to ensure the best possible experience.
+
+PCT has built in tab completion support for the following shells: `bash`, `zsh`, `fish` and `powershell`.
+
+To view the install instructions, access the `--help` menu in `pct completion` and follow the instructions for your shell:
+
+![tab_completion](docs/_resources/completion_setup.gif)
+
+## Quick Start Guide
+
+This quick start guide will show you how to:
+
+* Create a "bare bones" Puppet module from the `puppet-module-base` project template
+* Add a Puppet Class to the module
+* Add a Github Actions Workflow to test the module against the currently supported Puppet versions
+
+### **STEP 1:** Create a Puppet Module
+
+Let's name our module `test_module` using the `-n` flag:
+![new_project_template](docs/_resources/new_module.gif)
+
+### **STEP 2:** Add a New Class
+
+If we `cd` in to the module root dir, everything will get deployed with the correct layout:
+![new_class](docs/_resources/new_class.gif)
+
+### **STEP 3:** Add a Github Actions Workflow
+
+Want to know what configurable parameters are availble for a template and their defaults?
+Run `pct new --info <TEMPLATE_ID>`:
+
+![new_info](docs/_resources/new_info.gif)
+
+We're happy with those defaults, so let's deploy this item.
+
+Since we're outside the module root dir, we'll use the `-o` option to point at the root dir:
+
+![new_info](docs/_resources/new_ghactions.gif)
+
+## Getting Started
 
 The `$INSTALLATION_ROOT/templates` directory will be subsequently referred to as the **Default Template Location**.
 
@@ -119,16 +177,6 @@ At this time `pct new` will **NOT** update existing code to a newer version of a
 If you run a `pct new` command using a `project` template, the project will replace the content within the output directory with the template code.
 
 If you run a `pct new` command using an `item` template, the item will suppliment the content within the output directory with the template code. If files / folders that are named the same as the template content already exist, it will overwite this content.
-
-### Tab Completion
-
-PCT has built in tab completion support. You can enable it in the following shells: `bash`, `zsh`, `fish` and `powershell`
-
-To view the install instructions, access the `--help` menu in `pct completion` and follow the instructions.
-
-```bash
-pct completion --help
-```
 
 ## Writing Templates
 
