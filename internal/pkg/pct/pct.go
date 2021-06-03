@@ -331,7 +331,11 @@ func createTemplateFile(targetName string, configFile string, templateFile Puppe
 		log.Error().Msgf("Error: %v", err)
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Error().Msgf("Error closing file: %s\n", err)
+		}
+	}()
 
 	_, err = io.WriteString(file, text)
 	if err != nil {

@@ -51,13 +51,14 @@ func CreateRootCommand() *cobra.Command {
 	tmp.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pdk.yaml)")
 
 	tmp.PersistentFlags().StringVar(&LogLevel, "log-level", zerolog.InfoLevel.String(), "Log level (debug, info, warn, error, fatal, panic)")
-	tmp.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint:errcheck
+	err := tmp.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) != 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 		var levels = []string{"debug", "info", "warn", "error", "fatal", "panic"}
 		return utils.Find(levels, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
+	cobra.CheckErr(err)
 
 	tmp.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug output")
 	// tmp.PersistentFlags().StringVarP(&format, "format", "f", "junit", "formating (default is junit)")
