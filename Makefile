@@ -36,7 +36,7 @@ lint: $(GOPATH)/bin/golangci-lint
 PHONY+= sec
 sec: $(GOPATH)/bin/gosec
 	@echo "🔘 Checking for security problems ... (`date '+%H:%M:%S'`)"
-	@sec=`gosec -quiet ./...`; \
+	@sec=`gosec -exclude-dir=testutils -quiet ./...`; \
 	if [ "$$sec" != "" ]; \
 	then echo "🔴 Problems found"; echo "$$sec"; exit 1;\
 	else echo "✅ No problems found (`date '+%H:%M:%S'`)"; \
