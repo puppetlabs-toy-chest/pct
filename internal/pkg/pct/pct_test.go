@@ -227,11 +227,10 @@ func TestGet(t *testing.T) {
 
 func Test_createTemplateFile(t *testing.T) {
 	type args struct {
-		targetName   string
+		info         DeployInfo
 		configFile   string
 		templateFile PuppetContentTemplateFileInfo
 		tmpl         PuppetContentTemplate
-		pdkInfo      PDKInfo
 	}
 
 	tmp := t.TempDir()
@@ -244,13 +243,15 @@ func Test_createTemplateFile(t *testing.T) {
 		{
 			name: "",
 			args: args{
-				targetName: "foobar",
-				configFile: "testdata/examples/good-project/pct.yml",
-				pdkInfo: PDKInfo{
-					Version:   "0.1.0",
-					Commit:    "abc12345",
-					BuildDate: "2021/06/27",
+				info: DeployInfo{
+					TargetName: "foobar",
+					PdkInfo: PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
 				},
+				configFile: "testdata/examples/good-project/pct.yml",
 				tmpl: PuppetContentTemplate{
 					Type:    "project",
 					Display: "Good Project",
@@ -271,7 +272,7 @@ func Test_createTemplateFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createTemplateFile(tt.args.targetName, tt.args.configFile, tt.args.templateFile, tt.args.tmpl, tt.args.pdkInfo); (err != nil) != tt.wantErr {
+			if err := createTemplateFile(tt.args.info, tt.args.configFile, tt.args.templateFile, tt.args.tmpl); (err != nil) != tt.wantErr {
 				t.Errorf("createTemplateFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if _, err := os.Stat(tt.args.templateFile.TargetFilePath); err != nil {
@@ -283,11 +284,10 @@ func Test_createTemplateFile(t *testing.T) {
 
 func Test_processConfiguration(t *testing.T) {
 	type args struct {
-		projectName     string
+		info            DeployInfo
 		configFile      string
 		projectTemplate string
 		tmpl            PuppetContentTemplate
-		pdkInfo         PDKInfo
 	}
 	cwd, _ := os.Getwd()
 	hostName, _ := os.Hostname()
@@ -300,15 +300,17 @@ func Test_processConfiguration(t *testing.T) {
 		{
 			name: "with a valid config, returns a correct map interface",
 			args: args{
-				projectName:     "good-project",
+				info:            DeployInfo{
+					TargetName:    "good-project",
+					PdkInfo:       PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
 				configFile:      "testdata/examples/good-project/pct.yml",
 				projectTemplate: "",
 				tmpl:            PuppetContentTemplate{},
-				pdkInfo: PDKInfo{
-					Version:   "0.1.0",
-					Commit:    "abc12345",
-					BuildDate: "2021/06/27",
-				},
 			},
 			want: map[string]interface{}{
 				"user":     u,
@@ -336,17 +338,60 @@ func Test_processConfiguration(t *testing.T) {
 			},
 		},
 		{
+			name: "with a valid config, and a workspace overide, returns a correct map interface",
+			args: args{
+				info:            DeployInfo{
+					TargetName:    "good-project",
+					TargetOutputDir: "testdata/examples/good-project-override",
+					PdkInfo:       PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
+				configFile:      "testdata/examples/good-project/pct.yml",
+				projectTemplate: "",
+				tmpl:            PuppetContentTemplate{},
+			},
+			want: map[string]interface{}{
+				"user":     u,
+				"cwd":      cwd,
+				"hostname": hostName,
+				"pct_name": "good-project",
+				"pdk": map[string]interface{}{
+					"build_date":  "2021/06/27",
+					"commit_hash": "abc12345",
+					"version":     "0.1.0",
+				},
+				"template": map[string]interface{}{
+					"type":    "project",
+					"display": "Good Project",
+					"url":     "https://github.com/puppetlabs/pct-good-project",
+					"version": "0.1.0",
+					"id":      "good-project",
+				},
+				"puppet_module": map[string]interface{}{
+					"author":  u,
+					"license": "Apache-2.0",
+					"version": "0.2.0",
+					"summary": "Output Override Summary",
+				},
+			},
+		},
+		{
 			name: "with a non existant config, returns default config",
 			args: args{
-				projectName:     "good-project",
+				info:            DeployInfo{
+					TargetName:    "good-project",
+					PdkInfo:       PDKInfo{
+						Version:   "0.1.0",
+						Commit:    "abc12345",
+						BuildDate: "2021/06/27",
+					},
+				},
 				configFile:      "testdata/notthere/notthere/notthere.yml",
 				projectTemplate: "",
 				tmpl:            PuppetContentTemplate{},
-				pdkInfo: PDKInfo{
-					Version:   "0.1.0",
-					Commit:    "abc12345",
-					BuildDate: "2021/06/27",
-				},
 			},
 			want: map[string]interface{}{
 				"pct_name": "good-project",
@@ -366,7 +411,7 @@ func Test_processConfiguration(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := processConfiguration(tt.args.projectName, tt.args.configFile, tt.args.projectTemplate, tt.args.tmpl, tt.args.pdkInfo)
+			got := processConfiguration(tt.args.info, tt.args.configFile, tt.args.projectTemplate, tt.args.tmpl)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v\nwant %+v\n", got, tt.want)
 			}

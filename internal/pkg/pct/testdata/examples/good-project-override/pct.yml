@@ -1,0 +1,3 @@
+puppet_module:
+  version: "0.2.0"
+  summary: "Output Override Summary"
