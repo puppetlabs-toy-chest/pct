@@ -78,6 +78,6 @@ func main() {
 	rootCmd.AddCommand(bundle.CreateCommand())
 	rootCmd.AddCommand(console.CreateCommand())
 
-	cobra.OnInitialize(root.InitConfig)
+	cobra.OnInitialize(root.InitLogger, root.InitConfig)
 	cobra.CheckErr(rootCmd.Execute())
 }

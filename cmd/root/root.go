@@ -21,32 +21,31 @@ var (
 	// format string
 )
 
+func InitLogger() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	lvl, err := zerolog.ParseLevel(LogLevel)
+	if err != nil {
+		panic("Could not initialize zerolog")
+	}
+
+	zerolog.SetGlobalLevel(lvl)
+
+	if lvl == zerolog.InfoLevel {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Caller().Logger()
+	}
+
+	log.Trace().Msg("Initialized zerolog")
+}
+
 func CreateRootCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:   "pct",
 		Short: "pdk - Puppet Development Kit",
 		Long:  `Puppet development tooling, content creation, and testing framework`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		},
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
-			lvl, err := zerolog.ParseLevel(LogLevel)
-			if err != nil {
-				return err
-			}
-
-			zerolog.SetGlobalLevel(lvl)
-
-			if lvl == zerolog.InfoLevel {
-				log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-			} else {
-				log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Caller().Logger()
-			}
-
-			log.Trace().Msg("PersistentPreRunE")
-
-			return nil
 		},
 	}
 	tmp.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pdk.yaml)")
