@@ -99,7 +99,7 @@ func TestPctNewInfo(t *testing.T) {
 		assert.Fail(t, "expected data is not YAML")
 	}
 
-	assert.Equal(t, output, expected )
+	assert.Equal(t, expected, output)
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 }
@@ -130,7 +130,7 @@ func TestPctNewInfoJson(t *testing.T) {
 		assert.Fail(t, "expected data is not JSON")
 	}
 
-	assert.Equal(t, output, expected )
+	assert.Equal(t, expected, output)
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 }
