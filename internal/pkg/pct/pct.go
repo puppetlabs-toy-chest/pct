@@ -280,7 +280,7 @@ func Deploy(info DeployInfo) []string {
 				deployed = append(deployed, templateFile.TargetFilePath)
 			}
 		} else {
-			err := createTemplateFile(info.TargetName, file, templateFile, tmpl.Template, info.PdkInfo)
+			err := createTemplateFile(info, file, templateFile, tmpl.Template)
 			if err != nil {
 				log.Error().Msgf("%s", err)
 				continue
@@ -304,14 +304,13 @@ func createTemplateDirectory(targetDir string) error {
 	return nil
 }
 
-func createTemplateFile(targetName string, configFile string, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate, pdkInfo PDKInfo) error {
+func createTemplateFile(info DeployInfo, configFile string, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate) error {
 	log.Trace().Msgf("Creating: '%s'", templateFile.TargetFilePath)
 	config := processConfiguration(
-		targetName,
+		info,
 		configFile,
 		templateFile.TemplatePath,
 		tmpl,
-		pdkInfo,
 	)
 
 	text, err := renderFile(templateFile.TemplatePath, config)
@@ -352,10 +351,10 @@ func createTemplateFile(targetName string, configFile string, templateFile Puppe
 	return nil
 }
 
-func processConfiguration(projectName string, configFile string, projectTemplate string, tmpl PuppetContentTemplate, pdkInfo PDKInfo) map[string]interface{} {
+func processConfiguration(info DeployInfo, configFile string, projectTemplate string, tmpl PuppetContentTemplate) map[string]interface{} {
 	v := viper.New()
 
-	log.Trace().Msgf("PDKInfo: %+v", pdkInfo)
+	log.Trace().Msgf("PDKInfo: %+v", info.PdkInfo)
 	/*
 		Inheritance (each level overwritten by next):
 			convention based variables
@@ -367,12 +366,15 @@ func processConfiguration(projectName string, configFile string, projectTemplate
 				- information from the template itself
 				- designed to be runnable defaults for everything inside template
 			user overrides
-				- ~/.pdk/pdk.yml
+				- ~/.pdk/pct.yml
 				- user customizations for their preferences
+			Workspace overrides
+			  - ${cwd}/pct.yml
+				- ${outputDir}/pct.yml
 	*/
 
 	// Convention based variables
-	v.SetDefault("pct_name", projectName)
+	v.SetDefault("pct_name", info.TargetName)
 
 	user := getCurrentUser()
 	v.SetDefault("user", user)
@@ -385,9 +387,9 @@ func processConfiguration(projectName string, configFile string, projectTemplate
 	v.SetDefault("hostname", hostName)
 
 	// PDK binary specific variables
-	v.SetDefault("pdk.version", pdkInfo.Version)
-	v.SetDefault("pdk.commit_hash", pdkInfo.Commit)
-	v.SetDefault("pdk.build_date", pdkInfo.BuildDate)
+	v.SetDefault("pdk.version", info.PdkInfo.Version)
+	v.SetDefault("pdk.commit_hash", info.PdkInfo.Commit)
+	v.SetDefault("pdk.build_date", info.PdkInfo.BuildDate)
 
 	// Template specific variables
 	log.Trace().Msgf("Adding %v", filepath.Dir(configFile))
@@ -404,13 +406,34 @@ func processConfiguration(projectName string, configFile string, projectTemplate
 	home, _ := homedir.Dir()
 	userConfigPath := filepath.Join(home, ".pdk")
 	log.Trace().Msgf("Adding %v", userConfigPath)
-	v.SetConfigName(UserTemplateConfigName)
-	v.SetConfigType("yml")
-	v.AddConfigPath(userConfigPath)
-	if err := v.MergeInConfig(); err == nil {
+	vUser := viper.New()
+	vUser.SetConfigName(UserTemplateConfigName)
+	vUser.SetConfigType("yml")
+	vUser.AddConfigPath(userConfigPath)
+	if err := vUser.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Merging config file: %v", v.ConfigFileUsed())
 	} else {
 		log.Debug().Msgf("Error reading config: %v", err)
+	}
+
+	// workspace overrides
+	vWorkspace := viper.New()
+	vWorkspace.SetConfigName(UserTemplateConfigName)
+	vWorkspace.SetConfigType("yml")
+	vWorkspace.AddConfigPath(info.TargetOutputDir)
+	if err := vWorkspace.ReadInConfig(); err == nil {
+		log.Trace().Msgf("Merging config file: %v", v.ConfigFileUsed())
+	} else {
+		log.Debug().Msgf("Error reading config: %v", err)
+	}
+
+	userMergeErr := v.MergeConfigMap(vUser.AllSettings())
+	if userMergeErr != nil {
+		log.Warn().Msgf("Unable to merge user configuration values: %s", userMergeErr.Error())
+	}
+	workspaceMergeErr := v.MergeConfigMap(vWorkspace.AllSettings())
+	if userMergeErr != nil {
+		log.Warn().Msgf("Unable to merge workspace configuration values: %s", workspaceMergeErr.Error())
 	}
 
 	config := make(map[string]interface{})
