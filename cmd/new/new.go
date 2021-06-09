@@ -41,22 +41,27 @@ func CreateCommand() *cobra.Command {
 	tmp.Flags().StringVarP(&targetOutput, "output", "o", "", "location to place the generated output.")
 
 	tmp.Flags().BoolVarP(&listTemplates, "list", "l", false, "list templates")
-	tmp.RegisterFlagCompletionFunc("list", flagCompletion) //nolint:errcheck
+	err := tmp.RegisterFlagCompletionFunc("list", flagCompletion)
+	cobra.CheckErr(err)
 
 	tmp.Flags().StringVarP(&selectedTemplateInfo, "info", "i", "", "display the selected template's configuration and default values")
-	tmp.RegisterFlagCompletionFunc("info", flagCompletion) //nolint:errcheck
+	err = tmp.RegisterFlagCompletionFunc("info", flagCompletion)
+	cobra.CheckErr(err)
 
 	tmp.Flags().StringVar(&format, "format", "table", "display output in table or json format")
-	tmp.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint:errcheck
+	err = tmp.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) != 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 		var formats = []string{"table", "json"}
 		return utils.Find(formats, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
+	cobra.CheckErr(err)
 
 	tmp.Flags().StringVar(&localTemplateCache, "templatepath", "", "location of installed templates")
-	viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath")) //nolint:errcheck
+	err = viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath"))
+	cobra.CheckErr(err)
+
 	return tmp
 }
 

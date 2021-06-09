@@ -9,9 +9,9 @@ import (
 
 func CreateCompletionCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:       "completion",
-		Short:     "Generate shell completions for the chosen shell",
-		Long:      `To load completions:
+		Use:   "completion",
+		Short: "Generate shell completions for the chosen shell",
+		Long: `To load completions:
 
 Bash:
 
