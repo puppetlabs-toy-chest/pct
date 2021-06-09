@@ -11,7 +11,7 @@ ext=".tar.gz"
 
 releases=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${org}/${repo}/releases")
 
-ver=$(echo $releases | grep -oE -m 1 '"tag_name": "(([0-9]+\.)+[0-9]+(-pre+)?)"' | cut -d '"' -f 4)
+ver=$(echo $releases | grep -oE -m 1 '"tag_name": "(([0-9]+\.)+[0-9]+(-pre+)?)"' | cut -d '"' -f 4 | head -1)
 
 file="${app}_${ver}_${os}_${arch}${ext}"
 
