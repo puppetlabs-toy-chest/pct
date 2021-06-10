@@ -300,9 +300,9 @@ func Test_processConfiguration(t *testing.T) {
 		{
 			name: "with a valid config, returns a correct map interface",
 			args: args{
-				info:            DeployInfo{
-					TargetName:    "good-project",
-					PdkInfo:       PDKInfo{
+				info: DeployInfo{
+					TargetName: "good-project",
+					PdkInfo: PDKInfo{
 						Version:   "0.1.0",
 						Commit:    "abc12345",
 						BuildDate: "2021/06/27",
@@ -340,10 +340,10 @@ func Test_processConfiguration(t *testing.T) {
 		{
 			name: "with a valid config, and a workspace overide, returns a correct map interface",
 			args: args{
-				info:            DeployInfo{
-					TargetName:    "good-project",
+				info: DeployInfo{
+					TargetName:      "good-project",
 					TargetOutputDir: "testdata/examples/good-project-override",
-					PdkInfo:       PDKInfo{
+					PdkInfo: PDKInfo{
 						Version:   "0.1.0",
 						Commit:    "abc12345",
 						BuildDate: "2021/06/27",
@@ -381,9 +381,9 @@ func Test_processConfiguration(t *testing.T) {
 		{
 			name: "with a non existant config, returns default config",
 			args: args{
-				info:            DeployInfo{
-					TargetName:    "good-project",
-					PdkInfo:       PDKInfo{
+				info: DeployInfo{
+					TargetName: "good-project",
+					PdkInfo: PDKInfo{
 						Version:   "0.1.0",
 						Commit:    "abc12345",
 						BuildDate: "2021/06/27",
