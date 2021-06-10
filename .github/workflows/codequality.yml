@@ -1,5 +1,9 @@
 name: codequality
 on: [pull_request]
+
+env:
+  go_version: 1.16
+
 jobs:
   security:
     name: gosec, Inspects source code for security problems
@@ -15,15 +19,29 @@ jobs:
     name: fmt, makes sure there are no formatting issues
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+         go-version: ${{ env.go_version }}
+      -
+        name: Check out code
         uses: actions/checkout@v1
-      - name: Run fmt
+      -
+        name: Run fmt
         run: make format
   mod_tidy:
     name: go mod tidy, makes sure are dependencies are cool
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+         go-version: ${{ env.go_version }}
+      -
+        name: Check out code
         uses: actions/checkout@v1
-      - name: Run go mod tidy
+      -
+        name: Run go mod tidy
         run: make tidy
