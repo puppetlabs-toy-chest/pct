@@ -52,6 +52,8 @@ This will install the latest release of PCT to `~/.puppetlabs/pct`.
 
 ![install_pct](docs/_resources/install_and_export_path.gif)
 
+> :warning: If you do not use the install script and are extracting the archive yourself, be sure to use the fully qualified path to `~/.puppetlabs/pct` on *nix or `$HOME/.puppetlabs/pct` on Windows when you set your `PATH` environment variable.
+
 ## Setting up Tab Completion
 
 After installation, we'd highly recommend setting up tab completion for your shell to ensure the best possible experience.
