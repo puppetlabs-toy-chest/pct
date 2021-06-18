@@ -26,7 +26,7 @@ func Execute(args []string) (int, error) {
 	i := getPDKInfo()
 	executable := buildExecutable(i.RubyExecutable)
 	args = buildCommandArgs(args, i.RubyExecutable, i.PDKExecutable)
-	env := os.Environ()
+	env := getEnvironVars()
 	env = append(env, fmt.Sprintf("SSL_CERT_DIR=%s", i.CertDirectory), fmt.Sprintf("SSL_CERT_FILE=%s", i.CertPemFile))
 	cmd := &exec.Cmd{
 		Path:   executable,
@@ -37,6 +37,8 @@ func Execute(args []string) (int, error) {
 		Env:    env,
 	}
 
+	log.Trace().Msgf("PATH: %s", os.Getenv("PATH"))
+	log.Trace().Msgf("ENV: %s", env)
 	log.Trace().Msgf("args: %s", args)
 	if err := cmd.Run(); err != nil {
 		log.Fatal().Msgf("pdk failed with '%s'\n", err)
