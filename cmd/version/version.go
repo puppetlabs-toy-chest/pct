@@ -47,6 +47,6 @@ func changelogURL(version string) string {
 		return fmt.Sprintf("%s/releases/latest", path)
 	}
 
-	url := fmt.Sprintf("%s/releases/tag/v%s", path, strings.TrimPrefix(version, "v"))
+	url := fmt.Sprintf("%s/releases/tag/%s", path, strings.TrimPrefix(version, "v"))
 	return url
 }
