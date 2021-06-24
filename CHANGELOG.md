@@ -10,14 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [(GH-83)](https://github.com/puppetlabs/pdkgo/issues/83) 31fc89a Allow for workspace configuration overrides
-- [(GH-107](https://github.com/puppetlabs/pdkgo/issues/107) 73a1a80 Initialize zerolog via cobra.OnInitialize method
+- [(GH-83)](https://github.com/puppetlabs/pdkgo/issues/83) Allow for workspace configuration overrides
+- [(GH-107](https://github.com/puppetlabs/pdkgo/issues/107) Initialize zerolog via cobra.OnInitialize method
 
 ### Fixed
 
-- [(GH-15)](https://github.com/puppetlabs/pdkgo/issues/15) 06d5252 Unset necessary env vars in pdkshell
-- [(GH-125)](https://github.com/puppetlabs/pdkgo/issues/125) eb044da Fail on errors, quote arguments
-- [(GH-125)](https://github.com/puppetlabs/pdkgo/issues/125) 1eb56e5 Fix `$ver` bug in download script
+- [(GH-15)](https://github.com/puppetlabs/pdkgo/issues/15) Unset necessary env vars in pdkshell
+- [(GH-125)](https://github.com/puppetlabs/pdkgo/issues/125) Fail on errors, quote arguments
+- [(GH-125)](https://github.com/puppetlabs/pdkgo/issues/125) Fix `$ver` bug in download script
 
 ## [0.1.0]
 
