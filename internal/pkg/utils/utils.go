@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pdkshell"
 	"github.com/rs/zerolog/log"
@@ -77,4 +78,26 @@ func buildPDKCommandName(cmd *cobra.Command) []string {
 		argsV = append(argsV, cmd.Name())
 	}
 	return argsV
+}
+
+// Implement a safe way to copy from src -> dst to prevent
+// cases of DoS via decompression bombs (CWE-409)
+const copyWriteSize = 1024
+const maxCopySize = copyWriteSize * 1024 * 10 // 10MB copy limit
+
+func ChunkedCopy(dst io.Writer, src io.Reader) error {
+	currentBytesWritten := int64(0)
+	for {
+		n, err := io.CopyN(dst, src, copyWriteSize)
+		currentBytesWritten += n
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+		if currentBytesWritten > maxCopySize {
+			return fmt.Errorf("Exceeded max copy size of %v", maxCopySize)
+		}
+	}
 }
