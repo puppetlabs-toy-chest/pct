@@ -7,7 +7,6 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	utilsHelper = utilsHelperImplMock{}
 	osUtil = osUtilHelpersImplMock{}
 	tarUtil = tarHelpersImplMock{}
 	ioUtil = ioUtilHelpersImplMock{}
@@ -21,7 +20,6 @@ func TestBuild(t *testing.T) {
 	tests := []struct {
 		name                    string
 		args                    args
-		mockIsModuleRootErrResp error
 		mockStatResponses       []mockStatResponse
 		expectedFilePath        string
 		wantErr                 bool
@@ -29,16 +27,6 @@ func TestBuild(t *testing.T) {
 		mockGzipErrResponse     error
 		testTempDir             string
 	}{
-		{
-			name: "Should not attempt to package template if not in module root dir",
-			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
-			},
-			mockIsModuleRootErrResp: errors.New("Not in module root dir"),
-			wantErr:                 true,
-			expectedFilePath:        "",
-		},
 		{
 			name: "Should return err if template path does not exist",
 			args: args{
@@ -187,7 +175,6 @@ func TestBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockIsModuleRootErrResp = tt.mockIsModuleRootErrResp
 			mockStatResponses = tt.mockStatResponses
 			mockTarErrResponse = tt.mockTarErrResponse
 			mockGzipErrResponse = tt.mockGzipErrResponse

@@ -1,7 +1,6 @@
 package pct
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -26,15 +25,6 @@ func init() {
 }
 
 func Build(templatePath, targetDir string) (gzipArchiveFilePath string, err error) {
-	// Check we're in the root dir of a module before proceeding
-	wd, err := utilsHelper.IsModuleRoot()
-	if err != nil {
-		return "", fmt.Errorf("Could not determine if in module root dir: %v", err)
-	}
-	if wd == "" {
-		return "", fmt.Errorf("Not in current module root dir")
-	}
-
 	// Check template dir exists
 	if _, err := osUtil.Stat(templatePath); osUtil.IsNotExist(err) {
 		return "", err
@@ -66,7 +56,7 @@ func Build(templatePath, targetDir string) (gzipArchiveFilePath string, err erro
 	}
 
 	// GZIP the TAR created in the temp dir and output to the $MODULE_ROOT/pkg directory
-	gzipArchiveFilePath, err = gzipUtil.Gzip(tarArchiveFilePath, filepath.Join(wd, "pkg"))
+	gzipArchiveFilePath, err = gzipUtil.Gzip(tarArchiveFilePath, filepath.Join(targetDir, "pkg"))
 	if err != nil {
 		log.Error().Msgf("Could not GZIP template TAR archive (%v): %v", tarArchiveFilePath, err)
 		return "", err
