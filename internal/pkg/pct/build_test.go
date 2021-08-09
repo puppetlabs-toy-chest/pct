@@ -18,14 +18,14 @@ func TestBuild(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                    string
-		args                    args
-		mockStatResponses       []mockStatResponse
-		expectedFilePath        string
-		wantErr                 bool
-		mockTarErrResponse      error
-		mockGzipErrResponse     error
-		testTempDir             string
+		name                string
+		args                args
+		mockStatResponses   []mockStatResponse
+		expectedFilePath    string
+		wantErr             bool
+		mockTarErrResponse  error
+		mockGzipErrResponse error
+		testTempDir         string
 	}{
 		{
 			name: "Should return err if template path does not exist",
@@ -118,7 +118,7 @@ func TestBuild(t *testing.T) {
 			mockTarErrResponse: errors.New("Could not TAR the directory"),
 		},
 		{
-			name: "Should TAR.GZ valid template to $MODULE_ROOT/pkg and return path",
+			name: "Should TAR.GZ valid template to $MODULE_ROOT and return path",
 			args: args{
 				templatePath: testDir,
 				targetDir:    testDir,
@@ -140,7 +140,8 @@ func TestBuild(t *testing.T) {
 					mockError:    nil,
 				},
 			},
-			expectedFilePath:   filepath.Clean("/path/to/nowhere/pkg/template.tar.gz"),
+			// We need to clean the path so the test is compatible on both Windows and *nix systems
+			expectedFilePath:   filepath.Clean("/path/to/nowhere/template.tar.gz"),
 			wantErr:            false,
 			mockTarErrResponse: nil,
 		},

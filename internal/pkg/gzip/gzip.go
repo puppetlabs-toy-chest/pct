@@ -16,8 +16,14 @@ func Gzip(source, target string) (gzipFilePath string, err error) {
 		return "", err
 	}
 
+	err = os.MkdirAll(target, 0750)
+	if err != nil {
+		return "", err
+	}
+
 	filename := filepath.Base(source)
 	target = filepath.Join(target, fmt.Sprintf("%s.gz", filename))
+
 	writer, err := os.Create(target)
 	if err != nil {
 		return "", err

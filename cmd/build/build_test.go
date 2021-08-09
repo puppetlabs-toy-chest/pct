@@ -3,10 +3,13 @@ package build
 import (
 	"bytes"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"regexp"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 func nullFunction(cmd *cobra.Command, args []string) error {
@@ -14,6 +17,10 @@ func nullFunction(cmd *cobra.Command, args []string) error {
 }
 
 func TestCreatebuildCommand(t *testing.T) {
+	wd, _ := os.Getwd()
+	defaultSourceDir := wd
+	defaultTargetDir := filepath.Join(wd, "pkg")
+
 	tests := []struct {
 		name       string
 		args       []string
@@ -22,26 +29,44 @@ func TestCreatebuildCommand(t *testing.T) {
 		wantCmd    *cobra.Command
 		wantErr    bool
 		f          func(cmd *cobra.Command, args []string) error
+		expSrcDir  string
+		expTargDir string
 	}{
 		{
-			name:    "executes without error",
-			f:       nullFunction,
-			out:     "",
-			wantErr: false,
+			name:       "executes without error for valid flag",
+			args:       []string{"build"},
+			f:          nullFunction,
+			out:        "",
+			wantErr:    false,
+			expSrcDir:  defaultSourceDir,
+			expTargDir: defaultTargetDir,
 		},
 		{
-			name:    "executes without error for valid flag",
-			args:    []string{"build"},
-			f:       nullFunction,
-			out:     "",
-			wantErr: false,
+			name:       "executes with error for invalid flag",
+			args:       []string{"--foo"},
+			f:          nullFunction,
+			out:        "unknown flag: --foo",
+			wantErr:    true,
+			expSrcDir:  "",
+			expTargDir: "",
 		},
 		{
-			name:    "executes with error for invalid flag",
-			args:    []string{"--foo"},
-			f:       nullFunction,
-			out:     "unknown flag: --foo",
-			wantErr: true,
+			name:       "uses sourcedir, targetdir when passed in",
+			args:       []string{"build", "--sourcedir", "/path/to/template", "--targetdir", "/path/to/output"},
+			f:          nullFunction,
+			out:        "",
+			wantErr:    false,
+			expSrcDir:  "/path/to/template",
+			expTargDir: "/path/to/output",
+		},
+		{
+			name:       "Sets correct defaults if sourcedir and targetdir undefined",
+			args:       []string{"build"},
+			f:          nullFunction,
+			out:        "",
+			wantErr:    false,
+			expSrcDir:  defaultSourceDir,
+			expTargDir: defaultTargetDir,
 		},
 	}
 	for _, tt := range tests {
@@ -65,6 +90,9 @@ func TestCreatebuildCommand(t *testing.T) {
 				return
 			}
 
+			assert.Equal(t, tt.expSrcDir, sourceDir)
+			assert.Equal(t, tt.expTargDir, targetDir)
+
 			output := string(out)
 			r := regexp.MustCompile(tt.out)
 			if !r.MatchString(output) {
@@ -73,4 +101,5 @@ func TestCreatebuildCommand(t *testing.T) {
 			}
 		})
 	}
+
 }

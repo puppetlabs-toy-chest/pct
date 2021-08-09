@@ -1,29 +1,56 @@
 package build
 
 import (
-	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
+	"os"
+	"path/filepath"
+
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
 var (
-	force       bool
-	targetDir   string
-	noop        bool
-	templateRef bool
+	sourceDir string
+	targetDir string
 )
 
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:   "build [flags]",
-		Short: "Builds a package from the module that can be published to the Puppet Forge",
-		Long:  `Builds a package from the module that can be published to the Puppet Forge`,
-		RunE:  utils.ExecutePDKCommand,
+		Use:     "build [flags]",
+		Short:   "Builds a package from the template",
+		Long:    `Builds a package from the template. Assumes the current working directory is the template you wish to package`,
+		PreRunE: preExecute,
+		RunE:    execute,
 	}
 
-	tmp.Flags().BoolVar(&force, "force", false, "Skips the prompts and builds the module package")
-	tmp.Flags().StringVar(&targetDir, "target-dir", "", "The target directory where you want PDK to write the package")
-	tmp.Flags().BoolVar(&noop, "noop", false, "Do not update the module, just output what would be done")
-	tmp.Flags().BoolVar(&templateRef, "templateRef", false, "Specifies the template git branch or tag to use when creating new modules or classes")
+	tmp.Flags().StringVar(&sourceDir, "sourcedir", "", "The template directory you wish to package up")
+	tmp.Flags().StringVar(&targetDir, "targetdir", "", "The target directory where you want the packaged template to be output to")
 
 	return tmp
+}
+
+func preExecute(cmd *cobra.Command, args []string) error {
+
+	wd, err := os.Getwd()
+	log.Info().Msgf("WD: %v", wd)
+
+	if (sourceDir == "" || targetDir == "") && err != nil {
+		return err
+	}
+
+	if sourceDir == "" {
+		sourceDir = wd
+	}
+
+	if targetDir == "" {
+		targetDir = filepath.Join(wd, "pkg")
+	}
+
+	return nil
+}
+
+func execute(cmd *cobra.Command, args []string) error {
+	gzipArchiveFilePath, err := pct.Build(sourceDir, targetDir)
+	log.Info().Msgf("Template output to %v", gzipArchiveFilePath)
+	return err
 }

@@ -65,6 +65,9 @@ func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, e
 	return RunCommand(executeString, wd)
 }
 
+// On macOS systems, the `TempDir` func in the `testing` package will
+// potentially return the symlink to the dir, rather than the actual
+// path (`/private/folders/...` vs `/var/private/folders/...`).
 func GetTmpDir(t *testing.T) string {
 	dirName := t.TempDir()
 	tmpDir, err := filepath.EvalSymlinks(dirName)
