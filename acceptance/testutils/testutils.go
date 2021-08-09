@@ -51,7 +51,7 @@ func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, e
 		postfix = ".exe"
 	}
 
-	pctPath := fmt.Sprintf("../dist/pct_%s_%s/pct%s", runtime.GOOS, runtime.GOARCH, postfix)
+	pctPath := fmt.Sprintf("../../dist/pct_%s_%s/pct%s", runtime.GOOS, runtime.GOARCH, postfix)
 	absPath, err := filepath.Abs(pctPath)
 
 	if err != nil {

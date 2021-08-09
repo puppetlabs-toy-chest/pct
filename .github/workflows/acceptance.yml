@@ -39,4 +39,4 @@ jobs:
         ./build.ps1
       if: runner.os == 'Windows'
     - name: Test
-      run: go test -v ./acceptance
+      run: go test -v ./acceptance/...
