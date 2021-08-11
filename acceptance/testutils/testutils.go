@@ -64,3 +64,14 @@ func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, e
 
 	return RunCommand(executeString, wd)
 }
+
+func GetTmpDir(t *testing.T) string {
+	dirName := t.TempDir()
+	tmpDir, err := filepath.EvalSymlinks(dirName)
+
+	if err != nil {
+		panic("Could not create temp dir for test")
+	}
+
+	return tmpDir
+}
