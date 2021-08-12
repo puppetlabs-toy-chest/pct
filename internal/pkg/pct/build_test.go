@@ -17,7 +17,7 @@ func TestBuild(t *testing.T) {
 		targetDir    string
 	}
 
-	var testDir = "/path/to/nowhere/"
+	var mockTemplateDir = "/path/to/my/cool-template"
 
 	tests := []struct {
 		name                    string
