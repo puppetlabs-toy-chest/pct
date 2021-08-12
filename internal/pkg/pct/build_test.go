@@ -1,7 +1,6 @@
 package pct_test
 
 import (
-	"errors"
 	"path/filepath"
 	"testing"
 
@@ -130,7 +129,6 @@ func TestBuild(t *testing.T) {
 
 			fs := afero.NewMemMapFs()
 			afs := &afero.Afero{Fs: fs}
-			iofs := &afero.IOFS{Fs: fs}
 
 			for _, path := range tt.mockDirs {
 				afs.Mkdir(path, 750) //nolint:gosec,errcheck // this result is not used in a secure application
@@ -141,13 +139,9 @@ func TestBuild(t *testing.T) {
 			}
 
 			p := &pct.Builder{
-				&mock.UtilsHelper{TestDir: mockTemplateDir, IsModuleRootErrResp: tt.mockIsModuleRootErrResp},
-				&mock.OsUtil{},
-				&mock.IoUtil{TestDir: mockTemplateDir},
 				&mock.Tar{ReturnedPath: tt.tarFile, ErrResponse: tt.mockTarErr},
 				&mock.Gzip{ReturnedPath: tt.gzipFile, ErrResponse: tt.mockGzipErr},
 				afs,
-				iofs,
 			}
 
 			gotGzipArchiveFilePath, err := p.Build(tt.args.templatePath, tt.args.targetDir)

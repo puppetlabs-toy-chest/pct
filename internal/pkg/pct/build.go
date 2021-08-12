@@ -7,19 +7,14 @@ import (
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
-	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 )
 
 type Builder struct {
-	UtilsHelper utils.UtilsHelperI
-	OsUtil      utils.OsUtilI
-	IoUtil      utils.IoUtilI
-	Tar         tar.TarI
-	Gzip        gzip.GzipI
-	AFS         *afero.Afero
-	IOFS        *afero.IOFS
+	Tar  tar.TarI
+	Gzip gzip.GzipI
+	AFS  *afero.Afero
 }
 
 func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath string, err error) {

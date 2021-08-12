@@ -24,7 +24,7 @@ func (g *Gzip) Gzip(source, target string) (gzipFilePath string, err error) {
 		return "", err
 	}
 
-	err = os.MkdirAll(target, 0750)
+	err = g.AFS.MkdirAll(target, 0750)
 	if err != nil {
 		return "", err
 	}
