@@ -12,7 +12,6 @@ package pct
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -20,9 +19,10 @@ import (
 	"text/template"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/mitchellh/go-homedir"
 	"github.com/olekukonko/tablewriter"
+	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
@@ -76,50 +76,54 @@ type DeployInfo struct {
 	PdkInfo          PDKInfo
 }
 
-type osWrapper interface {
-	Getwd() (string, error)
-}
-type osFunc struct {
+type PctI interface {
+	GetInfo(templateCache string, selectedTemplate string) (PuppetContentTemplateInfo, error)
+	List(templatePath string, templateName string) ([]PuppetContentTemplate, error)
+	FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error
+	DisplayDefaults(defaults map[string]interface{}, format string) string
+	FormatDeployment(deployed []string, jsonOutput string) error
+	Deploy(info DeployInfo) []string
 }
 
-func (osf osFunc) Getwd() (dir string, err error) {
-	return os.Getwd()
+type Pct struct {
+	OsUtils utils.OsUtilI
+	Utils   utils.UtilsHelperI
+	AFS     *afero.Afero
+	IOFS    *afero.IOFS
 }
 
-var osUtils osWrapper = osFunc{}
-
-func Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
-	info, err := GetInfo(templateCache, selectedTemplate)
+func (p *Pct) Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
+	info, err := p.GetInfo(templateCache, selectedTemplate)
 	return info.Template, err
 }
 
-func GetInfo(templateCache string, selectedTemplate string) (PuppetContentTemplateInfo, error) {
+func (p *Pct) GetInfo(templateCache string, selectedTemplate string) (PuppetContentTemplateInfo, error) {
 	file := filepath.Join(templateCache, selectedTemplate, TemplateConfigFileName)
-	_, err := os.Stat(file)
+	_, err := p.AFS.Stat(file)
 	if os.IsNotExist(err) {
 		return PuppetContentTemplateInfo{}, fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
 	}
-	i := readTemplateConfig(file)
+	i := p.readTemplateConfig(file)
 	return i, nil
 }
 
 // List lists all templates in a given path and parses their configuration. Does
 // not return any errors from parsing invalid templates, but returns them as
 // debug log events
-func List(templatePath string, templateName string) ([]PuppetContentTemplate, error) {
+func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTemplate, error) {
 	log.Debug().Msgf("Searching %+v for templates", templatePath)
-	matches, _ := filepath.Glob(templatePath + "/**/" + TemplateConfigFileName)
+	matches, _ := p.IOFS.Glob(templatePath + "/**/" + TemplateConfigFileName)
 
 	var tmpls []PuppetContentTemplate
 	for _, file := range matches {
 		log.Debug().Msgf("Found: %+v", file)
-		i := readTemplateConfig(file).Template
+		i := p.readTemplateConfig(file).Template
 		tmpls = append(tmpls, i)
 	}
 
 	if templateName != "" {
 		log.Debug().Msgf("Filtering for: %s", templateName)
-		tmpls = filterFiles(tmpls, func(f PuppetContentTemplate) bool { return f.Id == templateName })
+		tmpls = p.filterFiles(tmpls, func(f PuppetContentTemplate) bool { return f.Id == templateName })
 	}
 
 	return tmpls, nil
@@ -127,7 +131,7 @@ func List(templatePath string, templateName string) ([]PuppetContentTemplate, er
 
 // FormatTemplates formats one or more templates to display on the console in
 // table format or json format.
-func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
+func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
 	switch jsonOutput {
 	case "table":
 		fmt.Println("")
@@ -162,7 +166,7 @@ func FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
 }
 
 // DisplayDefaults returns the Default values from a Templates configuration file
-func DisplayDefaults(defaults map[string]interface{}, format string) string {
+func (*Pct) DisplayDefaults(defaults map[string]interface{}, format string) string {
 	var err error
 	var prettyDefaults []byte
 
@@ -189,7 +193,7 @@ func DisplayDefaults(defaults map[string]interface{}, format string) string {
 
 // FormatDeployment formats the files returned by the Deploy method to display
 // on the console in table format or json format.
-func FormatDeployment(deployed []string, jsonOutput string) error {
+func (*Pct) FormatDeployment(deployed []string, jsonOutput string) error {
 	switch jsonOutput {
 	case "table":
 		for _, d := range deployed {
@@ -206,21 +210,21 @@ func FormatDeployment(deployed []string, jsonOutput string) error {
 // Deploy deploys a selected template to a target path with a target name using
 // data from both the configuration inside the template and provided by the
 // User in their user config file
-func Deploy(info DeployInfo) []string {
+func (p *Pct) Deploy(info DeployInfo) []string {
 
 	log.Trace().Msgf("PDKInfo: %+v", info.PdkInfo)
 
 	file := filepath.Join(info.TemplateCache, info.SelectedTemplate, TemplateConfigFileName)
 	log.Debug().Msgf("Template: %s", file)
-	tmpl := readTemplateConfig(file)
+	tmpl := p.readTemplateConfig(file)
 	log.Trace().Msgf("Parsed: %+v", tmpl)
 
 	if info.TargetName == "" && info.TargetOutputDir == "" { // pdk new foo-foo
-		cwd, _ := osUtils.Getwd()
+		cwd, _ := p.OsUtils.Getwd()
 		info.TargetName = filepath.Base(cwd)
 		info.TargetOutputDir = cwd
 	} else if info.TargetName != "" && info.TargetOutputDir == "" { // pdk new foo-foo -n wakka
-		cwd, _ := osUtils.Getwd()
+		cwd, _ := p.OsUtils.Getwd()
 		if tmpl.Template.Type == "project" {
 			info.TargetOutputDir = filepath.Join(cwd, info.TargetName)
 		} else {
@@ -245,7 +249,7 @@ func Deploy(info DeployInfo) []string {
 	)
 
 	var templateFiles []PuppetContentTemplateFileInfo
-	err := filepath.WalkDir(contentDir, func(path string, info os.DirEntry, err error) error {
+	err := p.AFS.Walk(contentDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -275,12 +279,12 @@ func Deploy(info DeployInfo) []string {
 	for _, templateFile := range templateFiles {
 		log.Debug().Msgf("Deploying: %s", templateFile.TargetFilePath)
 		if templateFile.IsDirectory {
-			err := createTemplateDirectory(templateFile.TargetFilePath)
+			err := p.createTemplateDirectory(templateFile.TargetFilePath)
 			if err == nil {
 				deployed = append(deployed, templateFile.TargetFilePath)
 			}
 		} else {
-			err := createTemplateFile(info, file, templateFile, tmpl.Template)
+			err := p.createTemplateFile(info, file, templateFile, tmpl.Template)
 			if err != nil {
 				log.Error().Msgf("%s", err)
 				continue
@@ -292,9 +296,9 @@ func Deploy(info DeployInfo) []string {
 	return deployed
 }
 
-func createTemplateDirectory(targetDir string) error {
+func (p *Pct) createTemplateDirectory(targetDir string) error {
 	log.Trace().Msgf("Creating: '%s'", targetDir)
-	err := os.MkdirAll(targetDir, os.ModePerm)
+	err := p.AFS.MkdirAll(targetDir, os.ModePerm)
 
 	if err != nil {
 		log.Error().Msgf("Error: %v", err)
@@ -304,28 +308,28 @@ func createTemplateDirectory(targetDir string) error {
 	return nil
 }
 
-func createTemplateFile(info DeployInfo, configFile string, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate) error {
+func (p *Pct) createTemplateFile(info DeployInfo, configFile string, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate) error {
 	log.Trace().Msgf("Creating: '%s'", templateFile.TargetFilePath)
-	config := processConfiguration(
+	config := p.processConfiguration(
 		info,
 		configFile,
 		templateFile.TemplatePath,
 		tmpl,
 	)
 
-	text, err := renderFile(templateFile.TemplatePath, config)
+	text, err := p.renderFile(templateFile.TemplatePath, config)
 	if err != nil {
 		return fmt.Errorf("Failed to create %s", templateFile.TargetFilePath)
 	}
 
 	log.Trace().Msgf("Writing: '%s' '%s'", templateFile.TargetFilePath, text)
-	err = os.MkdirAll(templateFile.TargetDir, os.ModePerm)
+	err = p.AFS.MkdirAll(templateFile.TargetDir, os.ModePerm)
 	if err != nil {
 		log.Error().Msgf("Error: %v", err)
 		return err
 	}
 
-	file, err := os.Create(templateFile.TargetFilePath)
+	file, err := p.AFS.Create(templateFile.TargetFilePath)
 	if err != nil {
 		log.Error().Msgf("Error: %v", err)
 		return err
@@ -336,7 +340,7 @@ func createTemplateFile(info DeployInfo, configFile string, templateFile PuppetC
 		}
 	}()
 
-	_, err = io.WriteString(file, text)
+	_, err = p.OsUtils.WriteString(file, text)
 	if err != nil {
 		log.Error().Msgf("Error: %v", err)
 		return err
@@ -351,7 +355,7 @@ func createTemplateFile(info DeployInfo, configFile string, templateFile PuppetC
 	return nil
 }
 
-func processConfiguration(info DeployInfo, configFile string, projectTemplate string, tmpl PuppetContentTemplate) map[string]interface{} {
+func (p *Pct) processConfiguration(info DeployInfo, configFile string, projectTemplate string, tmpl PuppetContentTemplate) map[string]interface{} {
 	v := viper.New()
 
 	log.Trace().Msgf("PDKInfo: %+v", info.PdkInfo)
@@ -376,13 +380,13 @@ func processConfiguration(info DeployInfo, configFile string, projectTemplate st
 	// Convention based variables
 	v.SetDefault("pct_name", info.TargetName)
 
-	user := getCurrentUser()
+	user := p.getCurrentUser()
 	v.SetDefault("user", user)
 	v.SetDefault("puppet_module.author", user)
 
 	// Machine based variables
 	cwd, _ := os.Getwd()
-	hostName, _ := os.Hostname()
+	hostName, _ := p.OsUtils.Hostname()
 	v.SetDefault("cwd", cwd)
 	v.SetDefault("hostname", hostName)
 
@@ -393,6 +397,7 @@ func processConfiguration(info DeployInfo, configFile string, projectTemplate st
 
 	// Template specific variables
 	log.Trace().Msgf("Adding %v", filepath.Dir(configFile))
+	// v.SetConfigFile(configFile)
 	v.SetConfigName(TemplateConfigName)
 	v.SetConfigType("yml")
 	v.AddConfigPath(filepath.Dir(configFile))
@@ -403,7 +408,7 @@ func processConfiguration(info DeployInfo, configFile string, projectTemplate st
 	}
 
 	// User specified variable overrides
-	home, _ := homedir.Dir()
+	home, _ := p.Utils.Dir()
 	userConfigPath := filepath.Join(home, ".pdk")
 	log.Trace().Msgf("Adding %v", userConfigPath)
 	vUser := viper.New()
@@ -446,12 +451,15 @@ func processConfiguration(info DeployInfo, configFile string, projectTemplate st
 	return config
 }
 
-func readTemplateConfig(configFile string) PuppetContentTemplateInfo {
+func (p *Pct) readTemplateConfig(configFile string) PuppetContentTemplateInfo {
 	v := viper.New()
-	userConfigFileBase := filepath.Base(configFile)
-	v.AddConfigPath(filepath.Dir(configFile))
-	v.SetConfigName(userConfigFileBase)
-	v.SetConfigType("yml")
+	v.SetFs(p.AFS)
+	v.SetConfigFile(configFile)
+	// userConfigFileBase := filepath.Base(configFile)
+	// v.AddConfigPath(filepath.Dir(configFile))
+	// v.SetConfigName(strings.TrimSuffix(userConfigFileBase, filepath.Ext(userConfigFileBase)))
+	// v.SetConfigType("yml")
+
 	if err := v.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Using template config file: %v", v.ConfigFileUsed())
 	}
@@ -476,8 +484,8 @@ func readTemplateConfig(configFile string) PuppetContentTemplateInfo {
 	return config
 }
 
-func renderFile(fileName string, vars interface{}) (string, error) {
-	tmpl, err := template.
+func (p *Pct) renderFile(fileName string, vars interface{}) (string, error) {
+	renderedTmpl := template.
 		New(filepath.Base(fileName)).
 		Funcs(
 			template.FuncMap{
@@ -485,18 +493,24 @@ func renderFile(fileName string, vars interface{}) (string, error) {
 					return strings.Title(strings.ToLower(itemName))
 				},
 			},
-		).
-		ParseFiles(fileName)
+		)
+	// This is not ideal, but this function needs to be toggled
+	// if we are running with aferos in memory file system
+	// if the file doesnt exist on the os then check if its part of afero
+	tmpl, err := renderedTmpl.ParseFiles(fileName)
+	if os.IsNotExist(err) {
+		tmpl, err = renderedTmpl.ParseFS(p.IOFS, fileName)
 
-	if err != nil {
-		log.Error().Msgf("Error parsing config: %v", err)
-		return "", err
+		if err != nil {
+			log.Error().Msgf("Error parsing config: %v", err)
+			return "", err
+		}
 	}
 
-	return process(tmpl, vars), nil
+	return p.process(tmpl, vars), nil
 }
 
-func process(t *template.Template, vars interface{}) string {
+func (p *Pct) process(t *template.Template, vars interface{}) string {
 	var tmplBytes bytes.Buffer
 
 	err := t.Execute(&tmplBytes, vars)
@@ -507,7 +521,7 @@ func process(t *template.Template, vars interface{}) string {
 	return tmplBytes.String()
 }
 
-func filterFiles(ss []PuppetContentTemplate, test func(PuppetContentTemplate) bool) (ret []PuppetContentTemplate) {
+func (p *Pct) filterFiles(ss []PuppetContentTemplate, test func(PuppetContentTemplate) bool) (ret []PuppetContentTemplate) {
 	for _, s := range ss {
 		if test(s) {
 			ret = append(ret, s)
@@ -516,7 +530,7 @@ func filterFiles(ss []PuppetContentTemplate, test func(PuppetContentTemplate) bo
 	return
 }
 
-func getCurrentUser() string {
+func (p *Pct) getCurrentUser() string {
 	user, _ := user.Current()
 	if strings.Contains(user.Username, "\\") {
 		v := strings.Split(user.Username, "\\")

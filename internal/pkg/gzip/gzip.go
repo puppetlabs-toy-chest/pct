@@ -3,15 +3,23 @@ package gzip
 import (
 	"compress/gzip"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/afero"
 )
 
-func Gzip(source, target string) (gzipFilePath string, err error) {
-	reader, err := os.Open(filepath.Clean(source))
+type GzipI interface {
+	Gzip(source, target string) (gzipFilePath string, err error)
+}
+
+type Gzip struct {
+	AFS *afero.Afero
+}
+
+func (g *Gzip) Gzip(source, target string) (gzipFilePath string, err error) {
+	reader, err := g.AFS.Open(filepath.Clean(source))
 	if err != nil {
 		return "", err
 	}
@@ -23,8 +31,7 @@ func Gzip(source, target string) (gzipFilePath string, err error) {
 
 	filename := filepath.Base(source)
 	target = filepath.Join(target, fmt.Sprintf("%s.gz", filename))
-
-	writer, err := os.Create(target)
+	writer, err := g.AFS.Create(target)
 	if err != nil {
 		return "", err
 	}

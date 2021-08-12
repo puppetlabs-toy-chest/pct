@@ -7,12 +7,6 @@ import (
 	"path/filepath"
 )
 
-type UtilsHelper interface {
-	IsModuleRoot() (string, error)
-}
-
-type UtilsHelperImpl struct{}
-
 // contains checks if a string is present in a slice
 func Contains(s []string, str string) bool {
 	for _, v := range s {
@@ -55,9 +49,16 @@ func ChunkedCopy(dst io.Writer, src io.Reader) error {
 	}
 }
 
+type UtilsHelperI interface {
+	IsModuleRoot() (string, error)
+	Dir() (string, error)
+}
+
+type UtilsHelper struct{}
+
 // Check if we're currently in the module root dir.
 // Return the sanitized file path if we are in a module root, otherwise an empty string.
-func (UtilsHelperImpl) IsModuleRoot() (string, error) {
+func (u *UtilsHelper) IsModuleRoot() (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -69,4 +70,8 @@ func (UtilsHelperImpl) IsModuleRoot() (string, error) {
 	}
 
 	return filepath.Clean(wd), nil
+}
+
+func (u *UtilsHelper) Dir() (string, error) {
+	return homedir.Dir()
 }

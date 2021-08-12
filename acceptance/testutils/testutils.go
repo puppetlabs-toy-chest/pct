@@ -23,7 +23,7 @@ func SkipAcceptanceTest(t *testing.T) {
 // if wd is and empty string it will default to the current working directory
 func RunCommand(cmdString string, wd string) (stdout string, stderr string, exitCode int) {
 	cmds := strings.Split(cmdString, " ")
-	cmd := exec.Command(cmds[0], cmds[1:]...)
+	cmd := exec.Command(cmds[0], cmds[1:]...) // #nosec // used only for testing
 	if wd != "" {
 		cmd.Dir = wd
 	}

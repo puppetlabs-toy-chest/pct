@@ -2,12 +2,12 @@ package utils
 
 import "io/ioutil"
 
-type IoUtil interface {
+type IoUtilI interface {
 	TempDir() (name string, err error)
 }
 
-type IoUtilHelpersImpl struct{}
+type IoUtil struct{}
 
-func (IoUtilHelpersImpl) TempDir() (name string, err error) {
+func (IoUtil) TempDir() (name string, err error) {
 	return ioutil.TempDir("", "")
 }

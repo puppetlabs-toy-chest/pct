@@ -6,15 +6,27 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
 	"strings"
 
+	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/afero"
 )
 
-func Tar(source, target string) (tarFilePath string, err error) {
+type TarI interface {
+	Tar(source, target string) (tarFilePath string, err error)
+	Untar(tarball, target string) (outputDirPath string, err error)
+}
+
+type Tar struct {
+	AFS *afero.Afero
+}
+
+func (t *Tar) Tar(source, target string) (tarFilePath string, err error) {
 	filename := filepath.Base(source)
 	target = filepath.Join(target, fmt.Sprintf("%s.tar", filename))
-	tarfile, err := os.Create(target)
+	tarfile, err := t.AFS.Create(target)
 	if err != nil {
 		return "", err
 	}
@@ -33,7 +45,7 @@ func Tar(source, target string) (tarFilePath string, err error) {
 		}
 	}()
 
-	info, err := os.Stat(source)
+	info, err := t.AFS.Stat(source)
 	if err != nil {
 		return "", nil
 	}
@@ -43,7 +55,7 @@ func Tar(source, target string) (tarFilePath string, err error) {
 		baseDir = filepath.Base(source)
 	}
 
-	err = filepath.Walk(source,
+	err = t.AFS.Walk(source,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -66,7 +78,7 @@ func Tar(source, target string) (tarFilePath string, err error) {
 				return nil
 			}
 
-			file, err := os.Open(filepath.Clean(path))
+			file, err := t.AFS.Open(filepath.Clean(path))
 			if err != nil {
 				return err
 			}
@@ -86,4 +98,68 @@ func Tar(source, target string) (tarFilePath string, err error) {
 	}
 
 	return target, err
+}
+
+func (t *Tar) Untar(tarball, target string) (outputDirPath string, err error) {
+	reader, err := t.AFS.Open(filepath.Clean(tarball))
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if err := reader.Close(); err != nil {
+			log.Error().Msgf("Error closing reader: %s", err)
+		}
+	}()
+
+	tarReader := tar.NewReader(reader)
+
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return "", err
+		}
+
+		if strings.Contains(header.Name, "../") {
+			return "", fmt.Errorf("TAR contains entry above top level archive dir: %s\n", header.Name)
+		}
+
+		path := filepath.Join(target, filepath.Clean(header.Name))
+		info := header.FileInfo()
+		if info.IsDir() {
+			if err = t.AFS.MkdirAll(filepath.Clean(path), info.Mode()); err != nil {
+				return "", err
+			}
+			continue
+		}
+
+		file, err := t.AFS.OpenFile(filepath.Clean(path), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
+
+		defer func() {
+			if err := file.Close(); err != nil {
+				log.Error().Msgf("Error closing file: %s", err)
+			}
+		}()
+
+		if err != nil {
+			return "", err
+		}
+
+		err = utils.ChunkedCopy(file, tarReader)
+		if err != nil {
+			return "", err
+		}
+
+		err = file.Close()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	targetDirName := strings.Split(filepath.Base(tarball), ".")[0]
+	targetDirPath := filepath.Join(target, targetDirName)
+
+	return targetDirPath, nil
 }
