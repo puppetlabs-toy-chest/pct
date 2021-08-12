@@ -36,8 +36,8 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should return err if template path does not exist",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			expectedFilePath: "",
 			wantErr:          true,
@@ -45,11 +45,11 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should return err if template path does not contain pct-config.yml",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			mockDirs: []string{
-				testDir,
+				mockTemplateDir,
 			},
 			expectedFilePath: "",
 			wantErr:          true,
@@ -57,14 +57,14 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should return err if content dir does not exist",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			mockDirs: []string{
-				testDir,
+				mockTemplateDir,
 			},
 			mockFiles: []string{
-				filepath.Clean(filepath.Join(testDir, "pct-config.yml")),
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")),
 			},
 			expectedFilePath: "",
 			wantErr:          true,
@@ -72,15 +72,15 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should not attempt to GZIP when TAR operation fails",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			mockDirs: []string{
-				testDir,
-				filepath.Join(testDir, "content"),
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
 			},
 			mockFiles: []string{
-				filepath.Join(testDir, "pct-config.yml"),
+				filepath.Join(mockTemplateDir, "pct-config.yml"),
 			},
 			expectedFilePath: "",
 			wantErr:          true,
@@ -89,15 +89,15 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should return error and empty path if GZIP operation fails",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			mockFiles: []string{
-				filepath.Join(testDir, "pct-config.yml"),
+				filepath.Join(mockTemplateDir, "pct-config.yml"),
 			},
 			mockDirs: []string{
-				testDir,
-				filepath.Join(testDir, "content"),
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
 			},
 			tarFile:          "/path/to/nowhere/pkg/nowhere.tar",
 			expectedFilePath: "",
@@ -108,15 +108,15 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Should TAR.GZ valid template to $MODULE_ROOT/pkg and return path",
 			args: args{
-				templatePath: testDir,
-				targetDir:    testDir,
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
 			},
 			mockDirs: []string{
-				testDir,
-				filepath.Join(testDir, "content"),
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
 			},
 			mockFiles: []string{
-				filepath.Join(testDir, "pct-config.yml"),
+				filepath.Join(mockTemplateDir, "pct-config.yml"),
 			},
 			tarFile:          "/path/to/nowhere/pkg/nowhere.tar",
 			gzipFile:         "/path/to/nowhere/pkg/nowhere.tar.gz",
@@ -133,7 +133,7 @@ func TestBuild(t *testing.T) {
 			iofs := &afero.IOFS{Fs: fs}
 
 			for _, path := range tt.mockDirs {
-				afs.Mkdir(path, 755) //nolint:gosec,errcheck // this result is not used in a secure application
+				afs.Mkdir(path, 750) //nolint:gosec,errcheck // this result is not used in a secure application
 			}
 
 			for _, path := range tt.mockFiles {
@@ -141,9 +141,9 @@ func TestBuild(t *testing.T) {
 			}
 
 			p := &pct.Builder{
-				&mock.UtilsHelper{TestDir: testDir, IsModuleRootErrResp: tt.mockIsModuleRootErrResp},
+				&mock.UtilsHelper{TestDir: mockTemplateDir, IsModuleRootErrResp: tt.mockIsModuleRootErrResp},
 				&mock.OsUtil{},
-				&mock.IoUtil{TestDir: testDir},
+				&mock.IoUtil{TestDir: mockTemplateDir},
 				&mock.Tar{ReturnedPath: tt.tarFile, ErrResponse: tt.mockTarErr},
 				&mock.Gzip{ReturnedPath: tt.gzipFile, ErrResponse: tt.mockGzipErr},
 				afs,
