@@ -51,7 +51,7 @@ func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, e
 		postfix = ".exe"
 	}
 
-	pctPath := fmt.Sprintf("../dist/pct_%s_%s/pct%s", runtime.GOOS, runtime.GOARCH, postfix)
+	pctPath := fmt.Sprintf("../../dist/pct_%s_%s/pct%s", runtime.GOOS, runtime.GOARCH, postfix)
 	absPath, err := filepath.Abs(pctPath)
 
 	if err != nil {
@@ -63,4 +63,18 @@ func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, e
 	executeString := fmt.Sprintf("%s %s", absPath, cmdString)
 
 	return RunCommand(executeString, wd)
+}
+
+// On macOS systems, the `TempDir` func in the `testing` package will
+// potentially return the symlink to the dir, rather than the actual
+// path (`/private/folders/...` vs `/var/private/folders/...`).
+func GetTmpDir(t *testing.T) string {
+	dirName := t.TempDir()
+	tmpDir, err := filepath.EvalSymlinks(dirName)
+
+	if err != nil {
+		panic("Could not create temp dir for test")
+	}
+
+	return tmpDir
 }

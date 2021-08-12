@@ -20,7 +20,7 @@ var templatePath string
 func TestMain(m *testing.M) {
 	log.Logger = zerolog.New(ioutil.Discard).With().Timestamp().Logger()
 
-	templatePath, _ = filepath.Abs("../internal/pkg/pct/testdata/examples")
+	templatePath, _ = filepath.Abs("../../internal/pkg/pct/testdata/examples")
 
 	os.Exit(m.Run())
 }

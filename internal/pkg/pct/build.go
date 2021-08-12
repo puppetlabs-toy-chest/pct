@@ -11,14 +11,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var utilsHelper utils.UtilsHelper
 var osUtil utils.OsUtil
 var ioUtil utils.IoUtil
 var tarUtil tar.TarHelpers
 var gzipUtil gzip.GzipHelpers
 
 func init() {
-	utilsHelper = utils.UtilsHelperImpl{}
 	osUtil = utils.OsUtilHelpersImpl{}
 	ioUtil = utils.IoUtilHelpersImpl{}
 	tarUtil = tar.TarHelpersImpl{}
@@ -26,28 +24,19 @@ func init() {
 }
 
 func Build(templatePath, targetDir string) (gzipArchiveFilePath string, err error) {
-	// Check we're in the root dir of a module before proceeding
-	wd, err := utilsHelper.IsModuleRoot()
-	if err != nil {
-		return "", fmt.Errorf("Could not determine if in module root dir: %v", err)
-	}
-	if wd == "" {
-		return "", fmt.Errorf("Not in current module root dir")
-	}
-
 	// Check template dir exists
 	if _, err := osUtil.Stat(templatePath); osUtil.IsNotExist(err) {
-		return "", err
+		return "", fmt.Errorf("No template directory at %v", templatePath)
 	}
 
 	// Check if pct-config.yml exists
 	if _, err := osUtil.Stat(filepath.Join(templatePath, "pct-config.yml")); osUtil.IsNotExist(err) {
-		return "", err
+		return "", fmt.Errorf("No 'pct-config.yml' found in %v", templatePath)
 	}
 
 	// Check if content dir exists
 	if _, err := osUtil.Stat(filepath.Join(templatePath, "content")); osUtil.IsNotExist(err) {
-		return "", err
+		return "", fmt.Errorf("No 'content' dir found in %v", templatePath)
 	}
 
 	// Create temp dir and TAR template there
@@ -66,7 +55,7 @@ func Build(templatePath, targetDir string) (gzipArchiveFilePath string, err erro
 	}
 
 	// GZIP the TAR created in the temp dir and output to the $MODULE_ROOT/pkg directory
-	gzipArchiveFilePath, err = gzipUtil.Gzip(tarArchiveFilePath, filepath.Join(wd, "pkg"))
+	gzipArchiveFilePath, err = gzipUtil.Gzip(tarArchiveFilePath, filepath.Join(targetDir))
 	if err != nil {
 		log.Error().Msgf("Could not GZIP template TAR archive (%v): %v", tarArchiveFilePath, err)
 		return "", err
