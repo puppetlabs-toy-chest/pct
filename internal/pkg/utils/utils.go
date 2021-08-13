@@ -3,15 +3,7 @@ package utils
 import (
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 )
-
-type UtilsHelper interface {
-	IsModuleRoot() (string, error)
-}
-
-type UtilsHelperImpl struct{}
 
 // contains checks if a string is present in a slice
 func Contains(s []string, str string) bool {
@@ -53,20 +45,4 @@ func ChunkedCopy(dst io.Writer, src io.Reader) error {
 			return fmt.Errorf("Exceeded max copy size of %v", maxCopySize)
 		}
 	}
-}
-
-// Check if we're currently in the module root dir.
-// Return the sanitized file path if we are in a module root, otherwise an empty string.
-func (UtilsHelperImpl) IsModuleRoot() (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	_, err = os.Stat(filepath.Join(wd, "metadata.json"))
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Clean(wd), nil
 }

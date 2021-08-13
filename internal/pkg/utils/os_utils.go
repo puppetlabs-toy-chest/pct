@@ -1,20 +1,26 @@
 package utils
 
 import (
+	"io"
 	"os"
 )
 
-type OsUtil interface {
-	Stat(string) (os.FileInfo, error)
-	IsNotExist(err error) bool
+type OsUtilI interface {
+	Hostname() (name string, err error)
+	WriteString(w io.Writer, s string) (n int, err error)
+	Getwd() (dir string, err error)
 }
 
-type OsUtilHelpersImpl struct{}
+type OsUtil struct{}
 
-func (OsUtilHelpersImpl) Stat(name string) (os.FileInfo, error) {
-	return os.Stat(name)
+func (*OsUtil) Hostname() (name string, err error) {
+	return os.Hostname()
 }
 
-func (OsUtilHelpersImpl) IsNotExist(err error) bool {
-	return os.IsNotExist(err)
+func (*OsUtil) WriteString(w io.Writer, s string) (n int, err error) {
+	return io.WriteString(w, s)
+}
+
+func (*OsUtil) Getwd() (dir string, err error) {
+	return os.Getwd()
 }

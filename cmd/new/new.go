@@ -10,6 +10,7 @@ import (
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -22,6 +23,7 @@ var (
 	listTemplates        bool
 	targetName           string
 	targetOutput         string
+	pctApi               *pct.Pct
 )
 
 func CreateCommand() *cobra.Command {
@@ -33,6 +35,15 @@ func CreateCommand() *cobra.Command {
 		ValidArgsFunction: flagCompletion,
 		PreRunE:           preExecute,
 		RunE:              execute,
+	}
+
+	// Configure PCT
+	fs := afero.NewOsFs() // configure afero to use real filesystem
+	pctApi = &pct.Pct{
+		OsUtils: &utils.OsUtil{},
+		Utils:   &utils.UtilsHelper{},
+		AFS:     &afero.Afero{Fs: fs},
+		IOFS:    &afero.IOFS{Fs: fs},
 	}
 
 	tmp.Flags().SortFlags = false
@@ -105,11 +116,12 @@ func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]str
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
 	localTemplateCache = viper.GetString("templatepath")
+
 	return completeName(localTemplateCache, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 }
 
 func completeName(cache string, match string) []string {
-	tmpls, _ := pct.List(cache, "")
+	tmpls, _ := pctApi.List(cache, "")
 	var names []string
 	for _, tmpl := range tmpls {
 		if strings.HasPrefix(tmpl.Id, match) {
@@ -141,12 +153,12 @@ func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
 	if listTemplates && selectedTemplateInfo == "" {
-		tmpls, err := pct.List(localTemplateCache, selectedTemplate)
+		tmpls, err := pctApi.List(localTemplateCache, selectedTemplate)
 		if err != nil {
 			return err
 		}
 
-		err = pct.FormatTemplates(tmpls, format)
+		err = pctApi.FormatTemplates(tmpls, format)
 		if err != nil {
 			return err
 		}
@@ -155,18 +167,18 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	if selectedTemplateInfo != "" {
-		pctData, err := pct.GetInfo(localTemplateCache, selectedTemplateInfo)
+		pctData, err := pctApi.GetInfo(localTemplateCache, selectedTemplateInfo)
 		if err != nil {
 			return err
 		}
 		log.Debug().Msgf("Template Defaults: %v", pctData.Defaults)
-		defaultString := pct.DisplayDefaults(pctData.Defaults, format)
+		defaultString := pctApi.DisplayDefaults(pctData.Defaults, format)
 		fmt.Printf("%s\n", defaultString)
 
 		return nil
 	}
 
-	_, err := pct.Get(localTemplateCache, selectedTemplate)
+	_, err := pctApi.Get(localTemplateCache, selectedTemplate)
 	if err != nil {
 		return err
 	}
@@ -174,7 +186,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	appVersionString := cmd.Parent().Version
 	pdkInfo := getApplicationInfo(appVersionString)
 
-	deployed := pct.Deploy(pct.DeployInfo{
+	deployed := pctApi.Deploy(pct.DeployInfo{
 		SelectedTemplate: selectedTemplate,
 		TemplateCache:    localTemplateCache,
 		TargetOutputDir:  targetOutput,
@@ -182,7 +194,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		PdkInfo:          pdkInfo,
 	})
 
-	err = pct.FormatDeployment(deployed, format)
+	err = pctApi.FormatDeployment(deployed, format)
 	if err != nil {
 		return err
 	}
