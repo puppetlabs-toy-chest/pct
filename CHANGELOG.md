@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [(GH-144)](https://github.com/puppetlabs/pdkgo/issues/144) Implement `pct build` CLI command
 
+- [(GH-144)](https://github.com/puppetlabs/pdkgo/issues/144) Implement `pct build` CLI command
+- [(GH-167)](https://github.com/puppetlabs/pdkgo/issues/167) Implement `pct install` CLI command
+
 ### Removed
 
 - [(GH-172)](https://github.com/puppetlabs/pdkgo/issues/172) Removal of PDKShell commands

@@ -3,6 +3,10 @@ package utils
 import (
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+
+	"github.com/rs/zerolog/log"
 )
 
 // contains checks if a string is present in a slice

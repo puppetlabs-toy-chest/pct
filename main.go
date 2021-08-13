@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
+	"github.com/puppetlabs/pdkgo/cmd/install"
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
@@ -28,6 +29,7 @@ func main() {
 	rootCmd.AddCommand(completion.CreateCompletionCommand())
 
 	rootCmd.AddCommand(build.CreateCommand())
+	rootCmd.AddCommand(install.CreateCommand())
 	rootCmd.AddCommand(new.CreateCommand())
 
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)

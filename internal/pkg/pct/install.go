@@ -1,6 +1,7 @@
 package pct
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,32 +19,34 @@ type PctInstaller struct {
 	IOFS   *afero.IOFS
 }
 
-func (p *PctInstaller) Install(tarFile string, targetDir string) (string, error) {
+func (p *PctInstaller) Install(templatePkg string, targetDir string) (string, error) {
+
+	if _, err := p.AFS.Stat(templatePkg); os.IsNotExist(err) {
+		return "", fmt.Errorf("No template package at %v", templatePkg)
+	}
+
 	tempDir, err := p.AFS.TempDir("", "")
 	defer func() {
 		err := p.AFS.Remove(tempDir)
 		log.Debug().Msgf("Failed to remove temp dir: %v", err)
 	}()
 	if err != nil {
-		log.Error().Msgf("Could not create tempdir to gunzip template: %v", err)
-		return "", err
+		return "", fmt.Errorf("Could not create tempdir to gunzip template: %v", err)
 	}
 
-	err = p.Gunzip.Gunzip(tarFile, tempDir)
+	err = p.Gunzip.Gunzip(templatePkg, tempDir)
 	if err != nil {
-		log.Error().Msgf("Could not GZIP template TAR archive (%v): %v", tempDir, err)
-		return "", err
+		return "", fmt.Errorf("Could not extract TAR from GZIP (%v): %v", templatePkg, err)
 	}
 
-	tempFile := strings.TrimSuffix(filepath.Join(tempDir, filepath.Base(tarFile)), `.gz`)
+	tempFile := strings.TrimSuffix(filepath.Join(tempDir, filepath.Base(templatePkg)), `.gz`)
 	if _, err = p.AFS.Stat(tempFile); os.IsNotExist(err) {
 		return "", err
 	}
 
 	t, err := p.Tar.Untar(tempFile, targetDir)
 	if err != nil {
-		log.Error().Msgf("Could not UNTAR template (%v): %v", tarFile, err)
-		return "", err
+		return "", fmt.Errorf("Could not UNTAR template (%v): %v", templatePkg, err)
 	}
 
 	return t, nil

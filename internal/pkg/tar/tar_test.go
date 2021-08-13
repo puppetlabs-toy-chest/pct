@@ -38,7 +38,7 @@ func TestTar(t *testing.T) {
 
 			fs := afero.NewMemMapFs()
 			afs := &afero.Afero{Fs: fs}
-			afs.MkdirAll(tt.args.source, 755) //nolint:errcheck
+			afs.MkdirAll(tt.args.source, 0755) //nolint:errcheck
 
 			tar := &tar.Tar{AFS: afs}
 			tarFilePath, err := tar.Tar(tt.args.source, tt.args.target)
