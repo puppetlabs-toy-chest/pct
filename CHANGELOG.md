@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- [(GH-172)](https://github.com/puppetlabs/pdkgo/issues/172) Removal of PDKShell commands
+
 ## [0.2.0]
 
 ### Added
