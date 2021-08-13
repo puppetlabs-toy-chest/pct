@@ -151,11 +151,6 @@ func (t *Tar) Untar(tarball, target string) (outputDirPath string, err error) {
 		if err != nil {
 			return "", err
 		}
-
-		err = file.Close()
-		if err != nil {
-			return "", err
-		}
 	}
 
 	targetDirName := strings.Split(filepath.Base(tarball), ".")[0]
