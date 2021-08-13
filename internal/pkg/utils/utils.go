@@ -46,3 +46,14 @@ func ChunkedCopy(dst io.Writer, src io.Reader) error {
 		}
 	}
 }
+
+func GetDefaultTemplatePath() (string, error) {
+	execDir, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	defaultTemplatePath := filepath.Join(filepath.Dir(execDir), "templates")
+	log.Trace().Msgf("Default template path: %v", defaultTemplatePath)
+	return defaultTemplatePath, nil
+}

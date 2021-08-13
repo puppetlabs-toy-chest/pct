@@ -2,8 +2,6 @@ package new
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
@@ -77,7 +75,7 @@ func CreateCommand() *cobra.Command {
 }
 
 func preExecute(cmd *cobra.Command, args []string) error {
-	defaultTemplatePath, err := getDefaultTemplatePath()
+	defaultTemplatePath, err := utils.GetDefaultTemplatePath()
 	if err != nil {
 		return err
 	}
@@ -200,15 +198,4 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-func getDefaultTemplatePath() (string, error) {
-	execDir, err := os.Executable()
-	if err != nil {
-		return "", err
-	}
-
-	defaultTemplatePath := filepath.Join(filepath.Dir(execDir), "templates")
-	log.Trace().Msgf("Default template path: %v", defaultTemplatePath)
-	return defaultTemplatePath, nil
 }
