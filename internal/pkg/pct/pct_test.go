@@ -228,7 +228,7 @@ Summary: {{.example_replace.summary}}`,
 			// Create the template
 			templateDir := filepath.Join(tt.args.info.TemplateCache, tt.args.info.SelectedTemplate)
 			contentDir := filepath.Join(templateDir, "content")
-			afs.MkdirAll(contentDir, 0750) //nolint:errcheck
+			afs.MkdirAll(contentDir, 750) //nolint:errcheck
 			// Create template config
 			config, _ := afs.Create(filepath.Join(templateDir, "pct-config.yml"))
 			config.Write([]byte(tt.args.templateConfig)) //nolint:errcheck
@@ -313,7 +313,7 @@ template:
 				// Create the template
 				templateDir := filepath.Join(tt.args.templateCache, tt.args.selectedTemplate)
 				contentDir := filepath.Join(templateDir, "content")
-				afs.MkdirAll(contentDir, 0750) //nolint:errcheck
+				afs.MkdirAll(contentDir, 750) //nolint:errcheck
 				// Create template config
 				config, _ := afs.Create(filepath.Join(templateDir, "pct-config.yml"))
 				config.Write([]byte(tt.args.templateConfig)) //nolint:errcheck

@@ -131,7 +131,7 @@ func TestBuild(t *testing.T) {
 			afs := &afero.Afero{Fs: fs}
 
 			for _, path := range tt.mockDirs {
-				afs.Mkdir(path, 0750) //nolint:errcheck
+				afs.Mkdir(path, 750) //nolint:errcheck
 			}
 
 			for _, path := range tt.mockFiles {

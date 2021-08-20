@@ -19,6 +19,10 @@ type PctInstaller struct {
 	IOFS   *afero.IOFS
 }
 
+type PctInstallerI interface {
+	Install(templatePkg string, targetDir string) (string, error)
+}
+
 func (p *PctInstaller) Install(templatePkg string, targetDir string) (string, error) {
 
 	if _, err := p.AFS.Stat(templatePkg); os.IsNotExist(err) {

@@ -113,7 +113,7 @@ func Test_PctInstall_Errors_When_NoTemplatePkgDefined(t *testing.T) {
 	stdout, stderr, exitCode := testutils.RunPctCommand("install", "")
 
 	// Assert
-	assert.Contains(t, stdout, "Must specify a path to a template package")
+	assert.Contains(t, stdout, "Path to template package (tar.gz) should be first argument")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }

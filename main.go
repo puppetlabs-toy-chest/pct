@@ -7,7 +7,11 @@ import (
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
+	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
@@ -28,8 +32,26 @@ func main() {
 
 	rootCmd.AddCommand(completion.CreateCompletionCommand())
 
+	// afero setup
+	fs := afero.NewOsFs()
+	afs := afero.Afero{Fs: fs}
+	iofs := afero.IOFS{Fs: fs}
+
+	// build
 	rootCmd.AddCommand(build.CreateCommand())
-	rootCmd.AddCommand(install.CreateCommand())
+
+	// install
+	installCmd := install.InstallCommand{
+		PctInstaller: &pct.PctInstaller{
+			Tar:    &tar.Tar{AFS: &afs},
+			Gunzip: &gzip.Gunzip{AFS: &afs},
+			AFS:    &afs,
+			IOFS:   &iofs,
+		},
+	}
+	rootCmd.AddCommand(installCmd.CreateCommand())
+
+	// new
 	rootCmd.AddCommand(new.CreateCommand())
 
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)
