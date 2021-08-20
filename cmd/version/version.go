@@ -36,7 +36,7 @@ func Format(version, buildDate string, commit string) string {
 		commit = strings.TrimSpace(commit[:len(commit)-length])
 	}
 
-	return fmt.Sprintf("pdk %s %s %s\npdk-ruby 2.2.0\n\n%s",
+	return fmt.Sprintf("pct %s %s %s\n\n%s",
 		version, commit, dateStr, changelogURL(version))
 }
 
