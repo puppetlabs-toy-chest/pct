@@ -43,8 +43,8 @@ func InitLogger() {
 func CreateRootCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:   "pct",
-		Short: "pdk - Puppet Development Kit",
-		Long:  `Puppet development tooling, content creation, and testing framework`,
+		Short: "pct - Puppet Content Templater",
+		Long:  `Puppet Content Templater (PCT) - Create a range of Puppet content from templates`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		},
 	}
