@@ -48,7 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [(GH-29)](https://github.com/puppetlabs/pdkgo/issues/29) Error if template not found
 
-[Unreleased]: https://github.com/puppetlabs/pdkgo/compare/0.2.0..main
+[Unreleased]: https://github.com/puppetlabs/pdkgo/compare/0.3.0..main
+[0.3.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.3.0
 [0.2.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.2.0
 [0.1.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.1.0
 [0.1.0-pre]: https://github.com/puppetlabs/pdkgo/releases/tag/0.1.0-pre
