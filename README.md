@@ -19,6 +19,11 @@
     * [pct-config.yml](#pct-configyml)
   * [Templating Language](#templating-language)
 * [Overriding Template Defaults](#overriding-template-defaults)
+  * [User level configuration](#user-level-configuration)
+  * [Workspace configuration](#workspace-configuration)
+* [Sharing Templates](#sharing-templates)
+  * [pct build](#pct-build)
+  * [Installing template packages](#installing-template-packages)
 * [Request a feature](#request-a-feature)
 * [Reporting Problems](#reporting-problems)
 
@@ -367,6 +372,27 @@ Running `pct new` within a directory makes the current working directory your wo
 If you specify an `--outputdir` that location is your workspace.
 
 The configuration specified in a workspace `pct.yml` will override any configuration found within the user level configuration at `$HOME/.pdk/pct.yml`
+
+## Sharing Templates
+
+After you've written your own template you may wish to share it with other members of your team or the wider Puppet community. Work is underway to improve this initial functionality.
+
+### pct build
+
+This command will attempt to package the current working directory. You can change the directory to pack by providing `--sourcedir`.
+
+``` bash
+pct build [--sourcedir <dir>][--targetdir <dir>]
+```
+
+The `build` command will ensure that the directory that you are attempting to package will produce a valid Puppet Content Template by looking for a `pct-config.yml` and a `content` directory.
+
+The resulting `tar.gz` package will be created by default in `$cwd/pkg`. You can change the directory the package is created in by providing `--targetdir`.
+
+### Installing template packages
+
+Packages created using the `build` command can be installed by extracting the `tar.gz` into  the **Default Template Location**.
+
 
 ## Requesting a feature
 
