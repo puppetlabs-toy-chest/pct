@@ -23,8 +23,8 @@ type InstallCommandI interface {
 func (ic *InstallCommand) CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:     "install [flags]",
-		Short:   "Installs a template package (in tar.gz) format",
-		Long:    `Installs a template package (in tar.gz) format to the default or specified template path`,
+		Short:   "Installs a template package (in tar.gz format)",
+		Long:    `Installs a template package (in tar.gz format) to the default or specified template path`,
 		PreRunE: ic.preExecute,
 		RunE:    ic.executeInstall,
 	}
