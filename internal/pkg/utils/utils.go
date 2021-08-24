@@ -3,6 +3,10 @@ package utils
 import (
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+
+	"github.com/rs/zerolog/log"
 )
 
 // contains checks if a string is present in a slice
@@ -45,4 +49,15 @@ func ChunkedCopy(dst io.Writer, src io.Reader) error {
 			return fmt.Errorf("Exceeded max copy size of %v", maxCopySize)
 		}
 	}
+}
+
+func GetDefaultTemplatePath() (string, error) {
+	execDir, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	defaultTemplatePath := filepath.Join(filepath.Dir(execDir), "templates")
+	log.Trace().Msgf("Default template path: %v", defaultTemplatePath)
+	return defaultTemplatePath, nil
 }
