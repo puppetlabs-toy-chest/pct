@@ -1,6 +1,7 @@
 package build
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -43,7 +44,7 @@ func CreateCommand() *cobra.Command {
 func preExecute(cmd *cobra.Command, args []string) error {
 
 	wd, err := os.Getwd()
-	log.Info().Msgf("WD: %v", wd)
+	log.Trace().Msgf("WD: %v", wd)
 
 	if (sourceDir == "" || targetDir == "") && err != nil {
 		return err
@@ -62,6 +63,10 @@ func preExecute(cmd *cobra.Command, args []string) error {
 
 func execute(cmd *cobra.Command, args []string) error {
 	gzipArchiveFilePath, err := builder.Build(sourceDir, targetDir)
+
+	if err != nil {
+		return fmt.Errorf("`sourcedir` is not a valid template: %s", err.Error())
+	}
 	log.Info().Msgf("Template output to %v", gzipArchiveFilePath)
-	return err
+	return nil
 }
