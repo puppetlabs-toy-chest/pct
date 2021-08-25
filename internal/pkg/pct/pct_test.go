@@ -463,6 +463,78 @@ func TestDisplayDefaults(t *testing.T) {
 	}
 }
 
+func TestFormatTemplates(t *testing.T) {
+	type args struct {
+		tmpls      []pct.PuppetContentTemplate
+		jsonOutput string
+	}
+	tests := []struct {
+		name    string
+		p       *pct.Pct
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "When no templates are passed",
+			// Should warn
+			args: args{
+				tmpls:      []pct.PuppetContentTemplate{},
+				jsonOutput: "table",
+			},
+			wantErr: false,
+		},
+		{
+			name: "When only one template is passed",
+			// should printf
+			args: args{
+				tmpls: []pct.PuppetContentTemplate{
+					{
+						Id:      "foo",
+						Author:  "bar",
+						Type:    "Item",
+						Display: "Bar Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+				},
+				jsonOutput: "table",
+			},
+			wantErr: false,
+		},
+		{
+			name: "When more than one template is passed",
+			// calls table.format
+			args: args{
+				tmpls:      []pct.PuppetContentTemplate{},
+				jsonOutput: "table",
+			},
+		},
+		{
+			name: "When format is specified as json",
+			args: args{
+				tmpls:      []pct.PuppetContentTemplate{},
+				jsonOutput: "json",
+			},
+		},
+		{
+			name: "When format is specified as json and template is can't be marshalled",
+			// errors; can this even happen without exploding since the data is a struct?
+			args: args{
+				tmpls:      []pct.PuppetContentTemplate{},
+				jsonOutput: "table",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// TODO: Figure out mocking external lib calls
+			if err := tt.p.FormatTemplates(tt.args.tmpls, tt.args.jsonOutput); (err != nil) != tt.wantErr {
+				t.Errorf("Pct.FormatTemplates() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 // func Test_createTemplateFile(t *testing.T) {
 // 	type args struct {
 // 		info         pct.DeployInfo

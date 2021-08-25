@@ -142,16 +142,17 @@ func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) er
 			log.Warn().Msgf("Could not locate any templates at %+v", viper.GetString("templatepath"))
 		} else if count == 1 {
 			fmt.Printf("DisplayName:     %v\n", tmpls[0].Display)
+			fmt.Printf("Author:          %v\n", tmpls[0].Author)
 			fmt.Printf("Name:            %v\n", tmpls[0].Id)
 			fmt.Printf("TemplateType:    %v\n", tmpls[0].Type)
 			fmt.Printf("TemplateURL:     %v\n", tmpls[0].URL)
 			fmt.Printf("TemplateVersion: %v\n", tmpls[0].Version)
 		} else {
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"DisplayName", "Name", "Type"})
+			table.SetHeader([]string{"DisplayName", "Author", "Name", "Type"})
 			table.SetBorder(false)
 			for _, v := range tmpls {
-				table.Append([]string{v.Display, v.Id, v.Type})
+				table.Append([]string{v.Display, v.Author, v.Id, v.Type})
 			}
 			table.Render()
 		}

@@ -31,7 +31,7 @@ func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "good-project", "content", "goodfile.txt.tmpl"))
 
 	stdout, stderr, exitCode = testutils.RunPctCommand("new --list", "")
-	assert.Regexp(t, "Good\\sProject\\s+\\|\\sgood-project\\s+\\|\\sproject", stdout)
+	assert.Regexp(t, "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject", stdout)
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 
@@ -54,7 +54,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 	templatePkgs := []templateData{
 		{
 			name:         "additional-project",
-			listExpRegex: "Additional\\sProject\\s+\\|\\sadditional-project\\s+\\|\\sproject",
+			listExpRegex: "Additional\\sProject\\s+\\|\\sadder\\s+\\|\\sadditional-project\\s+\\|\\sproject",
 			expectedFiles: []string{
 				"pct-config.yml",
 				"content/empty.txt",
@@ -63,7 +63,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 		},
 		{
 			name:         "good-project",
-			listExpRegex: "Good\\sProject\\s+\\|\\sgood-project\\s+\\|\\sproject",
+			listExpRegex: "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject",
 			expectedFiles: []string{
 				"pct-config.yml",
 				"content/empty.txt",

@@ -30,6 +30,7 @@ func TestPctNew(t *testing.T) {
 
 	stdout, stderr, exitCode := testutils.RunPctCommand("new", "")
 	assert.Contains(t, stdout, "DISPLAYNAME")
+	assert.Contains(t, stdout, "AUTHOR")
 	assert.Contains(t, stdout, "NAME")
 	assert.Contains(t, stdout, "TYPE")
 	assert.Equal(t, "", stderr)
