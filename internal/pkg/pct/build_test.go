@@ -7,6 +7,7 @@ import (
 	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBuild(t *testing.T) {
@@ -23,11 +24,11 @@ func TestBuild(t *testing.T) {
 		args                    args
 		mockIsModuleRootErrResp error
 		mockDirs                []string
-		mockFiles               []string
+		mockFiles               map[string]string
 		expectedFilePath        string
 		tarFile                 string
 		gzipFile                string
-		wantErr                 bool
+		expectedErr             string
 		mockTarErr              bool
 		mockGzipErr             bool
 		testTempDir             string
@@ -39,7 +40,7 @@ func TestBuild(t *testing.T) {
 				targetDir:    mockTemplateDir,
 			},
 			expectedFilePath: "",
-			wantErr:          true,
+			expectedErr:      "No template directory at /path/to/my/cool-template",
 		},
 		{
 			name: "Should return err if template path does not contain pct-config.yml",
@@ -51,7 +52,7 @@ func TestBuild(t *testing.T) {
 				mockTemplateDir,
 			},
 			expectedFilePath: "",
-			wantErr:          true,
+			expectedErr:      "No 'pct-config.yml' found in /path/to/my/cool-template",
 		},
 		{
 			name: "Should return err if content dir does not exist",
@@ -62,11 +63,16 @@ func TestBuild(t *testing.T) {
 			mockDirs: []string{
 				mockTemplateDir,
 			},
-			mockFiles: []string{
-				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")),
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  author: puppetlabs
+  version: 1.0.0
+`,
 			},
 			expectedFilePath: "",
-			wantErr:          true,
+			expectedErr:      "No 'content' dir found in /path/to/my/cool-template",
 		},
 		{
 			name: "Should not attempt to GZIP when TAR operation fails",
@@ -78,11 +84,16 @@ func TestBuild(t *testing.T) {
 				mockTemplateDir,
 				filepath.Join(mockTemplateDir, "content"),
 			},
-			mockFiles: []string{
-				filepath.Join(mockTemplateDir, "pct-config.yml"),
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  author: puppetlabs
+  version: 1.0.0
+`,
 			},
 			expectedFilePath: "",
-			wantErr:          true,
+			expectedErr:      "tar error",
 			mockTarErr:       true,
 		},
 		{
@@ -91,8 +102,13 @@ func TestBuild(t *testing.T) {
 				templatePath: mockTemplateDir,
 				targetDir:    mockTemplateDir,
 			},
-			mockFiles: []string{
-				filepath.Join(mockTemplateDir, "pct-config.yml"),
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  author: puppetlabs
+  version: 1.0.0
+`,
 			},
 			mockDirs: []string{
 				mockTemplateDir,
@@ -100,7 +116,7 @@ func TestBuild(t *testing.T) {
 			},
 			tarFile:          "/path/to/nowhere/pkg/nowhere.tar",
 			expectedFilePath: "",
-			wantErr:          true,
+			expectedErr:      "gzip error",
 			mockTarErr:       false,
 			mockGzipErr:      true,
 		},
@@ -114,14 +130,97 @@ func TestBuild(t *testing.T) {
 				mockTemplateDir,
 				filepath.Join(mockTemplateDir, "content"),
 			},
-			mockFiles: []string{
-				filepath.Join(mockTemplateDir, "pct-config.yml"),
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  author: puppetlabs
+  version: 1.0.0
+`,
 			},
 			tarFile:          "/path/to/nowhere/pkg/nowhere.tar",
 			gzipFile:         "/path/to/nowhere/pkg/nowhere.tar.gz",
 			expectedFilePath: "/path/to/nowhere/pkg/nowhere.tar.gz",
-			wantErr:          false,
 			mockTarErr:       false,
+		},
+		{
+			name: "Should complain that `id` is missing from pct-config.yml",
+			args: args{
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
+			},
+			mockDirs: []string{
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
+			},
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  author: puppetlabs
+  version: 1.0.0
+`,
+			},
+			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * id\n",
+			mockTarErr:  false,
+		},
+		{
+			name: "Should complain that `author` is missing from pct-config.yml",
+			args: args{
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
+			},
+			mockDirs: []string{
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
+			},
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  version: 1.0.0
+`,
+			},
+			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * author\n",
+			mockTarErr:  false,
+		},
+		{
+			name: "Should complain that `version` is missing from pct-config.yml",
+			args: args{
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
+			},
+			mockDirs: []string{
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
+			},
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  id: builder
+  author: puppetlabs
+`,
+			},
+			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * version\n",
+			mockTarErr:  false,
+		},
+		{
+			name: "Should complain all required are missing from pct-config.yml",
+			args: args{
+				templatePath: mockTemplateDir,
+				targetDir:    mockTemplateDir,
+			},
+			mockDirs: []string{
+				mockTemplateDir,
+				filepath.Join(mockTemplateDir, "content"),
+			},
+			mockFiles: map[string]string{
+				filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml")): `---
+template:
+  foo: bar
+`,
+			},
+			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * id\n  * author\n  * version\n",
+			mockTarErr:  false,
 		},
 	}
 	for _, tt := range tests {
@@ -134,8 +233,9 @@ func TestBuild(t *testing.T) {
 				afs.Mkdir(path, 0750) //nolint:gosec,errcheck // this result is not used in a secure application
 			}
 
-			for _, path := range tt.mockFiles {
-				afs.Create(path) //nolint:gosec,errcheck // this result is not used in a secure application
+			for file, content := range tt.mockFiles {
+				config, _ := afs.Create(file) //nolint:gosec,errcheck // this result is not used in a secure application
+				config.Write([]byte(content)) //nolint:errcheck
 			}
 
 			p := &pct.Builder{
@@ -145,8 +245,8 @@ func TestBuild(t *testing.T) {
 			}
 
 			gotGzipArchiveFilePath, err := p.Build(tt.args.templatePath, tt.args.targetDir)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Build() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) && tt.expectedErr != "" {
+				assert.Equal(t, tt.expectedErr, err.Error())
 				return
 			}
 			if gotGzipArchiveFilePath != tt.expectedFilePath {

@@ -47,6 +47,8 @@ func CreateRootCommand() *cobra.Command {
 		Long:  `Puppet Content Templater (PCT) - Create a range of Puppet content from templates`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		},
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 	tmp.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pdk.yaml)")
 
