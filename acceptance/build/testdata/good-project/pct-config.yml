@@ -1,6 +1,7 @@
 ---
 template:
   id: good-project
+  author: puppetlabs
   type: project
   display: Good Project
   version: 0.1.0

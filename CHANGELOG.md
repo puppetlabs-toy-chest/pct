@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- [(GH-185)](https://github.com/puppetlabs/pdkgo/issues/185) `pct build` validates pct-config.yml
 - [(GH-167)](https://github.com/puppetlabs/pdkgo/issues/167) Implement `pct install` CLI command
 
 ## [0.3.0]

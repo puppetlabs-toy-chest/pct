@@ -43,6 +43,7 @@ type PuppetContentTemplateInfo struct {
 // PuppetContentTemplate houses the actual information about each template
 type PuppetContentTemplate struct {
 	Id      string `mapstructure:"id"`
+	Author  string `mapstructure:"author"`
 	Type    string `mapstructure:"type"`
 	Display string `mapstructure:"display"`
 	Version string `mapstructure:"version"`
