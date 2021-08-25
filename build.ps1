@@ -20,7 +20,11 @@ switch ($Target) {
     git clone -b main --depth 1 --single-branch https://github.com/puppetlabs/baker-round (Join-Path $binPath "templates")
   }
   'quick' {
-    go build -o ${binPath}/pct
+    If ($Env:OS -match '^Windows') {
+      go build -o "$binPath/pct.exe"
+    } else {
+      go build -o "$binPath/pct"
+    }
   }
   'package' {
     git clone -b main --depth 1 --single-branch https://github.com/puppetlabs/baker-round "templates"
