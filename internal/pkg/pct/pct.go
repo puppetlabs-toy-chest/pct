@@ -132,39 +132,46 @@ func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTem
 
 // FormatTemplates formats one or more templates to display on the console in
 // table format or json format.
-func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) error {
+func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) (string, error) {
+	output := ""
 	switch jsonOutput {
 	case "table":
 		fmt.Println("")
-
 		count := len(tmpls)
 		if count < 1 {
 			log.Warn().Msgf("Could not locate any templates at %+v", viper.GetString("templatepath"))
 		} else if count == 1 {
-			fmt.Printf("DisplayName:     %v\n", tmpls[0].Display)
-			fmt.Printf("Author:          %v\n", tmpls[0].Author)
-			fmt.Printf("Name:            %v\n", tmpls[0].Id)
-			fmt.Printf("TemplateType:    %v\n", tmpls[0].Type)
-			fmt.Printf("TemplateURL:     %v\n", tmpls[0].URL)
-			fmt.Printf("TemplateVersion: %v\n", tmpls[0].Version)
+			stringBuilder := &strings.Builder{}
+			stringBuilder.WriteString(fmt.Sprintf("DisplayName:     %v\n", tmpls[0].Display))
+			stringBuilder.WriteString(fmt.Sprintf("Author:          %v\n", tmpls[0].Author))
+			stringBuilder.WriteString(fmt.Sprintf("Name:            %v\n", tmpls[0].Id))
+			stringBuilder.WriteString(fmt.Sprintf("TemplateType:    %v\n", tmpls[0].Type))
+			stringBuilder.WriteString(fmt.Sprintf("TemplateURL:     %v\n", tmpls[0].URL))
+			stringBuilder.WriteString(fmt.Sprintf("TemplateVersion: %v\n", tmpls[0].Version))
+			output = stringBuilder.String()
+			fmt.Printf("%s\n", output)
 		} else {
-			table := tablewriter.NewWriter(os.Stdout)
+			stringBuilder := &strings.Builder{}
+			table := tablewriter.NewWriter(stringBuilder)
 			table.SetHeader([]string{"DisplayName", "Author", "Name", "Type"})
 			table.SetBorder(false)
 			for _, v := range tmpls {
 				table.Append([]string{v.Display, v.Author, v.Id, v.Type})
 			}
 			table.Render()
+			output = stringBuilder.String()
+			fmt.Printf("%s\n", output)
 		}
 	case "json":
 		j := jsoniter.ConfigFastest
-		prettyJSON, err := j.MarshalIndent(&tmpls, "", "  ")
-		if err != nil {
-			log.Error().Msgf("Error converting to json: %v", err)
-		}
-		fmt.Printf("%s\n", string(prettyJSON))
+		// This can't actually error because it's always getting a valid data struct;
+		// if there are problems building the data struct for the template, we error
+		// at that point instead.
+		prettyJSON, _ := j.MarshalIndent(&tmpls, "", "  ")
+		output = string(prettyJSON)
+		fmt.Printf("%s\n", output)
 	}
-	return nil
+	return output, nil
 }
 
 // DisplayDefaults returns the Default values from a Templates configuration file

@@ -156,7 +156,7 @@ func execute(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		err = pctApi.FormatTemplates(tmpls, format)
+		_, err = pctApi.FormatTemplates(tmpls, format)
 		if err != nil {
 			return err
 		}
