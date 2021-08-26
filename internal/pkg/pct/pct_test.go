@@ -482,7 +482,6 @@ func TestFormatTemplates(t *testing.T) {
 				jsonOutput: "table",
 			},
 			matches: []string{},
-			wantErr: false,
 		},
 		{
 			name: "When only one template is passed",
@@ -507,12 +506,11 @@ func TestFormatTemplates(t *testing.T) {
 				`TemplateURL:\s+https://github.com/puppetlabs/pct-good-project`,
 				`TemplateVersion:\s+0\.1\.0`,
 			},
-			wantErr: false,
 		},
 		{
 			name: "When more than one template is passed",
 			args: args{
-				tmpls:      []pct.PuppetContentTemplate{
+				tmpls: []pct.PuppetContentTemplate{
 					{
 						Id:      "foo",
 						Author:  "baz",
@@ -537,12 +535,11 @@ func TestFormatTemplates(t *testing.T) {
 				`Foo Item\s+\|\sbaz\s+\|\sfoo\s+\|\sItem`,
 				`Bar Item\s+\|\sbaz\s+\|\sbar\s+\|\sItem`,
 			},
-			wantErr: false,
 		},
 		{
 			name: "When format is specified as json",
 			args: args{
-				tmpls:      []pct.PuppetContentTemplate{
+				tmpls: []pct.PuppetContentTemplate{
 					{
 						Id:      "foo",
 						Author:  "baz",
@@ -566,13 +563,12 @@ func TestFormatTemplates(t *testing.T) {
 				`\"Id\": \"foo\"`,
 				`\"Id\": \"bar\"`,
 			},
-			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output, err := tt.p.FormatTemplates(tt.args.tmpls, tt.args.jsonOutput)
-			if (err != nil) != tt.wantErr {
+			if err != nil {
 				t.Errorf("Pct.FormatTemplates() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

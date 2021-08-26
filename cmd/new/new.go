@@ -156,10 +156,11 @@ func execute(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		_, err = pctApi.FormatTemplates(tmpls, format)
+		formattedTemplates, err := pctApi.FormatTemplates(tmpls, format)
 		if err != nil {
 			return err
 		}
+		fmt.Print(formattedTemplates)
 
 		return nil
 	}

@@ -136,7 +136,6 @@ func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) (s
 	output := ""
 	switch jsonOutput {
 	case "table":
-		fmt.Println("")
 		count := len(tmpls)
 		if count < 1 {
 			log.Warn().Msgf("Could not locate any templates at %+v", viper.GetString("templatepath"))
@@ -149,7 +148,6 @@ func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) (s
 			stringBuilder.WriteString(fmt.Sprintf("TemplateURL:     %v\n", tmpls[0].URL))
 			stringBuilder.WriteString(fmt.Sprintf("TemplateVersion: %v\n", tmpls[0].Version))
 			output = stringBuilder.String()
-			fmt.Printf("%s\n", output)
 		} else {
 			stringBuilder := &strings.Builder{}
 			table := tablewriter.NewWriter(stringBuilder)
@@ -160,7 +158,6 @@ func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) (s
 			}
 			table.Render()
 			output = stringBuilder.String()
-			fmt.Printf("%s\n", output)
 		}
 	case "json":
 		j := jsoniter.ConfigFastest
@@ -169,7 +166,6 @@ func (*Pct) FormatTemplates(tmpls []PuppetContentTemplate, jsonOutput string) (s
 		// at that point instead.
 		prettyJSON, _ := j.MarshalIndent(&tmpls, "", "  ")
 		output = string(prettyJSON)
-		fmt.Printf("%s\n", output)
 	}
 	return output, nil
 }
