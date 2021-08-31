@@ -21,7 +21,7 @@ type Gunzip struct {
 func (g *Gunzip) Gunzip(source, target string) (string, error) {
 	reader, err := g.AFS.Open(filepath.Clean(source))
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
 	defer func() {
@@ -32,7 +32,7 @@ func (g *Gunzip) Gunzip(source, target string) (string, error) {
 
 	archive, err := gzip.NewReader(reader)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
 	defer func() {

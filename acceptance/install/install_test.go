@@ -23,12 +23,12 @@ func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
 
 	// Assert
-	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(getDefaultTemplatePath(), "good-project")))
+	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0")))
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
-	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "good-project", "pct-config.yml"))
-	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "good-project", "content", "empty.txt"))
-	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "good-project", "content", "goodfile.txt.tmpl"))
+	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0", "pct-config.yml"))
+	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0", "content", "empty.txt"))
+	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0", "content", "goodfile.txt.tmpl"))
 
 	stdout, stderr, exitCode = testutils.RunPctCommand("new --list", "")
 	assert.Regexp(t, "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject", stdout)
@@ -36,11 +36,12 @@ func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	assert.Equal(t, 0, exitCode)
 
 	// Tear Down
-	removeInstalledTemplate(filepath.Join(getDefaultTemplatePath(), "good-project"))
+	removeInstalledTemplate(filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0"))
 }
 
 type templateData struct {
 	name          string
+	author        string
 	listExpRegex  string
 	expectedFiles []string
 }
@@ -54,6 +55,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 	templatePkgs := []templateData{
 		{
 			name:         "additional-project",
+			author:       "adder",
 			listExpRegex: "Additional\\sProject\\s+\\|\\sadder\\s+\\|\\sadditional-project\\s+\\|\\sproject",
 			expectedFiles: []string{
 				"pct-config.yml",
@@ -63,6 +65,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 		},
 		{
 			name:         "good-project",
+			author:       "gooder",
 			listExpRegex: "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject",
 			expectedFiles: []string{
 				"pct-config.yml",
@@ -81,7 +84,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
 
 		// Assert
-		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.name)))
+		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
 		assert.Equal(t, "", stderr)
 		assert.Equal(t, 0, exitCode)
 	}
@@ -89,7 +92,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 	for _, template := range templatePkgs {
 		// Assert
 		for _, file := range template.expectedFiles {
-			assert.FileExists(t, filepath.Join(templatePath, template.name, file))
+			assert.FileExists(t, filepath.Join(templatePath, template.author, template.name, "0.1.0", file))
 		}
 
 		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
@@ -102,7 +105,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 
 	// Tear Down
 	for _, template := range templatePkgs {
-		removeInstalledTemplate(filepath.Join(templatePath, template.name))
+		removeInstalledTemplate(filepath.Join(templatePath, template.author, template.name, "0.1.0"))
 	}
 }
 
