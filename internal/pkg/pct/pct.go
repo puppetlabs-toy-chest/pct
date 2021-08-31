@@ -15,9 +15,11 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
+	"github.com/hashicorp/go-version"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olekukonko/tablewriter"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
@@ -121,13 +123,18 @@ func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTem
 	for _, file := range matches {
 		log.Debug().Msgf("Found: %+v", file)
 		i := p.readTemplateConfig(file).Template
-		tmpls = append(tmpls, i)
+		// Do not write id-less configs (ie, invalid, could not parse) to the return
+		if len(i.Id) > 0 {
+			tmpls = append(tmpls, i)
+		}
 	}
 
 	if templateName != "" {
 		log.Debug().Msgf("Filtering for: %s", templateName)
 		tmpls = p.filterFiles(tmpls, func(f PuppetContentTemplate) bool { return f.Id == templateName })
 	}
+
+	tmpls = p.filterNewestVersions(tmpls)
 
 	return tmpls, nil
 }
@@ -535,6 +542,44 @@ func (p *Pct) filterFiles(ss []PuppetContentTemplate, test func(PuppetContentTem
 		}
 	}
 	return
+}
+
+func (p *Pct) filterNewestVersions(tt []PuppetContentTemplate) (ret []PuppetContentTemplate) {
+	for _, t := range tt {
+		id := t.Id
+		author := t.Author
+		// Look for templates with the same author and id
+		templates := p.filterFiles(tt, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })
+		if len(templates) > 1 {
+			// If the author/id template has 2+ entries, that's multiple versions
+			// check first to see if the return list already has an entry for this template
+			if len(p.filterFiles(ret, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })) == 0 {
+				// turn the version strings into version objects for sorting and comparison
+				versionsRaw := []string{}
+				for _, t := range templates {
+					versionsRaw = append(versionsRaw, t.Version)
+				}
+				versions := make([]*version.Version, len(versionsRaw))
+				for i, raw := range versionsRaw {
+					v, _ := version.NewVersion(raw)
+					versions[i] = v
+				}
+				sort.Sort(version.Collection(versions))
+				// select the latest version
+				highestVersion := versions[len(versions)-1]
+				highestVersionTemplate := p.filterFiles(templates, func(f PuppetContentTemplate) bool {
+					actualVersion, _ := version.NewVersion(f.Version)
+					return actualVersion.Equal(highestVersion)
+				})
+				ret = append(ret, highestVersionTemplate[0])
+			}
+		} else {
+			// If the author/id template only has 1 entry, it's already the latest version
+			ret = append(ret, t)
+		}
+	}
+
+	return ret
 }
 
 func (p *Pct) getCurrentUser() string {
