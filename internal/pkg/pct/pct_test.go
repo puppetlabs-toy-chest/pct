@@ -463,6 +463,122 @@ func TestDisplayDefaults(t *testing.T) {
 	}
 }
 
+func TestFormatTemplates(t *testing.T) {
+	type args struct {
+		tmpls      []pct.PuppetContentTemplate
+		jsonOutput string
+	}
+	tests := []struct {
+		name    string
+		p       *pct.Pct
+		args    args
+		matches []string
+		wantErr bool
+	}{
+		{
+			name: "When no templates are passed",
+			args: args{
+				tmpls:      []pct.PuppetContentTemplate{},
+				jsonOutput: "table",
+			},
+			matches: []string{},
+		},
+		{
+			name: "When only one template is passed",
+			args: args{
+				tmpls: []pct.PuppetContentTemplate{
+					{
+						Id:      "foo",
+						Author:  "bar",
+						Type:    "Item",
+						Display: "Foo Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+				},
+				jsonOutput: "table",
+			},
+			matches: []string{
+				`DisplayName:\s+Foo Item`,
+				`Author:\s+bar`,
+				`Name:\s+foo`,
+				`TemplateType:\s+Item`,
+				`TemplateURL:\s+https://github.com/puppetlabs/pct-good-project`,
+				`TemplateVersion:\s+0\.1\.0`,
+			},
+		},
+		{
+			name: "When more than one template is passed",
+			args: args{
+				tmpls: []pct.PuppetContentTemplate{
+					{
+						Id:      "foo",
+						Author:  "baz",
+						Type:    "Item",
+						Display: "Foo Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+					{
+						Id:      "bar",
+						Author:  "baz",
+						Type:    "Item",
+						Display: "Bar Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+				},
+				jsonOutput: "table",
+			},
+			matches: []string{
+				`DISPLAYNAME \| AUTHOR \| NAME \| TYPE`,
+				`Foo Item\s+\|\sbaz\s+\|\sfoo\s+\|\sItem`,
+				`Bar Item\s+\|\sbaz\s+\|\sbar\s+\|\sItem`,
+			},
+		},
+		{
+			name: "When format is specified as json",
+			args: args{
+				tmpls: []pct.PuppetContentTemplate{
+					{
+						Id:      "foo",
+						Author:  "baz",
+						Type:    "Item",
+						Display: "Foo Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+					{
+						Id:      "bar",
+						Author:  "baz",
+						Type:    "Item",
+						Display: "Bar Item",
+						Version: "0.1.0",
+						URL:     "https://github.com/puppetlabs/pct-good-project",
+					},
+				},
+				jsonOutput: "json",
+			},
+			matches: []string{
+				`\"Id\": \"foo\"`,
+				`\"Id\": \"bar\"`,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output, err := tt.p.FormatTemplates(tt.args.tmpls, tt.args.jsonOutput)
+			if err != nil {
+				t.Errorf("Pct.FormatTemplates() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			for _, m := range tt.matches {
+				assert.Regexp(t, m, output)
+			}
+		})
+	}
+}
+
 // func Test_createTemplateFile(t *testing.T) {
 // 	type args struct {
 // 		info         pct.DeployInfo
