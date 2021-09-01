@@ -10,17 +10,18 @@ import (
 )
 
 type GunzipI interface {
-	Gunzip(source, target string) (err error)
+	Gunzip(source, target string) (string, error)
 }
 
 type Gunzip struct {
 	AFS *afero.Afero
 }
 
-func (g *Gunzip) Gunzip(source, target string) error {
+// returns the filepath to the extracted file. If there is an error the string will be empty
+func (g *Gunzip) Gunzip(source, target string) (string, error) {
 	reader, err := g.AFS.Open(filepath.Clean(source))
 	if err != nil {
-		return err
+		return "",err
 	}
 
 	defer func() {
@@ -31,7 +32,7 @@ func (g *Gunzip) Gunzip(source, target string) error {
 
 	archive, err := gzip.NewReader(reader)
 	if err != nil {
-		return err
+		return "",err
 	}
 
 	defer func() {
@@ -40,10 +41,10 @@ func (g *Gunzip) Gunzip(source, target string) error {
 		}
 	}()
 
-	target = filepath.Join(target, archive.Name)
-	writer, err := g.AFS.Create(target)
+	tar := filepath.Join(target, archive.Name)
+	writer, err := g.AFS.Create(tar)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer func() {
@@ -52,5 +53,5 @@ func (g *Gunzip) Gunzip(source, target string) error {
 		}
 	}()
 
-	return utils.ChunkedCopy(writer, archive)
+	return tar, utils.ChunkedCopy(writer, archive)
 }

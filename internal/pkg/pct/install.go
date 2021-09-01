@@ -3,8 +3,6 @@ package pct
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
@@ -29,6 +27,7 @@ func (p *PctInstaller) Install(templatePkg string, targetDir string) (string, er
 		return "", fmt.Errorf("No template package at %v", templatePkg)
 	}
 
+	// create a temporary Directory to extract the tar.gz to
 	tempDir, err := p.AFS.TempDir("", "")
 	defer func() {
 		err := p.AFS.Remove(tempDir)
@@ -38,17 +37,13 @@ func (p *PctInstaller) Install(templatePkg string, targetDir string) (string, er
 		return "", fmt.Errorf("Could not create tempdir to gunzip template: %v", err)
 	}
 
-	err = p.Gunzip.Gunzip(templatePkg, tempDir)
+	// gunzip the tar.gz to created tempdir
+	tarfile, err := p.Gunzip.Gunzip(templatePkg, tempDir)
 	if err != nil {
 		return "", fmt.Errorf("Could not extract TAR from GZIP (%v): %v", templatePkg, err)
 	}
 
-	tempFile := strings.TrimSuffix(filepath.Join(tempDir, filepath.Base(templatePkg)), `.gz`)
-	if _, err = p.AFS.Stat(tempFile); os.IsNotExist(err) {
-		return "", err
-	}
-
-	t, err := p.Tar.Untar(tempFile, targetDir)
+	t, err := p.Tar.Untar(tarfile, targetDir)
 	if err != nil {
 		return "", fmt.Errorf("Could not UNTAR template (%v): %v", templatePkg, err)
 	}

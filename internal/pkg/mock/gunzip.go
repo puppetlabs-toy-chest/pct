@@ -12,11 +12,12 @@ type Gunzip struct {
 	Fs          afero.Fs
 	ErrResponse bool
 	Fail        bool
+	FilePath    string
 }
 
-func (g *Gunzip) Gunzip(source, target string) (err error) {
+func (g *Gunzip) Gunzip(source, target string) (string, error) {
 	if g.ErrResponse {
-		return fmt.Errorf("gunzip error")
+		return g.FilePath, fmt.Errorf("gunzip error")
 	}
 
 	// complete mocking of this function is not possible as the target it not always known
@@ -30,5 +31,5 @@ func (g *Gunzip) Gunzip(source, target string) (err error) {
 		afs.Create(tar) // nolint:errcheck  // #nosec // this result is not used in a secure application
 	}
 
-	return nil
+	return g.FilePath, nil
 }
