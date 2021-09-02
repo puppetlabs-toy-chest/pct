@@ -128,6 +128,16 @@ func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTem
 			tmpls = append(tmpls, i)
 		}
 	}
+	// Temporary workaround to find old layout templates
+	oldMatches, _ := p.IOFS.Glob(templatePath + "/**/" + TemplateConfigFileName)
+	for _, file := range oldMatches {
+		log.Debug().Msgf("Found: %+v", file)
+		i := p.readTemplateConfig(file).Template
+		// Do not write id-less configs (ie, invalid, could not parse) to the return
+		if len(i.Id) > 0 {
+			tmpls = append(tmpls, i)
+		}
+	}
 
 	if templateName != "" {
 		log.Debug().Msgf("Filtering for: %s", templateName)
