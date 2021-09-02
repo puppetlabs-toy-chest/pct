@@ -13,6 +13,7 @@ import (
 type InstallCommand struct {
 	TemplatePkgPath string
 	InstallPath     string
+	Force           bool
 	PctInstaller    pct.PctInstallerI
 }
 
@@ -30,13 +31,15 @@ func (ic *InstallCommand) CreateCommand() *cobra.Command {
 	}
 	tmp.Flags().StringVar(&ic.InstallPath, "templatepath", "", "location of installed templates")
 	err := viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath"))
+	tmp.Flags().BoolVarP(&ic.Force, "force", "f", false, "Forces the install of a template without error, if it already exists. ")
+
 	cobra.CheckErr(err)
 
 	return tmp
 }
 
 func (ic *InstallCommand) executeInstall(cmd *cobra.Command, args []string) error {
-	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath)
+	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
 	if err != nil {
 		return err
 	}

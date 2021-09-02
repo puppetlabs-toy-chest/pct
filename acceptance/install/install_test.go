@@ -169,6 +169,66 @@ func Test_PctInstall_Errors_When_InvalidTarProvided(t *testing.T) {
 	assert.Equal(t, 1, exitCode)
 }
 
+func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Setup
+	templatePath := testutils.GetTmpDir(t)
+
+	// Install template
+	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
+	installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
+	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+
+	// verify the template installed
+	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+
+	// Attempt to reinstall the template
+	templatePkgPath, _ = filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
+	installCmd = fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
+	stdout, stderr, exitCode = testutils.RunPctCommand(installCmd, "")
+
+	// verify that the template failed to install
+	assert.Contains(t, stdout, "Unable to install in namespace: Template already installed")
+	assert.Equal(t, "exit status 1", stderr)
+	assert.Equal(t, 1, exitCode)
+
+	// Tear Down
+	removeInstalledTemplate(filepath.Join(templatePath, "adder", "additional-project", "0.1.0"))
+}
+
+func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Setup
+	templatePath := testutils.GetTmpDir(t)
+
+	// Install template
+	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
+	installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
+	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+
+	// verify the template installed
+	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+
+	// Attempt to reinstall the template
+	templatePkgPath, _ = filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
+	installCmd = fmt.Sprintf("install %v --force --templatepath %v", templatePkgPath, templatePath)
+	stdout, stderr, exitCode = testutils.RunPctCommand(installCmd, "")
+
+	// verify that the template reinstall exited successfully
+	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+
+	// Tear Down
+	removeInstalledTemplate(filepath.Join(templatePath, "adder", "additional-project", "0.1.0"))
+}
+
 // Util Functions
 
 func removeInstalledTemplate(templatePath string) {
