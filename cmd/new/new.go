@@ -119,7 +119,7 @@ func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]str
 }
 
 func completeName(cache string, match string) []string {
-	tmpls, _ := pctApi.List(cache, "")
+	tmpls := pctApi.List(cache, "")
 	var names []string
 	for _, tmpl := range tmpls {
 		if strings.HasPrefix(tmpl.Id, match) {
@@ -151,10 +151,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
 	if listTemplates && selectedTemplateInfo == "" {
-		tmpls, err := pctApi.List(localTemplateCache, selectedTemplate)
-		if err != nil {
-			return err
-		}
+		tmpls := pctApi.List(localTemplateCache, selectedTemplate)
 
 		formattedTemplates, err := pctApi.FormatTemplates(tmpls, format)
 		if err != nil {

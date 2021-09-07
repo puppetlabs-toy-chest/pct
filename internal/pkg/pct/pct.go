@@ -113,7 +113,7 @@ func (p *Pct) GetInfo(templateCache string, selectedTemplate string) (PuppetCont
 // List lists all templates in a given path and parses their configuration. Does
 // not return any errors from parsing invalid templates, but returns them as
 // debug log events
-func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTemplate, error) {
+func (p *Pct) List(templatePath string, templateName string) []PuppetContentTemplate {
 	log.Debug().Msgf("Searching %+v for templates", templatePath)
 	// Triple glob to match author/id/version/TemplateConfigFileName
 	// TODO: Make this backward compatible
@@ -146,7 +146,7 @@ func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTem
 
 	tmpls = p.filterNewestVersions(tmpls)
 
-	return tmpls, nil
+	return tmpls
 }
 
 // FormatTemplates formats one or more templates to display on the console in

@@ -770,7 +770,7 @@ template:
 				iofs,
 			}
 
-			got, _ := p.List(tt.args.templatePath, tt.args.templateName)
+			got := p.List(tt.args.templatePath, tt.args.templateName)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Pct.List() = %v, want %v", got, tt.want)
 			}
