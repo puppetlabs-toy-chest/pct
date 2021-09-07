@@ -17,6 +17,8 @@ jobs:
     env:
       GOPATH: ${{ github.workspace }}
       TEST_ACCEPTANCE: true
+      TMP: ${{ github.workspace }}/tmp
+      TEMP: ${{ github.workspace }}/tmp
     defaults:
       run:
         working-directory: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}

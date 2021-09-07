@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -113,7 +114,27 @@ func (p *Pct) GetInfo(templateCache string, selectedTemplate string) (PuppetCont
 // debug log events
 func (p *Pct) List(templatePath string, templateName string) ([]PuppetContentTemplate, error) {
 	log.Debug().Msgf("Searching %+v for templates", templatePath)
-	matches, _ := p.IOFS.Glob(templatePath + "/**/" + TemplateConfigFileName)
+
+	var matches []string
+
+	// recurse over the templatePath
+	err := p.AFS.Walk(templatePath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// If we find a config file, add it to our matches
+			if match, _ := regexp.MatchString(".*(/|\\\\)"+TemplateConfigFileName+"$", path); match {
+				matches = append(matches, path)
+			}
+
+			return nil
+		})
+
+	if err != nil {
+		return nil, err
+	}
 
 	var tmpls []PuppetContentTemplate
 	for _, file := range matches {

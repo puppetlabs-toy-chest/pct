@@ -63,8 +63,7 @@ func TestCreateinstallCommand(t *testing.T) {
 			installCmd := cmd.CreateCommand()
 
 			b := bytes.NewBufferString("")
-			installCmd.SetOut(b)
-			installCmd.SetErr(b)
+			installCmd.SetOutput(b)
 
 			installCmd.SetArgs(tt.args)
 			err := installCmd.Execute()

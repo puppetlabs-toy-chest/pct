@@ -12,19 +12,36 @@ import (
 )
 
 type InstallTest struct {
-	name             string
-	args             args
-	expectedError    string
-	expectedFilePath string
-	templateContent  []byte
-	unTarFile        string
-	untarFail        bool
-	gunzipErr        bool
-	gunzipFail       bool
+	name         string
+	args         args
+	expected     expected
+	mocks        mocks
+	mockReponses mockReponses
 }
+
+// what goes in
 type args struct {
 	templatePath string
 	targetDir    string
+	force        bool
+}
+
+// what comes out
+type expected struct {
+	errorMsg string
+	filepath string
+}
+
+// filesystem mocks
+type mocks struct {
+	dirs  []string
+	files map[string]string
+}
+
+// package mock responses
+type mockReponses struct {
+	untar  []mock.UntarResponse
+	gunzip []mock.GunzipResponse
 }
 
 func TestInstall(t *testing.T) {
@@ -39,8 +56,6 @@ func TestInstall(t *testing.T) {
 		0x00,
 	}
 
-	fs := afero.NewMemMapFs()
-
 	tests := []InstallTest{
 		{
 			name: "if it the file does not exist",
@@ -48,7 +63,9 @@ func TestInstall(t *testing.T) {
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    templatePath,
 			},
-			expectedError: fmt.Sprintf("No template package at %v", filepath.Join(templatePath, "good-project.tar.gz")),
+			expected: expected{
+				errorMsg: fmt.Sprintf("No template package at %v", filepath.Join(templatePath, "good-project.tar.gz")),
+			},
 		},
 		{
 			name: "should extract a tar.gz to a template folder",
@@ -56,11 +73,43 @@ func TestInstall(t *testing.T) {
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    extractionPath,
 			},
-			templateContent:  tarballBytes,
-			unTarFile:        filepath.Join(extractionPath, "good-project.tar.gz"),
-			untarFail:        false,
-			expectedFilePath: filepath.Join(extractionPath, "good-project.tar.gz"),
-			expectedError:    "false",
+			expected: expected{
+				filepath: filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+			},
+			mockReponses: mockReponses{
+				untar: []mock.UntarResponse{
+					{
+						ReturnPath:  filepath.Join(extractionPath, "good-project"),
+						ErrResponse: false,
+					},
+					{
+						ReturnPath:  filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+						ErrResponse: false,
+					},
+				},
+				gunzip: []mock.GunzipResponse{
+					{
+						Fail:     false,
+						FilePath: filepath.Join(extractionPath, "good-project.tar"),
+					},
+				},
+			},
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+					extractionPath,
+					filepath.Join(extractionPath, "good-project"),
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
+template:
+  id: good-project
+  author: puppetlabs
+  version: 1.0.0
+`,
+				},
+			},
 		},
 		{
 			name: "if it fails to gunzip",
@@ -68,8 +117,24 @@ func TestInstall(t *testing.T) {
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    templatePath,
 			},
-			gunzipErr:     true,
-			expectedError: "gunzip error",
+			mockReponses: mockReponses{
+				gunzip: []mock.GunzipResponse{
+					{
+						ErrResponse: true,
+					},
+				},
+			},
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+				},
+			},
+			expected: expected{
+				errorMsg: "gunzip error",
+			},
 		},
 		{
 			name: "if it fails to untar",
@@ -77,33 +142,146 @@ func TestInstall(t *testing.T) {
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    templatePath,
 			},
-			untarFail:     true,
-			expectedError: "untar error",
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+				},
+			},
+			mockReponses: mockReponses{
+				gunzip: []mock.GunzipResponse{
+					{
+						Fail:     false,
+						FilePath: filepath.Join(extractionPath, "good-project.tar"),
+					},
+				},
+				untar: []mock.UntarResponse{
+					{
+						ErrResponse: true,
+					},
+				},
+			},
+			expected: expected{
+				errorMsg: "untar error",
+			},
+		},
+		{
+			name: "If the tarball doesnt contain an valid config",
+			args: args{
+				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
+				targetDir:    extractionPath,
+			},
+			expected: expected{
+				errorMsg: "Invalid config: open " + filepath.FromSlash("path/to/extract/to/good-project/pct-config.yml") + ": file does not exist",
+			},
+			mockReponses: mockReponses{
+				untar: []mock.UntarResponse{
+					{
+						ReturnPath:  filepath.Join(extractionPath, "good-project"),
+						ErrResponse: false,
+					},
+					{
+						ReturnPath:  filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+						ErrResponse: false,
+					},
+				},
+				gunzip: []mock.GunzipResponse{
+					{
+						Fail:     false,
+						FilePath: filepath.Join(extractionPath, "good-project.tar"),
+					},
+				},
+			},
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+					extractionPath,
+					filepath.Join(extractionPath, "good-project"),
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+				},
+			},
+		},
+		{
+			name: "when the template already exists",
+			args: args{
+				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
+				targetDir:    extractionPath,
+			},
+			expected: expected{
+				filepath: filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+			},
+			mockReponses: mockReponses{
+				untar: []mock.UntarResponse{
+					{
+						ReturnPath:  filepath.Join(extractionPath, "good-project"),
+						ErrResponse: false,
+					},
+					{
+						ReturnPath:  filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+						ErrResponse: false,
+					},
+				},
+				gunzip: []mock.GunzipResponse{
+					{
+						Fail:     false,
+						FilePath: filepath.Join(extractionPath, "good-project.tar"),
+					},
+				},
+			},
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+					extractionPath,
+					filepath.Join(extractionPath, "good-project"),
+					filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
+template:
+  id: good-project
+  author: puppetlabs
+  version: 1.0.0
+`,
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
+			fs := afero.NewMemMapFs()
 			afs := &afero.Afero{Fs: fs}
 
-			if len(tt.templateContent) > 0 {
-				f, _ := afs.Create(tt.args.templatePath)
-				f.Write(tarballBytes) // nolint:errcheck
+			for _, path := range tt.mocks.dirs {
+				afs.Mkdir(path, 0750) //nolint:gosec,errcheck // this result is not used in a secure application
+			}
+
+			for file, content := range tt.mocks.files {
+				config, _ := afs.Create(file) //nolint:gosec,errcheck // this result is not used in a secure application
+				config.Write([]byte(content)) //nolint:errcheck
 			}
 
 			installer := &pct.PctInstaller{
-				&mock.Tar{ReturnedPath: tt.unTarFile, ErrResponse: tt.untarFail},
-				&mock.Gunzip{Fs: fs, ErrResponse: tt.gunzipErr, Fail: tt.gunzipFail},
+				&mock.Tar{UntarResponse: tt.mockReponses.untar},
+				&mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
 				afs,
 				&afero.IOFS{Fs: fs},
 			}
 
-			got, err := installer.Install(tt.args.templatePath, tt.args.targetDir)
-			if err != nil {
-				assert.Contains(t, err.Error(), tt.expectedError)
+			returnedPath, err := installer.Install(tt.args.templatePath, tt.args.targetDir, tt.args.force)
+
+			if tt.expected.errorMsg != "" && err != nil {
+				assert.Contains(t, err.Error(), tt.expected.errorMsg)
+			} else {
+				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.expectedFilePath, got)
+			assert.Equal(t, tt.expected.filepath, returnedPath)
 		})
 	}
 }
