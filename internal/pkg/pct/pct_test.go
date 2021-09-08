@@ -579,6 +579,205 @@ func TestFormatTemplates(t *testing.T) {
 	}
 }
 
+func TestList(t *testing.T) {
+	type stubbedConfig struct {
+		relativeConfigPath string
+		configContent      string
+	}
+	type args struct {
+		templatePath   string
+		templateName   string
+		stubbedConfigs []stubbedConfig
+	}
+	tests := []struct {
+		name string
+		args args
+		want []pct.PuppetContentTemplate
+	}{
+		{
+			name: "when no templates are found",
+			args: args{
+				templatePath: "stubbed/templates/none",
+			},
+		},
+		{
+			name: "when an invalid template is found",
+			args: args{
+				templatePath: "stubbed/templates/invalid",
+				stubbedConfigs: []stubbedConfig{
+					{
+						relativeConfigPath: "some_author/bad-template/0.1.0",
+						configContent:      "I am WILDLY INVALID",
+					},
+				},
+			},
+		},
+		{
+			name: "when valid templates are found",
+			args: args{
+				templatePath: "stubbed/templates/valid",
+				stubbedConfigs: []stubbedConfig{
+					{
+						relativeConfigPath: "some_author/first/0.1.0",
+						configContent: `---
+template:
+  author: some_author
+  id: first
+  type: project
+  display: First Template
+  version: 0.1.0
+  url: https://github.com/some_author/pct-first-template
+`,
+					},
+					{
+						relativeConfigPath: "some_author/second/0.1.0",
+						configContent: `---
+template:
+  author: some_author
+  id: second
+  type: project
+  display: Second Template
+  version: 0.1.0
+  url: https://github.com/some_author/pct-second-template
+`,
+					},
+				},
+			},
+			want: []pct.PuppetContentTemplate{
+				{
+					Author:  "some_author",
+					Id:      "first",
+					Type:    "project",
+					Display: "First Template",
+					Version: "0.1.0",
+					URL:     "https://github.com/some_author/pct-first-template",
+				},
+				{
+					Author:  "some_author",
+					Id:      "second",
+					Type:    "project",
+					Display: "Second Template",
+					Version: "0.1.0",
+					URL:     "https://github.com/some_author/pct-second-template",
+				},
+			},
+		},
+		{
+			name: "when templates are found with the same author/id and different versions",
+			args: args{
+				templatePath: "stubbed/templates/multiversion",
+				stubbedConfigs: []stubbedConfig{
+					{
+						relativeConfigPath: "some_author/first/0.1.0",
+						configContent: `---
+template:
+  author: some_author
+  id: first
+  type: project
+  display: First Template
+  version: 0.1.0
+  url: https://github.com/some_author/pct-first-template
+`,
+					},
+					{
+						relativeConfigPath: "some_author/first/0.2.0",
+						configContent: `---
+template:
+  author: some_author
+  id: first
+  type: project
+  display: First Template
+  version: 0.2.0
+  url: https://github.com/some_author/pct-first-template
+`,
+					},
+				},
+			},
+			want: []pct.PuppetContentTemplate{
+				{
+					Author:  "some_author",
+					Id:      "first",
+					Type:    "project",
+					Display: "First Template",
+					Version: "0.2.0",
+					URL:     "https://github.com/some_author/pct-first-template",
+				},
+			},
+		},
+		{
+			name: "when templateName is specified",
+			args: args{
+				templatePath: "stubbed/templates/named",
+				templateName: "first",
+				stubbedConfigs: []stubbedConfig{
+					{
+						relativeConfigPath: "some_author/first/0.1.0",
+						configContent: `---
+template:
+  author: some_author
+  id: first
+  type: project
+  display: First Template
+  version: 0.1.0
+  url: https://github.com/some_author/pct-first-template
+`,
+					},
+					{
+						relativeConfigPath: "some_author/second/0.1.0",
+						configContent: `---
+template:
+  author: some_author
+  id: second
+  type: project
+  display: Second Template
+  version: 0.1.0
+  url: https://github.com/some_author/pct-second-template
+`,
+					},
+				},
+			},
+			want: []pct.PuppetContentTemplate{
+				{
+					Author:  "some_author",
+					Id:      "first",
+					Type:    "project",
+					Display: "First Template",
+					Version: "0.1.0",
+					URL:     "https://github.com/some_author/pct-first-template",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			afs := &afero.Afero{Fs: fs}
+			iofs := &afero.IOFS{Fs: fs}
+
+			// Create the template
+			for _, st := range tt.args.stubbedConfigs {
+				templateDir := filepath.Join(tt.args.templatePath, st.relativeConfigPath)
+				afs.MkdirAll(templateDir, 0750) //nolint:errcheck
+				// Create template config
+				config, _ := afs.Create(filepath.Join(templateDir, "pct-config.yml"))
+				config.Write([]byte(st.configContent)) //nolint:errcheck
+			}
+
+			p := &pct.Pct{
+				&mock.OsUtil{},
+				&mock.UtilsHelper{},
+				afs,
+				iofs,
+			}
+
+			got := p.List(tt.args.templatePath, tt.args.templateName)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Pct.List() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 // func Test_createTemplateFile(t *testing.T) {
 // 	type args struct {
 // 		info         pct.DeployInfo
