@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	localTemplateCache   string
+	localTemplatePath   string
 	format               string
 	selectedTemplate     string
 	selectedTemplateInfo string
@@ -67,7 +67,7 @@ func CreateCommand() *cobra.Command {
 	})
 	cobra.CheckErr(err)
 
-	tmp.Flags().StringVar(&localTemplateCache, "templatepath", "", "location of installed templates")
+	tmp.Flags().StringVar(&localTemplatePath, "templatepath", "", "location of installed templates")
 	err = viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath"))
 	cobra.CheckErr(err)
 
@@ -81,7 +81,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 	}
 
 	viper.SetDefault("templatepath", defaultTemplatePath)
-	localTemplateCache = viper.GetString("templatepath")
+	localTemplatePath = viper.GetString("templatepath")
 	return nil
 }
 
@@ -103,7 +103,7 @@ func validateArgCount(cmd *cobra.Command, args []string) error {
 }
 
 func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	if localTemplateCache == "" {
+	if localTemplatePath == "" {
 		err := preExecute(cmd, args)
 		if err != nil {
 			log.Error().Msgf("Unable to set template path: %s", err.Error())
@@ -113,9 +113,9 @@ func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]str
 	if len(args) != 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
-	localTemplateCache = viper.GetString("templatepath")
+	localTemplatePath = viper.GetString("templatepath")
 
-	return completeName(localTemplateCache, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	return completeName(localTemplatePath, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 }
 
 func completeName(cache string, match string) []string {
@@ -147,11 +147,11 @@ func getApplicationInfo(appVersionString string) pct.PDKInfo {
 
 func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msg("Run")
-	log.Trace().Msgf("Template path: %v", localTemplateCache)
+	log.Trace().Msgf("Template path: %v", localTemplatePath)
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
 	if listTemplates && selectedTemplateInfo == "" {
-		tmpls := pctApi.List(localTemplateCache, selectedTemplate)
+		tmpls := pctApi.List(localTemplatePath, selectedTemplate)
 
 		formattedTemplates, err := pctApi.FormatTemplates(tmpls, format)
 		if err != nil {
@@ -163,7 +163,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	if selectedTemplateInfo != "" {
-		pctData, err := pctApi.GetInfo(localTemplateCache, selectedTemplateInfo)
+		pctData, err := pctApi.GetInfo(localTemplatePath, selectedTemplateInfo)
 		if err != nil {
 			return err
 		}
@@ -174,7 +174,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	_, err := pctApi.Get(localTemplateCache, selectedTemplate)
+	_, err := pctApi.Get(localTemplatePath, selectedTemplate)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func execute(cmd *cobra.Command, args []string) error {
 
 	deployed := pctApi.Deploy(pct.DeployInfo{
 		SelectedTemplate: selectedTemplate,
-		TemplateCache:    localTemplateCache,
+		TemplateCache:    localTemplatePath,
 		TargetOutputDir:  targetOutput,
 		TargetName:       targetName,
 		PdkInfo:          pdkInfo,
