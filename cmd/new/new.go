@@ -2,6 +2,7 @@ package new
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
@@ -14,7 +15,7 @@ import (
 )
 
 var (
-	localTemplatePath   string
+	localTemplatePath    string
 	format               string
 	selectedTemplate     string
 	selectedTemplateInfo string
@@ -22,6 +23,7 @@ var (
 	targetName           string
 	targetOutput         string
 	pctApi               *pct.Pct
+	cachedTemplates      []pct.PuppetContentTemplate
 )
 
 func CreateCommand() *cobra.Command {
@@ -82,6 +84,9 @@ func preExecute(cmd *cobra.Command, args []string) error {
 
 	viper.SetDefault("templatepath", defaultTemplatePath)
 	localTemplatePath = viper.GetString("templatepath")
+
+	cachedTemplates = pctApi.List(localTemplatePath, "")
+
 	return nil
 }
 
@@ -119,11 +124,11 @@ func flagCompletion(cmd *cobra.Command, args []string, toComplete string) ([]str
 }
 
 func completeName(cache string, match string) []string {
-	tmpls := pctApi.List(cache, "")
 	var names []string
-	for _, tmpl := range tmpls {
-		if strings.HasPrefix(tmpl.Id, match) {
-			m := tmpl.Id + "\t" + tmpl.Display
+	for _, tmpl := range cachedTemplates {
+		namespacedTemplate := fmt.Sprintf("%s/%s", tmpl.Author, tmpl.Id)
+		if strings.HasPrefix(namespacedTemplate, match) {
+			m := namespacedTemplate + "\t" + tmpl.Display
 			names = append(names, m)
 		}
 	}
@@ -151,9 +156,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	log.Trace().Msgf("Selected template: %v", selectedTemplate)
 
 	if listTemplates && selectedTemplateInfo == "" {
-		tmpls := pctApi.List(localTemplatePath, selectedTemplate)
-
-		formattedTemplates, err := pctApi.FormatTemplates(tmpls, format)
+		formattedTemplates, err := pctApi.FormatTemplates(cachedTemplates, format)
 		if err != nil {
 			return err
 		}
@@ -163,20 +166,40 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	if selectedTemplateInfo != "" {
-		pctData, err := pctApi.GetInfo(localTemplatePath, selectedTemplateInfo)
-		if err != nil {
-			return err
+		matchingTemplates := pctApi.FilterFiles(cachedTemplates, func(f pct.PuppetContentTemplate) bool {
+			return fmt.Sprintf("%s/%s", f.Author, f.Id) == selectedTemplateInfo
+		})
+
+		if len(matchingTemplates) == 1 {
+			matchingTemplate := matchingTemplates[0]
+			templateDirPath := filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
+			pctData, err := pctApi.GetInfo(templateDirPath)
+			if err != nil {
+				return err
+			}
+			log.Debug().Msgf("Template Defaults: %v", pctData.Defaults)
+			defaultString := pctApi.DisplayDefaults(pctData.Defaults, format)
+			fmt.Printf("%s\n", defaultString)
+		} else {
+			return fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplateInfo)
 		}
-		log.Debug().Msgf("Template Defaults: %v", pctData.Defaults)
-		defaultString := pctApi.DisplayDefaults(pctData.Defaults, format)
-		fmt.Printf("%s\n", defaultString)
 
 		return nil
 	}
 
-	_, err := pctApi.Get(localTemplatePath, selectedTemplate)
-	if err != nil {
-		return err
+	matchingTemplates := pctApi.FilterFiles(cachedTemplates, func(f pct.PuppetContentTemplate) bool {
+		return fmt.Sprintf("%s/%s", f.Author, f.Id) == selectedTemplate
+	})
+
+	if len(matchingTemplates) == 1 {
+		matchingTemplate := matchingTemplates[0]
+		templateDirPath := filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
+		_, err := pctApi.Get(templateDirPath)
+		if err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
 	}
 
 	appVersionString := cmd.Parent().Version
@@ -190,7 +213,7 @@ func execute(cmd *cobra.Command, args []string) error {
 		PdkInfo:          pdkInfo,
 	})
 
-	err = pctApi.FormatDeployment(deployed, format)
+	err := pctApi.FormatDeployment(deployed, format)
 	if err != nil {
 		return err
 	}

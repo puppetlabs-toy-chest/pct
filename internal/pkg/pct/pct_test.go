@@ -254,11 +254,10 @@ Summary: {{.example_replace.summary}}`,
 
 func TestGet(t *testing.T) {
 	type args struct {
-		templateCache    string
-		selectedTemplate string
-		setup            bool
-		templateConfig   string
-		templateContent  map[string]string
+		templateDirPath string
+		setup           bool
+		templateConfig  string
+		templateContent map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -269,18 +268,16 @@ func TestGet(t *testing.T) {
 		{
 			name: "returns error for non-existent template",
 			args: args{
-				templateCache:    "testdata/examples",
-				selectedTemplate: "i-dont-exist",
-				setup:            false,
+				templateDirPath: "templates/author/i-dont-exist/0.1.0",
+				setup:           false,
 			},
 			wantErr: true,
 		},
 		{
 			name: "returns tmpl for existent template",
 			args: args{
-				templateCache:    "testdata/examples",
-				selectedTemplate: "full-project",
-				setup:            true,
+				templateDirPath: "emplates/author/full-project/0.1.0",
+				setup:           true,
 				templateConfig: `---
 template:
   id: full-project
@@ -311,11 +308,10 @@ template:
 
 			if tt.args.setup {
 				// Create the template
-				templateDir := filepath.Join(tt.args.templateCache, tt.args.selectedTemplate)
-				contentDir := filepath.Join(templateDir, "content")
-				afs.MkdirAll(contentDir, 0750) //nolint:errcheck
+				contentDir := filepath.Join(tt.args.templateDirPath, "content")
+				afs.MkdirAll(tt.args.templateDirPath, 0750) //nolint:errcheck
 				// Create template config
-				config, _ := afs.Create(filepath.Join(templateDir, "pct-config.yml"))
+				config, _ := afs.Create(filepath.Join(tt.args.templateDirPath, "pct-config.yml"))
 				config.Write([]byte(tt.args.templateConfig)) //nolint:errcheck
 				// Create the contents
 				for file, content := range tt.args.templateContent {
@@ -331,7 +327,7 @@ template:
 				iofs,
 			}
 
-			got, err := p.Get(tt.args.templateCache, tt.args.selectedTemplate)
+			got, err := p.Get(tt.args.templateDirPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
