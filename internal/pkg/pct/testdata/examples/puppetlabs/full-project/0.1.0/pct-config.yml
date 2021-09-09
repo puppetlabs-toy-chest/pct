@@ -1,6 +1,7 @@
 ---
 template:
   id: full-project
+  author: puppetlabs
   type: project
   display: Full Project
   version: 0.1.0
