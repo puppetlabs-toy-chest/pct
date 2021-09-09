@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
 	"github.com/puppetlabs/pdkgo/cmd/install"
@@ -43,10 +45,11 @@ func main() {
 	// install
 	installCmd := install.InstallCommand{
 		PctInstaller: &pct.PctInstaller{
-			Tar:    &tar.Tar{AFS: &afs},
-			Gunzip: &gzip.Gunzip{AFS: &afs},
-			AFS:    &afs,
-			IOFS:   &iofs,
+			Tar:        &tar.Tar{AFS: &afs},
+			Gunzip:     &gzip.Gunzip{AFS: &afs},
+			AFS:        &afs,
+			IOFS:       &iofs,
+			HTTPClient: &http.Client{},
 		},
 	}
 	rootCmd.AddCommand(installCmd.CreateCommand())

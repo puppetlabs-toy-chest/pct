@@ -109,6 +109,69 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 	}
 }
 
+func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Setup
+	templatePath := testutils.GetTmpDir(t)
+
+	templatePkgs := []templateData{
+		{
+			name:         "additional-project",
+			author:       "adder",
+			listExpRegex: "Additional\\sProject\\s+\\|\\sadder\\s+\\|\\sadditional-project\\s+\\|\\sproject",
+			expectedFiles: []string{
+				"pct-config.yml",
+				"content/empty.txt",
+				"content/goodfile.txt.tmpl",
+			},
+		},
+		{
+			name:         "good-project",
+			author:       "gooder",
+			listExpRegex: "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject",
+			expectedFiles: []string{
+				"pct-config.yml",
+				"content/empty.txt",
+				"content/goodfile.txt.tmpl",
+			},
+		},
+	}
+
+	for _, template := range templatePkgs {
+		// Setup
+		templatePkgPath := fmt.Sprintf("https://github.com/puppetlabs/pdkgo/raw/main/acceptance/install/testdata/%s.tar.gz", template.name)
+		installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
+
+		// Exec
+		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+
+		// Assert
+		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
+		assert.Equal(t, "", stderr)
+		assert.Equal(t, 0, exitCode)
+	}
+
+	for _, template := range templatePkgs {
+		// Assert
+		for _, file := range template.expectedFiles {
+			assert.FileExists(t, filepath.Join(templatePath, template.author, template.name, "0.1.0", file))
+		}
+
+		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
+		stdout, stderr, exitCode := testutils.RunPctCommand(listCmd, "")
+
+		assert.Regexp(t, template.listExpRegex, stdout)
+		assert.Equal(t, "", stderr)
+		assert.Equal(t, 0, exitCode)
+	}
+
+	// Tear Down
+	for _, template := range templatePkgs {
+		removeInstalledTemplate(filepath.Join(templatePath, template.author, template.name, "0.1.0"))
+	}
+}
+
 func Test_PctInstall_Errors_When_NoTemplatePkgDefined(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
 
