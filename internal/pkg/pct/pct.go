@@ -95,16 +95,16 @@ type Pct struct {
 	IOFS    *afero.IOFS
 }
 
-func (p *Pct) Get(templateCache string, selectedTemplate string) (PuppetContentTemplate, error) {
-	info, err := p.GetInfo(templateCache, selectedTemplate)
+func (p *Pct) Get(templateDirPath string) (PuppetContentTemplate, error) {
+	info, err := p.GetInfo(templateDirPath)
 	return info.Template, err
 }
 
-func (p *Pct) GetInfo(templateCache string, selectedTemplate string) (PuppetContentTemplateInfo, error) {
-	file := filepath.Join(templateCache, selectedTemplate, TemplateConfigFileName)
+func (p *Pct) GetInfo(templateDirPath string) (PuppetContentTemplateInfo, error) {
+	file := filepath.Join(templateDirPath, TemplateConfigFileName)
 	_, err := p.AFS.Stat(file)
 	if os.IsNotExist(err) {
-		return PuppetContentTemplateInfo{}, fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
+		return PuppetContentTemplateInfo{}, fmt.Errorf("Couldn't find an installed template at '%s'", templateDirPath)
 	}
 	i := p.readTemplateConfig(file)
 	return i, nil
@@ -141,7 +141,7 @@ func (p *Pct) List(templatePath string, templateName string) []PuppetContentTemp
 
 	if templateName != "" {
 		log.Debug().Msgf("Filtering for: %s", templateName)
-		tmpls = p.filterFiles(tmpls, func(f PuppetContentTemplate) bool { return f.Id == templateName })
+		tmpls = p.FilterFiles(tmpls, func(f PuppetContentTemplate) bool { return f.Id == templateName })
 	}
 
 	tmpls = p.filterNewestVersions(tmpls)
@@ -545,7 +545,7 @@ func (p *Pct) process(t *template.Template, vars interface{}) string {
 	return tmplBytes.String()
 }
 
-func (p *Pct) filterFiles(ss []PuppetContentTemplate, test func(PuppetContentTemplate) bool) (ret []PuppetContentTemplate) {
+func (p *Pct) FilterFiles(ss []PuppetContentTemplate, test func(PuppetContentTemplate) bool) (ret []PuppetContentTemplate) {
 	for _, s := range ss {
 		if test(s) {
 			ret = append(ret, s)
@@ -559,11 +559,11 @@ func (p *Pct) filterNewestVersions(tt []PuppetContentTemplate) (ret []PuppetCont
 		id := t.Id
 		author := t.Author
 		// Look for templates with the same author and id
-		templates := p.filterFiles(tt, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })
+		templates := p.FilterFiles(tt, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })
 		if len(templates) > 1 {
 			// If the author/id template has 2+ entries, that's multiple versions
 			// check first to see if the return list already has an entry for this template
-			if len(p.filterFiles(ret, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })) == 0 {
+			if len(p.FilterFiles(ret, func(f PuppetContentTemplate) bool { return f.Id == id && f.Author == author })) == 0 {
 				// turn the version strings into version objects for sorting and comparison
 				versionsRaw := []string{}
 				for _, t := range templates {
@@ -577,7 +577,7 @@ func (p *Pct) filterNewestVersions(tt []PuppetContentTemplate) (ret []PuppetCont
 				sort.Sort(version.Collection(versions))
 				// select the latest version
 				highestVersion := versions[len(versions)-1]
-				highestVersionTemplate := p.filterFiles(templates, func(f PuppetContentTemplate) bool {
+				highestVersionTemplate := p.FilterFiles(templates, func(f PuppetContentTemplate) bool {
 					actualVersion, _ := version.NewVersion(f.Version)
 					return actualVersion.Equal(highestVersion)
 				})
