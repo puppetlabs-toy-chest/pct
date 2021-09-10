@@ -61,8 +61,17 @@ func TestPctNewTemplatePath(t *testing.T) {
 func TestPctNewUnknownTemplate(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new foo", "")
-	assert.Contains(t, stdout, "Error: Couldn't find an installed template that matches 'foo'")
+	stdout, stderr, exitCode := testutils.RunPctCommand("new foo/bar", "")
+	assert.Contains(t, stdout, "Error: Couldn't find an installed template that matches 'foo/bar'")
+	assert.Equal(t, "exit status 1", stderr)
+	assert.Equal(t, 1, exitCode)
+}
+
+func TestPctNewAuthorNoId(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	stdout, stderr, exitCode := testutils.RunPctCommand("new puppetlabs", "")
+	assert.Contains(t, stdout, "Error: Selected template must be in AUTHOR/ID format")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }

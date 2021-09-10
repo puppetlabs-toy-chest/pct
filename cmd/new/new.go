@@ -102,6 +102,9 @@ func validateArgCount(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) >= 1 {
+		if len(strings.Split(args[0], "/")) != 2 {
+			return fmt.Errorf("Selected template must be in AUTHOR/ID format")
+		}
 		selectedTemplate = args[0]
 	}
 

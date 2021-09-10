@@ -31,7 +31,7 @@ func TestCreateCommand(t *testing.T) {
 		},
 		{
 			name:    "executes without error for valid flag",
-			args:    []string{"bundle"},
+			args:    []string{"author/templateId"},
 			f:       nullFunction,
 			out:     "",
 			wantErr: false,
