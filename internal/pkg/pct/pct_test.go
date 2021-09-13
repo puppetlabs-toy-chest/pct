@@ -42,7 +42,7 @@ func TestDeploy(t *testing.T) {
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "full-project",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  filepath.Join(tmp, "foobar"),
 					TargetName:       "woo",
 					PdkInfo: pct.PDKInfo{
@@ -71,7 +71,7 @@ template:
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "full-project",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  "",
 					TargetName:       "",
 					PdkInfo: pct.PDKInfo{
@@ -100,7 +100,7 @@ template:
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "full-project",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  "",
 					TargetName:       "wibble",
 					PdkInfo: pct.PDKInfo{
@@ -129,7 +129,7 @@ template:
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "replace-thing",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  filepath.Join(tmp, "thing"),
 					TargetName:       "woo",
 					PdkInfo: pct.PDKInfo{
@@ -160,7 +160,7 @@ Summary: {{.example_replace.summary}}`,
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "replace-thing",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  "",
 					TargetName:       "",
 					PdkInfo: pct.PDKInfo{
@@ -191,7 +191,7 @@ Summary: {{.example_replace.summary}}`,
 			args: args{
 				info: pct.DeployInfo{
 					SelectedTemplate: "replace-thing",
-					TemplateCache:    "testdata/examples",
+					TemplateDirPath:  "templates/author/id/0.1.0",
 					TargetOutputDir:  "",
 					TargetName:       "wibble",
 					PdkInfo: pct.PDKInfo{
@@ -226,11 +226,10 @@ Summary: {{.example_replace.summary}}`,
 			iofs := &afero.IOFS{Fs: fs}
 
 			// Create the template
-			templateDir := filepath.Join(tt.args.info.TemplateCache, tt.args.info.SelectedTemplate)
-			contentDir := filepath.Join(templateDir, "content")
+			contentDir := filepath.Join(tt.args.info.TemplateDirPath, "content")
 			afs.MkdirAll(contentDir, 0750) //nolint:errcheck
 			// Create template config
-			config, _ := afs.Create(filepath.Join(templateDir, "pct-config.yml"))
+			config, _ := afs.Create(filepath.Join(tt.args.info.TemplateDirPath, "pct-config.yml"))
 			config.Write([]byte(tt.args.templateConfig)) //nolint:errcheck
 			// Create the contents
 			for file, content := range tt.args.templateContent {
@@ -276,7 +275,7 @@ func TestGet(t *testing.T) {
 		{
 			name: "returns tmpl for existent template",
 			args: args{
-				templateDirPath: "emplates/author/full-project/0.1.0",
+				templateDirPath: "templates/author/full-project/0.1.0",
 				setup:           true,
 				templateConfig: `---
 template:

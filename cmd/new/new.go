@@ -15,15 +15,16 @@ import (
 )
 
 var (
-	localTemplatePath    string
-	format               string
-	selectedTemplate     string
-	selectedTemplateInfo string
-	listTemplates        bool
-	targetName           string
-	targetOutput         string
-	pctApi               *pct.Pct
-	cachedTemplates      []pct.PuppetContentTemplate
+	localTemplatePath       string
+	format                  string
+	selectedTemplate        string
+	selectedTemplateDirPath string
+	selectedTemplateInfo    string
+	listTemplates           bool
+	targetName              string
+	targetOutput            string
+	pctApi                  *pct.Pct
+	cachedTemplates         []pct.PuppetContentTemplate
 )
 
 func CreateCommand() *cobra.Command {
@@ -101,6 +102,9 @@ func validateArgCount(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) >= 1 {
+		if len(strings.Split(args[0], "/")) != 2 {
+			return fmt.Errorf("Selected template must be in AUTHOR/ID format")
+		}
 		selectedTemplate = args[0]
 	}
 
@@ -172,8 +176,8 @@ func execute(cmd *cobra.Command, args []string) error {
 
 		if len(matchingTemplates) == 1 {
 			matchingTemplate := matchingTemplates[0]
-			templateDirPath := filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
-			pctData, err := pctApi.GetInfo(templateDirPath)
+			selectedTemplateDirPath = filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
+			pctData, err := pctApi.GetInfo(selectedTemplateDirPath)
 			if err != nil {
 				return err
 			}
@@ -193,8 +197,8 @@ func execute(cmd *cobra.Command, args []string) error {
 
 	if len(matchingTemplates) == 1 {
 		matchingTemplate := matchingTemplates[0]
-		templateDirPath := filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
-		_, err := pctApi.Get(templateDirPath)
+		selectedTemplateDirPath = filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
+		_, err := pctApi.Get(selectedTemplateDirPath)
 		if err != nil {
 			return err
 		}
@@ -207,7 +211,7 @@ func execute(cmd *cobra.Command, args []string) error {
 
 	deployed := pctApi.Deploy(pct.DeployInfo{
 		SelectedTemplate: selectedTemplate,
-		TemplateCache:    localTemplatePath,
+		TemplateDirPath:  selectedTemplateDirPath,
 		TargetOutputDir:  targetOutput,
 		TargetName:       targetName,
 		PdkInfo:          pdkInfo,

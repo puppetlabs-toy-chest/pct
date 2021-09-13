@@ -73,7 +73,7 @@ type PDKInfo struct {
 // DeployInfo represents the final set of information needed to deploy a template
 type DeployInfo struct {
 	SelectedTemplate string
-	TemplateCache    string
+	TemplateDirPath  string
 	TargetOutputDir  string
 	TargetName       string
 	PdkInfo          PDKInfo
@@ -238,9 +238,8 @@ func (p *Pct) Deploy(info DeployInfo) []string {
 
 	log.Trace().Msgf("PDKInfo: %+v", info.PdkInfo)
 
-	file := filepath.Join(info.TemplateCache, info.SelectedTemplate, TemplateConfigFileName)
-	log.Debug().Msgf("Template: %s", file)
-	tmpl := p.readTemplateConfig(file)
+	log.Debug().Msgf("Template: %s", info.TemplateDirPath)
+	tmpl := p.readTemplateConfig(filepath.Join(info.TemplateDirPath, TemplateConfigFileName))
 	log.Trace().Msgf("Parsed: %+v", tmpl)
 
 	if info.TargetName == "" && info.TargetOutputDir == "" { // pdk new foo-foo
@@ -262,7 +261,7 @@ func (p *Pct) Deploy(info DeployInfo) []string {
 		}
 	}
 
-	contentDir := filepath.Join(info.TemplateCache, info.SelectedTemplate, "content")
+	contentDir := filepath.Join(info.TemplateDirPath, "content")
 	log.Debug().Msgf("Target Name: %s", info.TargetName)
 	log.Debug().Msgf("Target Output: %s", info.TargetOutputDir)
 
@@ -308,7 +307,7 @@ func (p *Pct) Deploy(info DeployInfo) []string {
 				deployed = append(deployed, templateFile.TargetFilePath)
 			}
 		} else {
-			err := p.createTemplateFile(info, file, templateFile, tmpl.Template)
+			err := p.createTemplateFile(info, templateFile, tmpl.Template)
 			if err != nil {
 				log.Error().Msgf("%s", err)
 				continue
@@ -332,11 +331,10 @@ func (p *Pct) createTemplateDirectory(targetDir string) error {
 	return nil
 }
 
-func (p *Pct) createTemplateFile(info DeployInfo, configFile string, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate) error {
+func (p *Pct) createTemplateFile(info DeployInfo, templateFile PuppetContentTemplateFileInfo, tmpl PuppetContentTemplate) error {
 	log.Trace().Msgf("Creating: '%s'", templateFile.TargetFilePath)
 	config := p.processConfiguration(
 		info,
-		configFile,
 		templateFile.TemplatePath,
 		tmpl,
 	)
@@ -379,7 +377,7 @@ func (p *Pct) createTemplateFile(info DeployInfo, configFile string, templateFil
 	return nil
 }
 
-func (p *Pct) processConfiguration(info DeployInfo, configFile string, projectTemplate string, tmpl PuppetContentTemplate) map[string]interface{} {
+func (p *Pct) processConfiguration(info DeployInfo, projectTemplate string, tmpl PuppetContentTemplate) map[string]interface{} {
 	v := viper.New()
 
 	log.Trace().Msgf("PDKInfo: %+v", info.PdkInfo)
@@ -420,6 +418,8 @@ func (p *Pct) processConfiguration(info DeployInfo, configFile string, projectTe
 	v.SetDefault("pdk.build_date", info.PdkInfo.BuildDate)
 
 	// Template specific variables
+
+	configFile := filepath.Join(info.TemplateDirPath, TemplateConfigFileName)
 	log.Trace().Msgf("Adding %v", filepath.Dir(configFile))
 	// v.SetConfigFile(configFile)
 	v.SetConfigName(TemplateConfigName)

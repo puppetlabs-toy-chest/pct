@@ -1,6 +1,7 @@
 package new_test
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"github.com/puppetlabs/pdkgo/acceptance/testutils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v2"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -59,78 +61,85 @@ func TestPctNewTemplatePath(t *testing.T) {
 func TestPctNewUnknownTemplate(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new foo", "")
-	assert.Contains(t, stdout, "Error: Couldn't find an installed template that matches 'foo'")
+	stdout, stderr, exitCode := testutils.RunPctCommand("new foo/bar", "")
+	assert.Contains(t, stdout, "Error: Couldn't find an installed template that matches 'foo/bar'")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }
 
-// The following tests will need to be re-enabled after GH-183 has been completed
+func TestPctNewAuthorNoId(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
 
-// func TestPctNewKnownTemplate(t *testing.T) {
-// 	testutils.SkipAcceptanceTest(t)
+	stdout, stderr, exitCode := testutils.RunPctCommand("new puppetlabs", "")
+	assert.Contains(t, stdout, "Error: Selected template must be in AUTHOR/ID format")
+	assert.Equal(t, "exit status 1", stderr)
+	assert.Equal(t, 1, exitCode)
+}
 
-// 	stdout, stderr, exitCode := testutils.RunPctCommand("new full-project --templatepath "+templatePath, os.TempDir())
-// 	assert.Contains(t, stdout, "Deployed:")
-// 	assert.Equal(t, "", stderr)
-// 	assert.Equal(t, 0, exitCode)
-// }
+func TestPctNewKnownTemplate(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
 
-// func TestPctNewInfo(t *testing.T) {
-// 	testutils.SkipAcceptanceTest(t)
+	stdout, stderr, exitCode := testutils.RunPctCommand("new puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
+	assert.Contains(t, stdout, "Deployed:")
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+}
 
-// 	stdout, stderr, exitCode := testutils.RunPctCommand("new --info full-project --templatepath "+templatePath, os.TempDir())
+func TestPctNewInfo(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
 
-// 	expectedYaml := `puppet_module:
-//   license: Apache-2.0
-//   summary: A New Puppet Module
-//   version: 0.1.0`
+	stdout, stderr, exitCode := testutils.RunPctCommand("new --info puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
 
-// 	var output map[string]interface{}
-// 	var expected map[string]interface{}
+	expectedYaml := `puppet_module:
+  license: Apache-2.0
+  summary: A New Puppet Module
+  version: 0.1.0`
 
-// 	err := yaml.Unmarshal([]byte(stdout), &output)
-// 	if err != nil {
-// 		assert.Fail(t, "returned data is not YAML")
-// 	}
+	var output map[string]interface{}
+	var expected map[string]interface{}
 
-// 	err = yaml.Unmarshal([]byte(expectedYaml), &expected)
-// 	if err != nil {
-// 		assert.Fail(t, "expected data is not YAML")
-// 	}
+	err := yaml.Unmarshal([]byte(stdout), &output)
+	if err != nil {
+		assert.Fail(t, "returned data is not YAML")
+	}
 
-// 	assert.Equal(t, expected, output)
-// 	assert.Equal(t, "", stderr)
-// 	assert.Equal(t, 0, exitCode)
-// }
+	err = yaml.Unmarshal([]byte(expectedYaml), &expected)
+	if err != nil {
+		assert.Fail(t, "expected data is not YAML")
+	}
 
-// func TestPctNewInfoJson(t *testing.T) {
-// 	testutils.SkipAcceptanceTest(t)
+	assert.Equal(t, expected, output)
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+}
 
-// 	stdout, stderr, exitCode := testutils.RunPctCommand("new --info full-project --format json --templatepath "+templatePath, os.TempDir())
+func TestPctNewInfoJson(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
 
-// 	expectedJson := `{
-//   "puppet_module": {
-//     "license": "Apache-2.0",
-//     "version": "0.1.0",
-//     "summary": "A New Puppet Module"
-//   }
-// }`
+	stdout, stderr, exitCode := testutils.RunPctCommand("new --info puppetlabs/full-project --format json --templatepath "+templatePath, os.TempDir())
 
-// 	var output map[string]interface{}
-// 	var expected map[string]interface{}
+	expectedJson := `{
+  "puppet_module": {
+    "license": "Apache-2.0",
+    "version": "0.1.0",
+    "summary": "A New Puppet Module"
+  }
+}`
 
-// 	err := json.Unmarshal([]byte(stdout), &output)
-// 	if err != nil {
-// 		assert.Fail(t, "returned data is not JSON")
-// 	}
+	var output map[string]interface{}
+	var expected map[string]interface{}
 
-// 	err = json.Unmarshal([]byte(expectedJson), &expected)
-// 	if err != nil {
-// 		assert.Fail(t, "expected data is not JSON")
-// 	}
+	err := json.Unmarshal([]byte(stdout), &output)
+	if err != nil {
+		assert.Fail(t, "returned data is not JSON")
+	}
 
-// 	assert.Equal(t, expected, output)
-// 	assert.Equal(t, "", stderr)
-// 	assert.Equal(t, 0, exitCode)
-// }
+	err = json.Unmarshal([]byte(expectedJson), &expected)
+	if err != nil {
+		assert.Fail(t, "expected data is not JSON")
+	}
+
+	assert.Equal(t, expected, output)
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+}
