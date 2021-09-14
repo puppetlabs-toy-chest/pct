@@ -1,11 +1,15 @@
 package pct
 
 import (
+	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
+	"github.com/puppetlabs/pdkgo/internal/pkg/httpclient"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
@@ -13,10 +17,11 @@ import (
 )
 
 type PctInstaller struct {
-	Tar    tar.TarI
-	Gunzip gzip.GunzipI
-	AFS    *afero.Afero
-	IOFS   *afero.IOFS
+	Tar        tar.TarI
+	Gunzip     gzip.GunzipI
+	AFS        *afero.Afero
+	IOFS       *afero.IOFS
+	HTTPClient httpclient.HTTPClientI
 }
 
 type PctInstallerI interface {
@@ -24,6 +29,28 @@ type PctInstallerI interface {
 }
 
 func (p *PctInstaller) Install(templatePkg string, targetDir string, force bool) (string, error) {
+
+	// If the package path is a URI, download tar to temp folder
+
+	if strings.HasPrefix(templatePkg, "http") {
+		u, err := url.ParseRequestURI(templatePkg)
+		if err != nil {
+			return "", fmt.Errorf("Could not parse template url %s: %v", templatePkg, err)
+		}
+		// create a temporary Directory to download the tar.gz to
+		tempDownloadDir, err := p.AFS.TempDir("", "")
+		defer func() {
+			err := p.AFS.Remove(tempDownloadDir)
+			log.Debug().Msgf("Failed to remove temp dir: %v", err)
+		}()
+		if err != nil {
+			return "", fmt.Errorf("Could not create tempdir to download template: %v", err)
+		}
+		templatePkg, err = p.downloadTemplate(u, tempDownloadDir)
+		if err != nil {
+			return "", fmt.Errorf("Could not effectively download template: %v", err)
+		}
+	}
 
 	if _, err := p.AFS.Stat(templatePkg); os.IsNotExist(err) {
 		return "", fmt.Errorf("No template package at %v", templatePkg)
@@ -110,4 +137,35 @@ func (p *PctInstaller) setupTemplateNamespace(targetDir string, info PuppetConte
 	}
 
 	return namespacePath, err
+}
+
+func (p *PctInstaller) downloadTemplate(targetURL *url.URL, downloadDir string) (string, error) {
+	// Get the file contents from URL
+	response, err := p.HTTPClient.Get(targetURL.String())
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		message := fmt.Sprintf("Received response code %d when trying to download from %s", response.StatusCode, targetURL.String())
+		return "", errors.New(message)
+	}
+
+	// Create the empty file
+	fileName := filepath.Base(targetURL.Path)
+	downloadPath := filepath.Join(downloadDir, fileName)
+	file, err := p.AFS.Create(downloadPath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Write file contents
+	err = p.AFS.WriteReader(downloadPath, response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return downloadPath, nil
 }

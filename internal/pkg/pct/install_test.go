@@ -1,7 +1,10 @@
 package pct_test
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"path/filepath"
 	"testing"
 
@@ -40,6 +43,7 @@ type mocks struct {
 
 // package mock responses
 type mockReponses struct {
+	get    mock.GetResponse
 	untar  []mock.UntarResponse
 	gunzip []mock.GunzipResponse
 }
@@ -47,6 +51,7 @@ type mockReponses struct {
 func TestInstall(t *testing.T) {
 
 	templatePath := "path/to/somewhere"
+	remoteTemplatPath := "https://somewhere.online/templates"
 	extractionPath := "path/to/extract/to"
 
 	tarballBytes := []byte{
@@ -250,6 +255,75 @@ template:
 				},
 			},
 		},
+		{
+			name: "if the tar file is remote and does not exist",
+			args: args{
+				templatePath: fmt.Sprintf("%s/%s", remoteTemplatPath, "good-project.tar.gz"),
+				targetDir:    templatePath,
+			},
+			expected: expected{
+				errorMsg: fmt.Sprintf("Received response code 404 when trying to download from %s", fmt.Sprintf("%s/%s", remoteTemplatPath, "good-project.tar.gz")),
+			},
+			mockReponses: mockReponses{
+				get: mock.GetResponse{
+					RequestResponse: &http.Response{
+						StatusCode: 404,
+						// We still need the body to exist and be a reader, just with empty bytes
+						Body: ioutil.NopCloser(bytes.NewReader([]byte{})),
+					},
+				},
+			},
+		},
+		{
+			name: "should download and extract a remote tar.gz to a template folder",
+			args: args{
+				templatePath: fmt.Sprintf("%s/%s", remoteTemplatPath, "good-project.tar.gz"),
+				targetDir:    extractionPath,
+			},
+			expected: expected{
+				filepath: filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+			},
+			mockReponses: mockReponses{
+				untar: []mock.UntarResponse{
+					{
+						ReturnPath:  filepath.Join(extractionPath, "good-project"),
+						ErrResponse: false,
+					},
+					{
+						ReturnPath:  filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+						ErrResponse: false,
+					},
+				},
+				gunzip: []mock.GunzipResponse{
+					{
+						Fail:     false,
+						FilePath: filepath.Join(extractionPath, "good-project.tar"),
+					},
+				},
+				get: mock.GetResponse{
+					RequestResponse: &http.Response{
+						StatusCode: 200,
+						Body:       ioutil.NopCloser(bytes.NewReader(tarballBytes)),
+					},
+				},
+			},
+			mocks: mocks{
+				dirs: []string{
+					templatePath,
+					extractionPath,
+					filepath.Join(extractionPath, "good-project"),
+				},
+				files: map[string]string{
+					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
+					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
+template:
+  id: good-project
+  author: puppetlabs
+  version: 1.0.0
+`,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -272,6 +346,7 @@ template:
 				&mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
 				afs,
 				&afero.IOFS{Fs: fs},
+				&mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
 			}
 
 			returnedPath, err := installer.Install(tt.args.templatePath, tt.args.targetDir, tt.args.force)

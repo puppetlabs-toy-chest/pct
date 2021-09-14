@@ -393,6 +393,29 @@ The resulting `tar.gz` package will be created by default in `$cwd/pkg`. You can
 
 Packages created using the `build` command can be installed by extracting the `tar.gz` into  the **Default Template Location**.
 
+#### Local archive
+
+Packages created using the `build` command can also be installed with the `pct install` command.
+
+For example, this command:
+
+```bash
+pct install ~/my-template-1.2.3.tar.gz
+```
+
+Will install the template contained in `my-template-1.2.3.tar.gz` to the default template location.
+
+#### Remote archive
+
+Packages created using the `build` command can be automatically downloaded and extracted with `pct install` so long as you know the URL to where the archive is.
+
+For example, this command:
+
+```bash
+pct install https://packages.mycompany.com/pct/my-template-1.2.3.tar.gz
+```
+
+Will attempt to download the PCT template from the specified url and then afterward install it like any other locally available PCT template archive.
 
 ## Requesting a feature
 
