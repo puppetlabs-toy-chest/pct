@@ -3,12 +3,12 @@ package main
 import (
 	"net/http"
 
-	"github.com/puppetlabs/pdkgo/cmd/build"
-	"github.com/puppetlabs/pdkgo/cmd/completion"
-	"github.com/puppetlabs/pdkgo/cmd/install"
-	"github.com/puppetlabs/pdkgo/cmd/new"
-	"github.com/puppetlabs/pdkgo/cmd/root"
-	appver "github.com/puppetlabs/pdkgo/cmd/version"
+	"github.com/puppetlabs/pdkgo/cmd/pct/build"
+	"github.com/puppetlabs/pdkgo/cmd/pct/completion"
+	"github.com/puppetlabs/pdkgo/cmd/pct/install"
+	"github.com/puppetlabs/pdkgo/cmd/pct/new"
+	"github.com/puppetlabs/pdkgo/cmd/pct/root"
+	appver "github.com/puppetlabs/pdkgo/cmd/pct/version"
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
