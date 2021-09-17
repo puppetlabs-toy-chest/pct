@@ -106,7 +106,7 @@ The `$INSTALLATION_ROOT/templates` directory will be subsequently referred to as
 
 Templates currently come in 2 flavours: `project` and `item`.
 
-* A `project` is a template containing many files in a particular structure. They create a ready-to-run structures to start using a Puppet product. _These are great starting points._ You can create a boilerplate empty starter Puppet Module or a fully customized Puppet Module with specialized CI files and RSAPI providers.
+* A `project` is a template containing many files in a particular structure. They create a ready-to-run structure to start using a Puppet product. _These are great starting points._ You can create a boilerplate empty starter Puppet Module or a fully customized Puppet Module with specialized CI files and RSAPI providers.
 * An `item` is a template that will supplement a project or existing content. These could be language features like a Puppet class or single files like a Git ignore file.
 
 ### pct new
@@ -203,7 +203,7 @@ pct new my-name/my-custom-project --templatepath /home/me/templates
 
 ### Composition
 
-A PCT must contain a `pct-config.yml` in the root directory, alongside a `content` directory. The root directory must be named the same as the `id` value defined in  your `pct-config.yml`
+A PCT must contain a `pct-config.yml` in the root directory, alongside a `content` directory.
 
 The `content` directory contains the files and folders required to produce the `project` or `item`.
 
@@ -249,14 +249,14 @@ template:
   type: project
   display: Example
   version: 0.1.0
-  url: https://github.com/puppetlabs/pct-example
+  url: https://github.com/puppetlabs/example-template
 ```
 
 Example structure for `example-template`:
 
 ``` bash
-> tree ~/templates/example-template-params
-/Users/me/templates/example-template-params
+> tree ~/templates/example-template
+/Users/me/templates/example-template
 ├── content
 │   └── example.txt.tmpl
 └── pct-config.yml
@@ -271,15 +271,15 @@ Example pct-config.yml with parameters:
 ``` yaml
 ---
 template:
-  id: example-template-params
+  id: example-template-with-params
   author: myorgname
   type: project
   display: Example with Parameters
   version: 0.1.0
-  url: https://github.com/puppetlabs/pct-example-params
+  url: https://github.com/puppetlabs/pct-example-with-params
 
 
-example_template:
+example_params:
   foo: "bar"
   isPuppet: true
   colours:
@@ -289,12 +289,12 @@ example_template:
 
 ```
 
-In the above template `example-template-params` the parameters can be accessed in a `.tmpl` file like so:
+In the above template `example-template-with-params` the parameters can be accessed in a `.tmpl` file like so:
 
 ``` go
-{{.example_template.foo}}
-{{.example_template.isPuppet}}
-{{.example_template.colours}}
+{{.example_params.foo}}
+{{.example_params.isPuppet}}
+{{.example_params.colours}}
 ```
 
 outputs:
