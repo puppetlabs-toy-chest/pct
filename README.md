@@ -90,7 +90,7 @@ If we `cd` in to the module root dir, everything will get deployed with the corr
 ### **STEP 3:** Add a Github Actions Workflow
 
 Want to know what configurable parameters are availble for a template and their defaults?
-Run `pct new --info <TEMPLATE_ID>`:
+Run `pct new --info <TEMPLATE_AUTHOR>/<TEMPLATE_ID>`:
 
 ![new_info](docs/_resources/new_info.gif)
 
@@ -123,43 +123,43 @@ pct new --list
 Example output:
 
 ```bash
-           DISPLAYNAME          |          NAME           |  TYPE
---------------------------------+-------------------------+----------
-                                |                         |
-  Bolt Plan                     | bolt-plan               | item
-  Bolt Project                  | bolt-project            | project
-  Bolt PowerShell Task          | bolt-pwsh-task          | item
-  Bolt YAML Plan                | bolt-yaml-plan          | item
-  Puppet Module Managed Gemfile | git-attributes          | item
-  Puppet Class                  | puppet-class            | item
-  Puppet Content Template       | puppet-content-template | project
-  Puppet Defined Type           | puppet-defined-type     | item
-  Puppet Fact                   | puppet-fact             | item
-  Puppet Module                 | puppet-module           | project
-  Puppet Resource API Provider  | rsapi-provider          | item
-  Puppet Resource API Transport | puppet-transport        | item
+           DISPLAYNAME          |   AUTHOR   |          NAME           |  TYPE
+--------------------------------+------------+-------------------------+------
+                                |            |                         |
+  Bolt Plan                     | puppetlabs | bolt-plan               | item
+  Bolt Project                  | puppetlabs | bolt-project            | project
+  Bolt PowerShell Task          | puppetlabs | bolt-pwsh-task          | item
+  Bolt YAML Plan                | puppetlabs | bolt-yaml-plan          | item
+  Puppet Module Managed Gemfile | puppetlabs | git-attributes          | item
+  Puppet Class                  | puppetlabs | puppet-class            | item
+  Puppet Content Template       | puppetlabs | puppet-content-template | project
+  Puppet Defined Type           | puppetlabs | puppet-defined-type     | item
+  Puppet Fact                   | puppetlabs | puppet-fact             | item
+  Puppet Module                 | puppetlabs | puppet-module           | project
+  Puppet Resource API Provider  | puppetlabs | rsapi-provider          | item
+  Puppet Resource API Transport | puppetlabs | puppet-transport        | item
 ```
 
 Using the available templates above, its time to generate some content.
 
 ``` bash
-pct new <template>
+pct new <author>/<template>
 ```
 
-Replace `<template>` with the `name` of the template containing the content you want.
+Replace `<author>` and `<template>` with the `author` and `name` of the template containing the content you want.
 
-By default the `new <template>` function will use the directory name of your current working directory to "name" your new content.
+By default the `new <author>/<template>` function will use the directory name of your current working directory to "name" your new content.
 To override this behaviour use the `--name` or `-n` flag.
 
 ``` bash
-pct new <template> --name MyProject
+pct new <author>/<template> --name MyProject
 ```
 
-By default the `new <template>` function will output the template content to the current working directory.
+By default the `new <author>/<template>` function will output the template content to the current working directory.
 To override this behavour use the `--output` or `-o` flag.
 
 ``` bash
-pct new <template> --output /path/to/your/project
+pct new <author>/<template> --output /path/to/your/project
 ```
 
 > :memo: Not all templates require a `name`. If a template doesn't require one, providing a value to the `--name` parameter will have no effect on the generated content.
@@ -168,15 +168,15 @@ pct new <template> --output /path/to/your/project
 
 ``` bash
 > cd /home/me/projects/MyBoltProject
-> pct new bolt-project
+> pct new puppetlabs/bolt-project
 ```
 
 ``` bash
 > pct new puppet-module -n MyNewProject -o /home/me/projects/
 > cd /home/me/projects/MyNewProject
-> pct new puppet-fact -n ApplicationVersion
-> pct new rsapi-provider -n Awesomething
-> pct new puppet-transport -n AwesomethingApi
+> pct new puppetlabs/puppet-fact -n ApplicationVersion
+> pct new puppetlabs/rsapi-provider -n Awesomething
+> pct new puppetlabs/puppet-transport -n AwesomethingApi
 ```
 
 ### Template Updates
@@ -198,7 +198,7 @@ A PCT is an archive containing a templated set of files and folders that represe
 You can specify the location of your templates using the `--templatepath` option:
 
 ```bash
-pct new my-custom-project --templatepath /home/me/templates
+pct new my-name/my-custom-project --templatepath /home/me/templates
 ```
 
 ### Composition
@@ -228,6 +228,7 @@ Format of pct-config.yml
 ---
 template:
   id: <a unique name>
+  author: <name|username|orgname|handle|etc>
   type: <'item' or 'project'>
   display: <a human readable name>
   version: <semver>
@@ -236,7 +237,7 @@ template:
 <template parameters>
 ```
 
-> :memo: Template `id` must not contain spaces or special characters. We recommend using a hyphen to break up the identifier.
+> :memo: Template `id` and `author` must not contain spaces or special characters. We recommend using a hyphen to break up the identifier.
 
 Example pct-config.yml:
 
@@ -244,6 +245,7 @@ Example pct-config.yml:
 ---
 template:
   id: example-template
+  author: myorgname
   type: project
   display: Example
   version: 0.1.0
@@ -270,6 +272,7 @@ Example pct-config.yml with parameters:
 ---
 template:
   id: example-template-params
+  author: myorgname
   type: project
   display: Example with Parameters
   version: 0.1.0
