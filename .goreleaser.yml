@@ -11,6 +11,7 @@ before:
 
 builds:
   - binary: pct
+    id: pct
     env:
       - CGO_ENABLED=0
     goos:
@@ -21,6 +22,27 @@ builds:
       - amd64
       - arm
       - arm64
+    main: ./cmd/pct
+    asmflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    gcflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
+    mod_timestamp: '{{ .CommitTimestamp }}'
+  - binary: pmr
+    id: pmr
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    main: ./cmd/pmr
     asmflags:
       - all=-trimpath={{.Env.WORKINGDIR}}
     gcflags:

@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/cmd/install"
+	"github.com/puppetlabs/pdkgo/cmd/pct/install"
 	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
