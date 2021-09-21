@@ -33,6 +33,7 @@ func CreateSetPuppetCommand() *cobra.Command {
 	}
 
 	tmp.PersistentFlags().StringVar(&PuppetVersion, "version", zerolog.InfoLevel.String(), "Log level (debug, info, warn, error, fatal, panic)")
+	/* #nosec G104 */
 	tmp.RegisterFlagCompletionFunc("version", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint:errcheck
 		if len(args) != 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp

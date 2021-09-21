@@ -14,6 +14,7 @@ func StartContainer(puppetVersion string) {
 	containerName := fmt.Sprintf("puppet/puppet-agent:%s", puppetVersion)
 	log.Info().Msgf("Starting container `%s`", containerName)
 
+	/* #nosec G204 */
 	runCommand := exec.Command("docker", "run", "--rm", "-i", "-d", "--name", "pdk-toolchain", "-v", "/toolchain", containerName)
 
 	if err := runCommand.Run(); err != nil {
