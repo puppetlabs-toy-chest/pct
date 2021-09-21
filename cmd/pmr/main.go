@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/puppetlabs/pdkgo/cmd/pct/completion"
+	"github.com/puppetlabs/pdkgo/cmd/pmr/get"
 	"github.com/puppetlabs/pdkgo/cmd/pmr/root"
+	"github.com/puppetlabs/pdkgo/cmd/pmr/set"
 	appver "github.com/puppetlabs/pdkgo/cmd/pmr/version"
 
 	"github.com/spf13/cobra"
@@ -22,6 +24,9 @@ func main() {
 	rootCmd.Version = v
 	rootCmd.SetVersionTemplate(v)
 	rootCmd.AddCommand(verCmd)
+
+	rootCmd.AddCommand(set.CreateSetCommand())
+	rootCmd.AddCommand(get.CreateGetCommand())
 
 	rootCmd.AddCommand(completion.CreateCompletionCommand())
 

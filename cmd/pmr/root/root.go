@@ -1,10 +1,13 @@
 package root
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/puppetlabs/pdkgo/cmd/pmr/get"
+	"github.com/puppetlabs/pdkgo/internal/pkg/config"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -50,7 +53,7 @@ func CreateRootCommand() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	tmp.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pmr.yaml)")
+	tmp.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pmr.yaml)")
 
 	tmp.PersistentFlags().StringVar(&LogLevel, "log-level", zerolog.InfoLevel.String(), "Log level (debug, info, warn, error, fatal, panic)")
 	err := tmp.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -69,6 +72,8 @@ func CreateRootCommand() *cobra.Command {
 }
 
 func InitConfig() {
+	viper.SetDefault(config.PuppetVersion, "7")
+
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
@@ -77,11 +82,16 @@ func InitConfig() {
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(home)
 		viper.AddConfigPath(filepath.Join(home, ".config"))
+		defaultConfigFile := fmt.Sprintf("%s/.config/.pmr.yaml", home)
+		if err := viper.SafeWriteConfigAs(defaultConfigFile); err != nil {
+			log.Error().Msgf("Failed to create config at `%s`: %s", defaultConfigFile, err.Error())
+		}
 	}
 
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Using config file: %s", viper.ConfigFileUsed())
+		get.LogPuppetVersion()
 	}
 }
