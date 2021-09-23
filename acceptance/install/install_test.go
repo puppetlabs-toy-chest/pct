@@ -311,7 +311,7 @@ func getDefaultTemplatePath() string {
 		return defaultTemplatePath
 	}
 
-	entries, err := filepath.Glob("../../dist/*/templates")
+	entries, err := filepath.Glob("../../dist/pct_*/templates")
 	if err != nil {
 		panic("getDefaultTemplatePath(): Could not determine default template path")
 	}

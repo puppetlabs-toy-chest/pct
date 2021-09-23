@@ -11,6 +11,7 @@ before:
 
 builds:
   - binary: pct
+    id: pct
     env:
       - CGO_ENABLED=0
     goos:
@@ -26,7 +27,28 @@ builds:
     gcflags:
       - all=-trimpath={{.Env.WORKINGDIR}}
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}} -X main.honeycomb_api_key={{.Env.HONEYCOMB_API_KEY}} -X main.honeycomb_dataset={{.Env.HONEYCOMB_DATASET}}
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    tags:
+      - telemetry
+  - binary: pct
+    id: notel_pct
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    asmflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    gcflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}} -X main.honeycomb_api_key={{.Env.HONEYCOMB_API_KEY}} -X main.honeycomb_dataset={{.Env.HONEYCOMB_DATASET}}
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
