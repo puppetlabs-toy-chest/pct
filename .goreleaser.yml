@@ -50,6 +50,26 @@ builds:
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
     mod_timestamp: '{{ .CommitTimestamp }}'
+  - binary: pcv
+    id: pcv
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    main: ./cmd/pcv
+    asmflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    gcflags:
+      - all=-trimpath={{.Env.WORKINGDIR}}
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
+    mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
   - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
