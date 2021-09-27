@@ -3,6 +3,7 @@ module github.com/puppetlabs/pdkgo
 go 1.16
 
 require (
+	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/hashicorp/go-version v1.3.0
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/go-homedir v1.1.0
