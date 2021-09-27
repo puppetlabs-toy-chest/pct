@@ -7,6 +7,7 @@ import (
 	"context"
 	"runtime"
 
+	"github.com/denisbrodbeck/machineid"
 	"github.com/rs/zerolog/log"
 
 	"go.opentelemetry.io/otel"
@@ -59,6 +60,7 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 
 	tracer := otel.Tracer("pct")
 
+	uuid := attribute.Key("uuid")
 	osKey := attribute.Key("osinfo/os")
 	osArch := attribute.Key("osinfo/arch")
 
@@ -66,6 +68,11 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 	_, span = tracer.Start(ctx, "execution")
 	defer span.End()
 
+	// The Protected ID is hashed base on application name to prevent any
+	// accidental leakage of a reversable ID.
+	machineUUID, _ := machineid.ProtectedID("pdk")
+
+	span.SetAttributes(uuid.String(machineUUID))
 	span.SetAttributes(osKey.String(runtime.GOOS))
 	span.SetAttributes(osArch.String(runtime.GOARCH))
 }
