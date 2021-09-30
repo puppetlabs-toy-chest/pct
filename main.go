@@ -28,10 +28,10 @@ var (
 )
 
 func main() {
-
-	// Context must always be established:
-	ctx := context.Background()
-	telemetry.Start(ctx, honeycomb_api_key, honeycomb_dataset)
+	// Telemetry must be initialized before anything else;
+	// If the telemetry build tag was not passed, this is all null ops
+	ctx, traceProvider, span := telemetry.Start(context.Background(), honeycomb_api_key, honeycomb_dataset)
+	defer telemetry.ShutDown(ctx, traceProvider, span)
 
 	var rootCmd = root.CreateRootCommand()
 
@@ -67,5 +67,5 @@ func main() {
 	rootCmd.AddCommand(new.CreateCommand())
 
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)
-	cobra.CheckErr(rootCmd.Execute())
+	cobra.CheckErr(rootCmd.ExecuteContext(ctx))
 }
