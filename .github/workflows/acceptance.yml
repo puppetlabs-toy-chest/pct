@@ -35,10 +35,16 @@ jobs:
         go get github.com/goreleaser/goreleaser
         ./build.sh
       if: runner.os != 'Windows'
+      env:
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_DEV }}
+        HONEYCOMB_DATASET: pct_dev
     - name: Build Windows
       run: |
         go get github.com/goreleaser/goreleaser
         ./build.ps1
       if: runner.os == 'Windows'
+      env:
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_DEV }}
+        HONEYCOMB_DATASET: pct_dev
     - name: Test
       run: go test -v ./acceptance/...
