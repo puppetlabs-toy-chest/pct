@@ -9,16 +9,15 @@ import (
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc/credentials"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc/credentials"
 
 	"go.opentelemetry.io/otel/sdk/resource"
 )
@@ -29,26 +28,33 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 	api_key_set := honeycomb_api_key != "not_set" && honeycomb_api_key != ""
 	dataset_set := honeycomb_dataset != "not_set" && honeycomb_dataset != ""
 	if api_key_set && dataset_set {
-		exp, err := otlp.NewExporter(
-			ctx,
-			otlpgrpc.NewDriver(
-				otlpgrpc.WithEndpoint("api.honeycomb.io:443"),
-				otlpgrpc.WithHeaders(map[string]string{
-					"x-honeycomb-team":    honeycomb_api_key,
-					"x-honeycomb-dataset": honeycomb_dataset,
-				}),
-				otlpgrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")),
-			),
+		exp, err := otlptracegrpc.New(ctx,
+			otlptracegrpc.WithEndpoint("api.honeycomb.io:443"),
+			otlptracegrpc.WithHeaders(map[string]string{
+				"x-honeycomb-team":    honeycomb_api_key,
+				"x-honeycomb-dataset": honeycomb_dataset,
+			}),
+			otlptracegrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")),
 		)
 		if err != nil {
 			log.Fatal().Msgf("failed to initialize exporter: %v", err)
+		}
+
+		res, err := resource.New(ctx,
+			resource.WithAttributes(
+				// the service name used to display traces in backends
+				semconv.ServiceNameKey.String("PCT"),
+			),
+		)
+		if err != nil {
+			log.Fatal().Msgf("failed to initialize respource: %v", err)
 		}
 
 		// Create a new tracer provider with a batch span processor and the otlp exporter.
 		// Add a resource attribute service.name that identifies the service in the Honeycomb UI.
 		tp = sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
-			sdktrace.WithResource(resource.NewWithAttributes(semconv.ServiceNameKey.String("PCT"))),
+			sdktrace.WithResource(res),
 		)
 
 		// Set the Tracer Provider and the W3C Trace Context propagator as globals
