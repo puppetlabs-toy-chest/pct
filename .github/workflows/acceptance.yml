@@ -18,7 +18,7 @@ jobs:
       GOPATH: ${{ github.workspace }}
       TEST_ACCEPTANCE: true
       TMP: ${{ github.workspace }}/tmp
-      TEMP: ${{ github.workspace }}/tmp
+      TEMP: ${{ github.workspace }}/tmpg
     defaults:
       run:
         working-directory: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
@@ -33,12 +33,20 @@ jobs:
     - name: Build nix
       run: |
         go get github.com/goreleaser/goreleaser
+        echo "$HONEYCOMB_DATASET"
         ./build.sh
       if: runner.os != 'Windows'
+      env:
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_DEV }}
+        HONEYCOMB_DATASET: pct_dev
     - name: Build Windows
       run: |
         go get github.com/goreleaser/goreleaser
+        echo "$Env:HONEYCOMB_DATASET"
         ./build.ps1
       if: runner.os == 'Windows'
+      env:
+        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_DEV }}
+        HONEYCOMB_DATASET: pct_dev
     - name: Test
       run: go test -v ./acceptance/...
