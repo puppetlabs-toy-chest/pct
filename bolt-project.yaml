@@ -1,0 +1,11 @@
+---
+name: pdkgo
+plans:
+  - pdkgo::*
+tasks:
+  - pdkgo::*
+modules:
+  - name: puppetlabs-ruby_task_helper
+    version_requirement: "=0.5.1"
+  - name: puppetlabs-powershell_task_helper
+    version_requirement: "=0.1.0"

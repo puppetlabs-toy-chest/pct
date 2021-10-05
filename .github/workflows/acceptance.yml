@@ -46,7 +46,7 @@ jobs:
         ./build.ps1
       if: runner.os == 'Windows'
       env:
-        HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_DEV }}
+        HONEYCOMB_API_KEY: 123-abc-i-am-not-real
         HONEYCOMB_DATASET: pct_dev
     - name: Test
       run: go test -v ./acceptance/...

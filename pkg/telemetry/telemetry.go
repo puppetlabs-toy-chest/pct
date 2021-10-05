@@ -64,10 +64,10 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 		)
 	} else {
 		if !api_key_set {
-			log.Info().Msgf("Unable to load honeycomb: API Key must be set and not empty")
+			log.Fatal().Msgf("Unable to load honeycomb: API Key must be set and not empty")
 		}
 		if !dataset_set {
-			log.Info().Msgf("Unable to load honeycomb: Dataset must be set and not empty")
+			log.Fatal().Msgf("Unable to load honeycomb: Dataset must be set and not empty")
 		}
 		// should the entire function return here?
 		// No spans will be reported, maybe it's best to return nils or error?
