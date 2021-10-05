@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/puppetlabs/pdkgo/pkg/telemetry"
 	"github.com/spf13/cobra"
 )
 
@@ -52,6 +53,10 @@ PowerShell:
 		ValidArgs: []string{"bash", "fish", "pwsh", "zsh"},
 		Args:      cobra.ExactValidArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			_, span := telemetry.NewSpan(cmd.Context(), "completion")
+			defer telemetry.EndSpan(span)
+			telemetry.AddStringSpanAttribute(span, "name", "completion")
+
 			var err error
 			switch args[0] {
 			case "bash":
