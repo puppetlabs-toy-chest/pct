@@ -5,6 +5,7 @@ import (
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
+	"github.com/puppetlabs/pdkgo/pkg/telemetry"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,6 +40,10 @@ func (ic *InstallCommand) CreateCommand() *cobra.Command {
 }
 
 func (ic *InstallCommand) executeInstall(cmd *cobra.Command, args []string) error {
+	_, span := telemetry.NewSpan(cmd.Context(), "install")
+	defer telemetry.EndSpan(span)
+	telemetry.AddStringSpanAttribute(span, "name", "install")
+
 	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
 	if err != nil {
 		return err

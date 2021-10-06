@@ -39,3 +39,5 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY_PROD }}
+          HONEYCOMB_DATASET: pct

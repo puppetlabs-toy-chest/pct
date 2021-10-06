@@ -1,0 +1,75 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug (With Telemetry): pct new --list",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "new",
+        "--list",
+        "--templatepath",
+        "${input:pct_template_path}"
+      ],
+      "buildFlags": "-tags='telemetry' -ldflags='-X main.honeycomb_api_key=${input:honeycomb_api_key} -X main.honeycomb_dataset=pct_dev'",
+    },
+    {
+      "name": "Debug (No Telemetry): pct new --list",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "new",
+        "--list",
+        "--templatepath",
+        "${input:pct_template_path}"
+      ],
+    },
+    {
+      "name": "Debug (With Telemetry): pct new puppetlabs/bolt-plan",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "new",
+        "puppetlabs/bolt-plan",
+        "--templatepath",
+        "${input:pct_template_path}"
+      ],
+      "buildFlags": "-tags='telemetry' -ldflags='-X main.honeycomb_api_key=${input:honeycomb_api_key} -X main.honeycomb_dataset=pct_dev'",
+    },
+    {
+      "name": "Debug (No Telemetry): pct new puppetlabs/bolt-plan",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "args": [
+        "new",
+        "puppetlabs/bolt-plan",
+        "--templatepath",
+        "${input:pct_template_path}"
+      ],
+    },
+  ],
+  "inputs": [
+    {
+      "id": "pct_template_path",
+      "description": "The path to the folder containing PCT Templates",
+      "type": "promptString",
+      "default": "${workspaceFolder}/../baker-round"
+    },
+    {
+      "id": "honeycomb_api_key",
+      "description": "The API Key for sending traces to Honeycomb",
+      "type": "promptString",
+    }
+  ]
+}
