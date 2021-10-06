@@ -21,6 +21,10 @@ func NewSpan(ctx context.Context, name string) (context.Context, string) {
 	return ctx, ""
 }
 
+func RecordSpanError(span string, err error) {
+	// deliberately does nothing
+}
+
 func AddStringSpanAttribute(span string, key string, value string) {
 	// deliberately does nothing
 }

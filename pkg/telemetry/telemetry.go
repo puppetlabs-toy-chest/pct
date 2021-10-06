@@ -101,6 +101,10 @@ func NewSpan(ctx context.Context, name string) (context.Context, trace.Span) {
 	return tracer.Start(ctx, name)
 }
 
+func RecordSpanError(span trace.Span, err error) {
+	span.RecordError(err)
+}
+
 // Create a new attribute and attach it to the specified span
 func AddStringSpanAttribute(span trace.Span, key string, value string) {
 	attr := attribute.Key(key)
