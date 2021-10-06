@@ -18,5 +18,7 @@ templates/
 
 .DS_Store
 
+.idea/
+
 ./pdk
 ./pct
