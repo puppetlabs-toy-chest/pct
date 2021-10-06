@@ -46,6 +46,7 @@ func (ic *InstallCommand) executeInstall(cmd *cobra.Command, args []string) erro
 
 	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
 	if err != nil {
+		telemetry.RecordSpanError(span, err)
 		return err
 	}
 	log.Info().Msgf("Template installed to %v", templateInstallationPath)

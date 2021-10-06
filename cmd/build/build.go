@@ -70,7 +70,9 @@ func execute(cmd *cobra.Command, args []string) error {
 	gzipArchiveFilePath, err := builder.Build(sourceDir, targetDir)
 
 	if err != nil {
-		return fmt.Errorf("`sourcedir` is not a valid template: %s", err.Error())
+		err := fmt.Errorf("`sourcedir` is not a valid template: %s", err.Error())
+		telemetry.RecordSpanError(span, err)
+		return err
 	}
 	log.Info().Msgf("Template output to %v", gzipArchiveFilePath)
 	return nil

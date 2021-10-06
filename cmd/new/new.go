@@ -171,6 +171,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	if listTemplates && selectedTemplateInfo == "" {
 		formattedTemplates, err := pctApi.FormatTemplates(cachedTemplates, format)
 		if err != nil {
+			telemetry.RecordSpanError(span, err)
 			return err
 		}
 		fmt.Print(formattedTemplates)
@@ -188,13 +189,16 @@ func execute(cmd *cobra.Command, args []string) error {
 			selectedTemplateDirPath = filepath.Join(localTemplatePath, matchingTemplate.Author, matchingTemplate.Id, matchingTemplate.Version)
 			pctData, err := pctApi.GetInfo(selectedTemplateDirPath)
 			if err != nil {
+				telemetry.RecordSpanError(span, err)
 				return err
 			}
 			log.Debug().Msgf("Template Defaults: %v", pctData.Defaults)
 			defaultString := pctApi.DisplayDefaults(pctData.Defaults, format)
 			fmt.Printf("%s\n", defaultString)
 		} else {
-			return fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplateInfo)
+			err := fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplateInfo)
+			telemetry.RecordSpanError(span, err)
+			return err
 		}
 
 		return nil
@@ -212,7 +216,9 @@ func execute(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		return fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
+		err := fmt.Errorf("Couldn't find an installed template that matches '%s'", selectedTemplate)
+		telemetry.RecordSpanError(span, err)
+		return err
 	}
 
 	appVersionString := cmd.Parent().Version
@@ -228,6 +234,7 @@ func execute(cmd *cobra.Command, args []string) error {
 
 	err := pctApi.FormatDeployment(deployed, format)
 	if err != nil {
+		telemetry.RecordSpanError(span, err)
 		return err
 	}
 
