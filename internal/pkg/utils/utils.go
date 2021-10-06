@@ -2,11 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
-
-	"github.com/rs/zerolog/log"
+	"runtime"
 )
 
 // contains checks if a string is present in a slice
@@ -60,4 +61,32 @@ func GetDefaultTemplatePath() (string, error) {
 	defaultTemplatePath := filepath.Join(filepath.Dir(execDir), "templates")
 	log.Trace().Msgf("Default template path: %v", defaultTemplatePath)
 	return defaultTemplatePath, nil
+}
+
+func Command(name string, arg ...string) *exec.Cmd {
+	pathToExecutable := ""
+	if runtime.GOOS == "windows" {
+		pathToExecutable, _ = exec.LookPath("cmd.exe")
+	} else {
+		pathToExecutable, _ = exec.LookPath(name)
+	}
+	correctArgs := buildCommandArgs(name, arg)
+	log.Debug().Msgf("Path to executable: %v", pathToExecutable)
+	log.Debug().Msgf("Command args: %v", correctArgs)
+	cmd := &exec.Cmd{
+		Path: pathToExecutable,
+		Args: correctArgs,
+		Env:  os.Environ(),
+	}
+	return cmd
+}
+
+func buildCommandArgs(commandName string, args []string) []string {
+	var a []string
+	if runtime.GOOS == "windows" {
+		a = append(a, "/c")
+	}
+	a = append(a, commandName)
+	a = append(a, args...)
+	return a
 }
