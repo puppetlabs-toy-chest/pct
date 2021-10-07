@@ -43,7 +43,7 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 		res, err := resource.New(ctx,
 			resource.WithAttributes(
 				// the service name used to display traces in backends
-				semconv.ServiceNameKey.String("PCT"),
+				semconv.ServiceNameKey.String("PDK"),
 			),
 		)
 		if err != nil {
@@ -73,7 +73,7 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 		// No spans will be reported, maybe it's best to return nils or error?
 	}
 
-	tracer := otel.Tracer("pct")
+	tracer := otel.GetTracerProvider().Tracer("")
 
 	var span trace.Span
 	ctx, span = tracer.Start(ctx, rootSpanName)
