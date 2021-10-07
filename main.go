@@ -31,7 +31,6 @@ func main() {
 	// Telemetry must be initialized before anything else;
 	// If the telemetry build tag was not passed, this is all null ops
 	ctx, traceProvider, parentSpan := telemetry.Start(context.Background(), honeycomb_api_key, honeycomb_dataset, "pct")
-	defer telemetry.ShutDown(ctx, traceProvider, parentSpan)
 
 	var rootCmd = root.CreateRootCommand()
 
@@ -78,8 +77,13 @@ func main() {
 
 	// instrument & execute called command
 	ctx, childSpan := telemetry.NewSpan(ctx, calledCommand)
-	defer telemetry.EndSpan(childSpan)
 	err := rootCmd.ExecuteContext(ctx)
-	// handle error recording
+	telemetry.RecordSpanError(childSpan, err)
+	telemetry.EndSpan(childSpan)
+
+	// Send all events
+	telemetry.ShutDown(ctx, traceProvider, parentSpan)
+
+	// Handle exiting with/out errors.
 	cobra.CheckErr(err)
 }
