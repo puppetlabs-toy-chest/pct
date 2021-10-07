@@ -2,6 +2,7 @@ package install_test
 
 import (
 	"bytes"
+	"github.com/spf13/afero"
 	"io/ioutil"
 	"testing"
 
@@ -20,6 +21,7 @@ func TestCreateinstallCommand(t *testing.T) {
 		expectedTargetDir       string
 		viperTemplatePath       string
 		expectedOutput          string
+		expectedGitUri          string
 	}{
 		{
 			name:           "Should error when no args provided",
@@ -49,16 +51,35 @@ func TestCreateinstallCommand(t *testing.T) {
 			expectedTargetDir:       "/a/new/place/for/templates",
 			viperTemplatePath:       "/the/default/location/for/templates",
 		},
+		{
+			name:              "Sets GitUri to passed arg and InstallPath to default template dir",
+			args:              []string{"--git-uri", "https://github.com/puppetlabs/pct-test-template-01.git"},
+			viperTemplatePath: "/the/default/location/for/templates",
+			expectError:       false,
+			expectedTargetDir: "/the/default/location/for/templates",
+			expectedGitUri:    "https://github.com/puppetlabs/pct-test-template-01.git",
+		},
+		{
+			name:              "Sets GitUri and InstallPath to passed args",
+			args:              []string{"--git-uri", "https://github.com/puppetlabs/pct-test-template-01.git", "--templatepath", "/a/new/place/for/templates"},
+			viperTemplatePath: "/the/default/location/for/templates",
+			expectError:       false,
+			expectedTargetDir: "/a/new/place/for/templates",
+			expectedGitUri:    "https://github.com/puppetlabs/pct-test-template-01.git",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
 			viper.SetDefault("templatepath", tt.viperTemplatePath)
 			cmd := install.InstallCommand{
 				PctInstaller: &mock.PctInstaller{
 					ExpectedTemplatePkg: tt.expectedTemplatePkgPath,
 					ExpectedTargetDir:   tt.expectedTargetDir,
+					ExpectedGitUri:      tt.expectedGitUri,
 				},
+				AFS: &afero.Afero{Fs: fs},
 			}
 			installCmd := cmd.CreateCommand()
 
