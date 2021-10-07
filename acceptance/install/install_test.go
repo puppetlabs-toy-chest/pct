@@ -44,6 +44,7 @@ type templateData struct {
 	author        string
 	listExpRegex  string
 	expectedFiles []string
+	gitUri        string
 }
 
 func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
@@ -325,4 +326,110 @@ func getDefaultTemplatePath() string {
 	}
 
 	return defaultTemplatePath
+}
+
+func Test_PctInstall_WithGitUri_InstallTemplate(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Setup
+	templatePath := testutils.GetTmpDir(t)
+
+	templatePkgs := []templateData{
+		{
+			name:         "test-template-1",
+			author:       "test-user",
+			listExpRegex: "Test\\sTemplate\\s1\\s+\\|\\stest-user\\s+\\|\\stest-template-1\\s+\\|\\sproject",
+			expectedFiles: []string{
+				"pct-config.yml",
+			},
+			gitUri: "https://github.com/puppetlabs/pct-test-template-01.git",
+		},
+		{
+			name:         "test-template-2",
+			author:       "test-user",
+			listExpRegex: "Test\\sTemplate\\s2\\s+\\|\\stest-user\\s+\\|\\stest-template-2\\s+\\|\\sproject",
+			expectedFiles: []string{
+				"pct-config.yml",
+			},
+			gitUri: "https://github.com/puppetlabs/pct-test-template-02.git",
+		},
+	}
+
+	for _, template := range templatePkgs {
+		// Setup TODO: Change to new uri
+		installCmd := fmt.Sprintf("install --git-uri %v --templatepath %v", template.gitUri, templatePath)
+
+		// Exec
+		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+
+		// Assert
+		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
+		assert.Equal(t, "", stderr)
+		assert.Equal(t, 0, exitCode)
+	}
+
+	for _, template := range templatePkgs {
+		// Assert
+		for _, file := range template.expectedFiles {
+			assert.FileExists(t, filepath.Join(templatePath, template.author, template.name, "0.1.0", file))
+		}
+
+		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
+		stdout, stderr, exitCode := testutils.RunPctCommand(listCmd, "")
+
+		assert.Regexp(t, template.listExpRegex, stdout)
+		assert.Equal(t, "", stderr)
+		assert.Equal(t, 0, exitCode)
+	}
+
+	// Tear Down
+	for _, template := range templatePkgs {
+		removeInstalledTemplate(filepath.Join(templatePath, template.author, template.name, "0.1.0"))
+	}
+}
+
+func Test_PctInstall_WithGitUri_FailsWithNonExistentUri(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Exec
+	stdout, stderr, exitCode := testutils.RunPctCommand(fmt.Sprintf("install --git-uri https://example.com/fake-git-uri"), "")
+
+	// Assert
+	assert.Contains(t, stdout, "Could not clone git repository:")
+	assert.Equal(t, "exit status 1", stderr)
+	assert.Equal(t, 1, exitCode)
+}
+
+func Test_PctInstall_WithGitUri_FailsWithInvalidUri(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Exec
+	stdout, stderr, exitCode := testutils.RunPctCommand(fmt.Sprintf("install --git-uri example.com/invalid-git-uri"), "")
+
+	// Assert
+	assert.Contains(t, stdout, "Could not parse template uri")
+	assert.Equal(t, "exit status 1", stderr)
+	assert.Equal(t, 1, exitCode)
+}
+
+func Test_PctInstall_WithGitUri_RemovesHiddenGitDir(t *testing.T) {
+	testutils.SkipAcceptanceTest(t)
+
+	// Setup
+	templatePath := testutils.GetTmpDir(t)
+
+	// Install template
+	installCmd := fmt.Sprint("install --git-uri https://github.com/puppetlabs/pct-test-template-01.git --templatepath ", templatePath)
+	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+
+	// Verify the template installed
+	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "test-user", "test-template-1", "0.1.0")))
+	assert.Equal(t, "", stderr)
+	assert.Equal(t, 0, exitCode)
+
+	// Check .git directory has been deleted
+	assert.NoDirExists(t, filepath.Join(templatePath, "test-user", "test-template-1", "0.1.0", ".git"))
+
+	// Tear Down
+	removeInstalledTemplate(filepath.Join(templatePath, "test-user", "test-template-1", "0.1.0"))
 }

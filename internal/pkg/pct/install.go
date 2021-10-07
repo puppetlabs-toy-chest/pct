@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/puppetlabs/pdkgo/internal/pkg/exec_runner"
+
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/httpclient"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
@@ -22,10 +24,12 @@ type PctInstaller struct {
 	AFS        *afero.Afero
 	IOFS       *afero.IOFS
 	HTTPClient httpclient.HTTPClientI
+	Exec       exec_runner.ExecI
 }
 
 type PctInstallerI interface {
 	Install(templatePkg string, targetDir string, force bool) (string, error)
+	InstallClone(gitUri string, targetDir string, tempDir string, force bool) (string, error)
 }
 
 func (p *PctInstaller) Install(templatePkg string, targetDir string, force bool) (string, error) {
@@ -90,6 +94,53 @@ func (p *PctInstaller) Install(templatePkg string, targetDir string, force bool)
 	}
 
 	return namespacedPath, nil
+}
+
+func (p *PctInstaller) InstallClone(gitUri string, targetDir string, tempDir string, force bool) (string, error) {
+	// Validate git URI
+	_, err := url.ParseRequestURI(gitUri)
+	if err != nil {
+		return "", fmt.Errorf("Could not parse template uri %s: %v", gitUri, err)
+	}
+
+	// Clone git repository to temp folder
+	folderPath, err := p.cloneTemplate(gitUri, tempDir)
+	if err != nil {
+		return "", fmt.Errorf("Could not clone git repository: %v", err)
+	}
+
+	// Remove .git folder from cloned repository
+	err = p.AFS.RemoveAll(filepath.Join(folderPath, ".git"))
+	if err != nil {
+		return "", fmt.Errorf("Failed to remove '.git' directory")
+	}
+
+	// Read config to determine template properties
+	info, err := p.readConfig(filepath.Join(folderPath, "pct-config.yml"))
+	if err != nil {
+		return "", fmt.Errorf("Invalid config: %v", err.Error())
+	}
+
+	// Create namespaced directory and move contents of temp folder to it
+	namespacedPath, err := p.setupTemplateNamespace(targetDir, info, folderPath, force)
+	if err != nil {
+		return "", fmt.Errorf("Unable to install in namespace: %v", err.Error())
+	}
+
+	return namespacedPath, nil
+}
+
+func (p *PctInstaller) cloneTemplate(gitUri string, tempDir string) (string, error) {
+	// TODO: Sanitize command args
+	//clonePath := filepath.Clean(filepath.Join(tempDir, "temp"))
+	clonePath := filepath.Join(tempDir, "temp")
+	command := p.Exec.Command("git", "clone", gitUri, clonePath)
+	output, err := command.Output()
+	log.Info().Msgf(string(output))
+	if err != nil {
+		return "", err
+	}
+	return clonePath, nil
 }
 
 func (p *PctInstaller) readConfig(configFile string) (info PuppetContentTemplateInfo, err error) {
