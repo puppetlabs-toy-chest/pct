@@ -3,6 +3,8 @@ package install
 import (
 	"fmt"
 
+	"github.com/spf13/afero"
+
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
 	"github.com/puppetlabs/pdkgo/pkg/telemetry"
@@ -16,6 +18,8 @@ type InstallCommand struct {
 	InstallPath     string
 	Force           bool
 	PctInstaller    pct.PctInstallerI
+	GitUri          string
+	AFS             *afero.Afero
 }
 
 type InstallCommandI interface {
@@ -33,6 +37,7 @@ func (ic *InstallCommand) CreateCommand() *cobra.Command {
 	tmp.Flags().StringVar(&ic.InstallPath, "templatepath", "", "location of installed templates")
 	err := viper.BindPFlag("templatepath", tmp.Flags().Lookup("templatepath"))
 	tmp.Flags().BoolVarP(&ic.Force, "force", "f", false, "Forces the install of a template without error, if it already exists. ")
+	tmp.Flags().StringVar(&ic.GitUri, "git-uri", "", "Installs a template package from a remote git repository.")
 
 	cobra.CheckErr(err)
 
@@ -44,7 +49,25 @@ func (ic *InstallCommand) executeInstall(cmd *cobra.Command, args []string) erro
 	defer telemetry.EndSpan(span)
 	telemetry.AddStringSpanAttribute(span, "name", "install")
 
-	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
+	templateInstallationPath := ""
+	var err error = nil
+	if ic.GitUri != "" { // For cloning a template
+		// Create temp folder
+		tempDir, dirErr := ic.AFS.TempDir("", "")
+		defer func() {
+			dirErr := ic.AFS.Remove(tempDir)
+			if dirErr != nil {
+				log.Debug().Msgf("Failed to remove temp dir: %v", dirErr)
+			}
+		}()
+		if dirErr != nil {
+			return fmt.Errorf("Could not create tempdir to clone template to: %v", err)
+		}
+		templateInstallationPath, err = ic.PctInstaller.InstallClone(ic.GitUri, ic.InstallPath, tempDir, ic.Force)
+	} else { // For downloading and/or locally installing a template
+		templateInstallationPath, err = ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -68,6 +91,9 @@ func (ic *InstallCommand) setInstallPath() error {
 
 func (ic *InstallCommand) preExecute(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
+		if ic.GitUri != "" {
+			return ic.setInstallPath()
+		}
 		return fmt.Errorf("Path to template package (tar.gz) should be first argument")
 	}
 
