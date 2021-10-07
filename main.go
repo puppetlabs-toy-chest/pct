@@ -30,8 +30,8 @@ var (
 func main() {
 	// Telemetry must be initialized before anything else;
 	// If the telemetry build tag was not passed, this is all null ops
-	ctx, traceProvider, span := telemetry.Start(context.Background(), honeycomb_api_key, honeycomb_dataset)
-	defer telemetry.ShutDown(ctx, traceProvider, span)
+	ctx, traceProvider, parentSpan := telemetry.Start(context.Background(), honeycomb_api_key, honeycomb_dataset, "pct")
+	defer telemetry.ShutDown(ctx, traceProvider, parentSpan)
 
 	var rootCmd = root.CreateRootCommand()
 

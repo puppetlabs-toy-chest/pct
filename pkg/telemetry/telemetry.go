@@ -22,7 +22,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string) (context.Context, *sdktrace.TracerProvider, trace.Span) {
+func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string, rootSpanName string) (context.Context, *sdktrace.TracerProvider, trace.Span) {
 	var tp *sdktrace.TracerProvider
 	// if telemetry is turned on and honeycomb is configured, hook it up
 	api_key_set := honeycomb_api_key != "not_set" && honeycomb_api_key != ""
@@ -76,7 +76,7 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 	tracer := otel.Tracer("pct")
 
 	var span trace.Span
-	ctx, span = tracer.Start(ctx, "execution")
+	ctx, span = tracer.Start(ctx, rootSpanName)
 
 	// The Protected ID is hashed base on application name to prevent any
 	// accidental leakage of a reversable ID.

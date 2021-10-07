@@ -7,7 +7,7 @@ import (
 	"context"
 )
 
-func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string) (context.Context, string, string) {
+func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string, rootSpanName string) (context.Context, string, string) {
 	// deliberately does nothing
 	return ctx, "", ""
 }
