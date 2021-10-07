@@ -35,6 +35,13 @@ func main() {
 
 	var rootCmd = root.CreateRootCommand()
 
+	// Get the command called and its arguments;
+	// The arguments are only necessary if we want to
+	// hand them off as an attribute to the parent span:
+	// do we? Otherwise we just need the calledCommand
+	calledCommand, calledCommandArguments := root.GetCalledCommand(rootCmd)
+	telemetry.AddStringSpanAttribute(parentSpan, "arguments", calledCommandArguments)
+
 	var verCmd = appver.CreateVersionCommand(version, date, commit)
 	v := appver.Format(version, date, commit)
 	rootCmd.Version = v
@@ -66,6 +73,13 @@ func main() {
 	// new
 	rootCmd.AddCommand(new.CreateCommand())
 
+	// initialize
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)
-	cobra.CheckErr(rootCmd.ExecuteContext(ctx))
+
+	// instrument & execute called command
+	ctx, childSpan := telemetry.NewSpan(ctx, calledCommand)
+	defer telemetry.EndSpan(childSpan)
+	err := rootCmd.ExecuteContext(ctx)
+	// handle error recording
+	cobra.CheckErr(err)
 }

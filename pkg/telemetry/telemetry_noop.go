@@ -16,6 +16,11 @@ func EndSpan(span string) {
 	// deliberately does nothing
 }
 
+func GetSpanFromContext(ctx context.Context) string {
+	// deliberately does nothing
+	return ""
+}
+
 func NewSpan(ctx context.Context, name string) (context.Context, string) {
 	// deliberately does nothing
 	return ctx, ""

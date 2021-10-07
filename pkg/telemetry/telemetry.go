@@ -94,6 +94,11 @@ func EndSpan(span trace.Span) {
 	span.End()
 }
 
+// Returns the current span from context
+func GetSpanFromContext(ctx context.Context) trace.Span {
+	return trace.SpanFromContext(ctx)
+}
+
 // Create a new span;
 // the span will need to be closed somewhere up the call stack
 func NewSpan(ctx context.Context, name string) (context.Context, trace.Span) {

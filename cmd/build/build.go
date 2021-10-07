@@ -8,7 +8,6 @@ import (
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
-	"github.com/puppetlabs/pdkgo/pkg/telemetry"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -63,10 +62,6 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	_, span := telemetry.NewSpan(cmd.Context(), "build")
-	defer telemetry.EndSpan(span)
-	telemetry.AddStringSpanAttribute(span, "name", "build")
-
 	gzipArchiveFilePath, err := builder.Build(sourceDir, targetDir)
 
 	if err != nil {

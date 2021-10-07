@@ -156,10 +156,8 @@ func getApplicationInfo(appVersionString string) pct.PDKInfo {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	_, span := telemetry.NewSpan(cmd.Context(), "new")
-	defer telemetry.EndSpan(span)
-	telemetry.AddStringSpanAttribute(span, "name", "new")
-
+	span := telemetry.GetSpanFromContext(cmd.Context())
+	// Add template to span if needed
 	if len(args) == 1 {
 		telemetry.AddStringSpanAttribute(span, "template", args[0])
 	}
