@@ -79,8 +79,14 @@ func CreateCommand() *cobra.Command {
 }
 
 func preExecute(cmd *cobra.Command, args []string) error {
+	_, span := telemetry.NewSpan(cmd.Context(), "new")
+	defer telemetry.EndSpan(span)
+	telemetry.AddStringSpanAttribute(span, "name", "new")
+	telemetry.AddStringSpanAttribute(span, "step", "PreRunE")
+
 	defaultTemplatePath, err := utils.GetDefaultTemplatePath()
 	if err != nil {
+		telemetry.RecordSpanError(span, err)
 		return err
 	}
 
@@ -93,6 +99,10 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func validateArgCount(cmd *cobra.Command, args []string) error {
+	_, span := telemetry.NewSpan(cmd.Context(), "new")
+	defer telemetry.EndSpan(span)
+	telemetry.AddStringSpanAttribute(span, "name", "new")
+	telemetry.AddStringSpanAttribute(span, "step", "Args")
 	// show available templates if user runs `pct new`
 	if len(args) == 0 && !listTemplates {
 		listTemplates = true
@@ -104,7 +114,9 @@ func validateArgCount(cmd *cobra.Command, args []string) error {
 
 	if len(args) >= 1 {
 		if len(strings.Split(args[0], "/")) != 2 {
-			return fmt.Errorf("Selected template must be in AUTHOR/ID format")
+			err := fmt.Errorf("Selected template must be in AUTHOR/ID format")
+			telemetry.RecordSpanError(span, err)
+			return err
 		}
 		selectedTemplate = args[0]
 	}
@@ -159,6 +171,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	_, span := telemetry.NewSpan(cmd.Context(), "new")
 	defer telemetry.EndSpan(span)
 	telemetry.AddStringSpanAttribute(span, "name", "new")
+	telemetry.AddStringSpanAttribute(span, "step", "RunE")
 
 	if len(args) == 1 {
 		telemetry.AddStringSpanAttribute(span, "template", args[0])

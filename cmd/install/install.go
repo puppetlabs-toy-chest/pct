@@ -43,6 +43,7 @@ func (ic *InstallCommand) executeInstall(cmd *cobra.Command, args []string) erro
 	_, span := telemetry.NewSpan(cmd.Context(), "install")
 	defer telemetry.EndSpan(span)
 	telemetry.AddStringSpanAttribute(span, "name", "install")
+	telemetry.AddStringSpanAttribute(span, "step", "RunE")
 
 	templateInstallationPath, err := ic.PctInstaller.Install(ic.TemplatePkgPath, ic.InstallPath, ic.Force)
 	if err != nil {
@@ -68,17 +69,30 @@ func (ic *InstallCommand) setInstallPath() error {
 }
 
 func (ic *InstallCommand) preExecute(cmd *cobra.Command, args []string) error {
+	_, span := telemetry.NewSpan(cmd.Context(), "install")
+	defer telemetry.EndSpan(span)
+	telemetry.AddStringSpanAttribute(span, "name", "install")
+	telemetry.AddStringSpanAttribute(span, "step", "PreRunE")
+
 	if len(args) < 1 {
-		return fmt.Errorf("Path to template package (tar.gz) should be first argument")
+		err := fmt.Errorf("Path to template package (tar.gz) should be first argument")
+		telemetry.RecordSpanError(span, err)
+		return err
 	}
 
 	if len(args) == 1 {
 		ic.TemplatePkgPath = args[0]
-		return ic.setInstallPath()
+		err := ic.setInstallPath()
+		if err != nil {
+			telemetry.RecordSpanError(span, err)
+		}
+		return err
 	}
 
 	if len(args) > 1 {
-		return fmt.Errorf("Incorrect number of arguments; path to template package (tar.gz) should be first argument")
+		err := fmt.Errorf("Incorrect number of arguments; path to template package (tar.gz) should be first argument")
+		telemetry.RecordSpanError(span, err)
+		return err
 	}
 
 	return nil

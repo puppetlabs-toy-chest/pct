@@ -43,11 +43,16 @@ func CreateCommand() *cobra.Command {
 }
 
 func preExecute(cmd *cobra.Command, args []string) error {
+	_, span := telemetry.NewSpan(cmd.Context(), "build")
+	defer telemetry.EndSpan(span)
+	telemetry.AddStringSpanAttribute(span, "name", "build")
+	telemetry.AddStringSpanAttribute(span, "step", "PreRunE")
 
 	wd, err := os.Getwd()
 	log.Trace().Msgf("WD: %v", wd)
 
 	if (sourceDir == "" || targetDir == "") && err != nil {
+		telemetry.RecordSpanError(span, err)
 		return err
 	}
 
@@ -66,6 +71,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	_, span := telemetry.NewSpan(cmd.Context(), "build")
 	defer telemetry.EndSpan(span)
 	telemetry.AddStringSpanAttribute(span, "name", "build")
+	telemetry.AddStringSpanAttribute(span, "step", "RunE")
 
 	gzipArchiveFilePath, err := builder.Build(sourceDir, targetDir)
 
