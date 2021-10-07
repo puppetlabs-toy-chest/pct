@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [(GH-222)](https://github.com/uppetlabs/pdkgo/issues/222) Telemetry to the binary, which will report the operating system type and architecture when a command is run; the implementation allows for two binaries: one with telemetry configured and enabled, and one _without_ the telemetry included at all. <!-- For more information, see our [telemetry blog post](link to blog). -->
 - [(GH-223)](https://github.com/uppetlabs/pdkgo/issues/223) Added hashed machine uuid generation and included in the telemetry; this will report a universally unique machine ID for each node running PCT and reporting telemetry.
+- [(GH-224)](https://github.com/uppetlabs/pdkgo/issues/224) Added span tracing for each PCT command, ensuring telemetry can tell which commands are being called how often.
+- [(GH-225)](https://github.com/uppetlabs/pdkgo/issues/225) Added error records to span tracing, ensuring that error information is included in telemetry for analysis and prioritization
 
 ## [0.4.0]
 
