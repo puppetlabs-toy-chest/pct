@@ -1,0 +1,299 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: powershell.exe
+
+  # Specify the current working directory path
+  # the default is the current working directory path
+  # cwd: C:\Users\UserName
+
+  # Export additional ENV variables
+  env:
+    recording: true
+
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 100
+
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 12
+
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+
+  # Quality
+  # 1 - 100
+  quality: 100
+
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 2000
+
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: solid
+    title: null
+    style: []
+      # border: 0px black solid
+      # boxShadow: none
+      # margin: 0px
+
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "'FiraCode NF Retina', Monaco, Lucida Console, Ubuntu Mono, Monospace"
+
+  # The size of the font
+  fontSize: 16
+
+  # The height of lines
+  lineHeight: 1
+
+  # The spacing between letters
+  letterSpacing: 0
+
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+
+# Records, feel free to edit them
+records:
+  - delay: 85
+    content: "\e[32m\e[;H~/test_module "
+  - delay: 24
+    content: "\e[m"
+  - delay: 2886
+    content: "\e[?25l"
+  - delay: 13
+    content: "\e[93m\e[;15Hp\e[?25h"
+  - delay: 76
+    content: "\e[m\e[?25l"
+  - delay: 17
+    content: "\e[93m\e[;15Hpc\e[?25h"
+  - delay: 230
+    content: "\e[m\e[?25l"
+  - delay: 21
+    content: "\e[93m\e[;15Hpct\e[?25h"
+  - delay: 82
+    content: "\e[m\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m \e[?25h"
+  - delay: 253
+    content: "\e[?25l"
+  - delay: 11
+    content: "\e[93m\e[;15Hpct\e[m n\e[?25h"
+  - delay: 77
+    content: "\e[?25l"
+  - delay: 16
+    content: "\e[93m\e[;15Hpct\e[m ne\e[?25h"
+  - delay: 81
+    content: "\e[?25l"
+  - delay: 14
+    content: "\e[93m\e[;15Hpct\e[m new\e[?25h"
+  - delay: 90
+    content: "\e[?25l"
+  - delay: 18
+    content: "\e[93m\e[;15Hpct\e[m new \e[?25h"
+  - delay: 445
+    content: "\e[?25l"
+  - delay: 22
+    content: "\e[93m\e[;15Hpct\e[m new p\e[?25h"
+  - delay: 146
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new pu\e[?25h"
+  - delay: 116
+    content: "\e[?25l"
+  - delay: 23
+    content: "\e[93m\e[;15Hpct\e[m new pup\e[?25h"
+  - delay: 97
+    content: "\e[?25l"
+  - delay: 10
+    content: "\e[93m\e[;15Hpct\e[m new pupp\e[?25h"
+  - delay: 62
+    content: "\e[?25l"
+  - delay: 17
+    content: "\e[93m\e[;15Hpct\e[m new puppe\e[?25h"
+  - delay: 127
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppet\e[?25h"
+  - delay: 156
+    content: "\e[?25l"
+  - delay: 17
+    content: "\e[93m\e[;15Hpct\e[m new puppetl\e[?25h"
+  - delay: 128
+    content: "\e[?25l"
+  - delay: 13
+    content: "\e[93m\e[;15Hpct\e[m new puppetla\e[?25h"
+  - delay: 89
+    content: "\e[?25l"
+  - delay: 19
+    content: "\e[93m\e[;15Hpct\e[m new puppetlab\e[?25h"
+  - delay: 118
+    content: "\e[?25l"
+  - delay: 23
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs\e[?25h"
+  - delay: 234
+    content: "\e[?25l"
+  - delay: 15
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/\e[?25h"
+  - delay: 160
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/p\e[?25h"
+  - delay: 149
+    content: "\e[?25l"
+  - delay: 21
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/pu\e[?25h"
+  - delay: 106
+    content: "\e[?25l"
+  - delay: 17
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/pup\e[?25h"
+  - delay: 112
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/pupp\e[?25h"
+  - delay: 99
+    content: "\e[?25l"
+  - delay: 10
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppe\e[?25h"
+  - delay: 182
+    content: "\e[?25l"
+  - delay: 23
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet\e[?25h"
+  - delay: 153
+    content: "\e[?25l"
+  - delay: 18
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-\e[?25h"
+  - delay: 246
+    content: "\e[?25l"
+  - delay: 16
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-c\e[?25h"
+  - delay: 407
+    content: "\e[25l\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class\e[?25h"
+  - delay: 441
+    content: "\e[?25l"
+  - delay: 19
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[?25h"
+  - delay: 669
+    content: "\e[?25l"
+  - delay: 18
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class -\e[?25h"
+  - delay: 334
+    content: "\e[?25l"
+  - delay: 19
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[?25h"
+  - delay: 182
+    content: "\e[m\e[?25l"
+  - delay: 21
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m \e[?25h"
+  - delay: 738
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m a\e[?25h"
+  - delay: 412
+    content: "\e[?25l"
+  - delay: 20
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m aw\e[?25h"
+  - delay: 124
+    content: "\e[?25l"
+  - delay: 16
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awe\e[?25h"
+  - delay: 168
+    content: "\e[?25l"
+  - delay: 18
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awes\e[?25h"
+  - delay: 71
+    content: "\e[?25l"
+  - delay: 21
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m aweso\e[?25h"
+  - delay: 67
+    content: "\e[?25l"
+  - delay: 11
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesom\e[?25h"
+  - delay: 20
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesome\e[?25h"
+  - delay: 244
+    content: "\e[?25l"
+  - delay: 20
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesomec\e[?25h"
+  - delay: 100
+    content: "\e[?25l"
+  - delay: 9
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesomecl\e[?25h"
+  - delay: 128
+    content: "\e[?25l"
+  - delay: 12
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesomecla\e[?25h"
+  - delay: 83
+    content: "\e[?25l"
+  - delay: 10
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesomeclas\e[?25h"
+  - delay: 190
+    content: "\e[?25l"
+  - delay: 13
+    content: "\e[93m\e[;15Hpct\e[m new puppetlabs/puppet-class \e[90m-n\e[m awesomeclass\e[?25h"
+  - delay: 217
+    content: "\r\n"
+  - delay: 37
+    content: "\e[90m7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\r\n"
+  - delay: 11
+    content: "\e[90m7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\\manifests\e[24X\e[90m\r\n7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\\manifests\\awesomeclass.pp        \e[90m\r\n7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\\spec\e[29X\e[90m\r\n7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\\spec\\classes\e[21X\e[90m\r\n7:32PM\e[m \e[32mINF\e[m Deployed: C:\\Users\\bigmikey\\test_module\\spec\\classes\\awesomeclass_spec.rb\r\n"
+  - delay: 1500
+    content: "\r\n"
