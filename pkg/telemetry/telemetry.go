@@ -22,7 +22,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string) (context.Context, *sdktrace.TracerProvider, trace.Span) {
+func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset string, rootSpanName string) (context.Context, *sdktrace.TracerProvider, trace.Span) {
 	var tp *sdktrace.TracerProvider
 	// if telemetry is turned on and honeycomb is configured, hook it up
 	api_key_set := honeycomb_api_key != "not_set" && honeycomb_api_key != ""
@@ -43,7 +43,7 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 		res, err := resource.New(ctx,
 			resource.WithAttributes(
 				// the service name used to display traces in backends
-				semconv.ServiceNameKey.String("PCT"),
+				semconv.ServiceNameKey.String("PDK"),
 			),
 		)
 		if err != nil {
@@ -73,10 +73,10 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 		// No spans will be reported, maybe it's best to return nils or error?
 	}
 
-	tracer := otel.Tracer("pct")
+	tracer := otel.GetTracerProvider().Tracer("")
 
 	var span trace.Span
-	ctx, span = tracer.Start(ctx, "execution")
+	ctx, span = tracer.Start(ctx, rootSpanName)
 
 	// The Protected ID is hashed base on application name to prevent any
 	// accidental leakage of a reversable ID.
@@ -94,11 +94,22 @@ func EndSpan(span trace.Span) {
 	span.End()
 }
 
+// Returns the current span from context
+func GetSpanFromContext(ctx context.Context) trace.Span {
+	return trace.SpanFromContext(ctx)
+}
+
 // Create a new span;
 // the span will need to be closed somewhere up the call stack
 func NewSpan(ctx context.Context, name string) (context.Context, trace.Span) {
 	tracer := otel.GetTracerProvider().Tracer("")
 	return tracer.Start(ctx, name)
+}
+
+// Records an error to the span;
+// If err is nil, this function does nothing
+func RecordSpanError(span trace.Span, err error) {
+	span.RecordError(err)
 }
 
 // Create a new attribute and attach it to the specified span

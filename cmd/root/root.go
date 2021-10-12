@@ -3,6 +3,7 @@ package root
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
@@ -84,4 +85,18 @@ func InitConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Trace().Msgf("Using config file: %s", viper.ConfigFileUsed())
 	}
+}
+
+// Returns the cobra command called, e.g. new or install
+// and also the fully formatted command as passed with arguments/flags.
+// Idea borrowed from carolynvs/porter:
+// https://github.com/carolynvs/porter/blob/ccca10a63627e328616c1006600153da8411a438/cmd/porter/main.go
+func GetCalledCommand(cmd *cobra.Command) (string, string) {
+	calledCommandStr := os.Args[1]
+
+	// Also figure out the full called command from the CLI
+	// Is there anything sensitive you could leak here? 🤔
+	calledCommandArgs := strings.Join(os.Args[1:], " ")
+
+	return calledCommandStr, calledCommandArgs
 }
