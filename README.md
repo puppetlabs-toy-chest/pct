@@ -420,6 +420,20 @@ pct install https://packages.mycompany.com/pct/my-template-1.2.3.tar.gz
 
 Will attempt to download the PCT template from the specified url and then afterward install it like any other locally available PCT template archive.
 
+#### Remote Git Repository
+
+**Git** must be installed for this feature to work. The git repository must contain only one template and must be structured with the `pct-config.yml` file and the `content` directory in the root directory of the repository.
+
+For more information on template structures see the [Writing Templates](https://github.com/puppetlabs/pdkgo#writing-templates) section in the `README`.
+
+For example, this command:
+
+```bash
+pct install --git-uri https://github.com/myorg/myawesometemplate
+```
+
+This will attempt to clone the PCT template from the git repository at the specified URI and install to the default template location.
+
 ## Requesting a feature
 
 Open a new feature request in our [Github discussion](https://github.com/puppetlabs/pdkgo/issues/new) page.

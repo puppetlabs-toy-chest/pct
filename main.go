@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/puppetlabs/pdkgo/internal/pkg/exec_runner"
 	"net/http"
 
 	"github.com/puppetlabs/pdkgo/cmd/build"
@@ -65,7 +66,9 @@ func main() {
 			AFS:        &afs,
 			IOFS:       &iofs,
 			HTTPClient: &http.Client{},
+			Exec:       &exec_runner.Exec{},
 		},
+		AFS: &afs,
 	}
 	rootCmd.AddCommand(installCmd.CreateCommand())
 

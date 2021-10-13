@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [(GH-222)](https://github.com/uppetlabs/pdkgo/issues/222) Telemetry to the binary, which will report the operating system type and architecture when a command is run; the implementation allows for two binaries: one with telemetry configured and enabled, and one _without_ the telemetry included at all. <!-- For more information, see our [telemetry blog post](link to blog). -->
-- [(GH-223)](https://github.com/uppetlabs/pdkgo/issues/223) Added hashed machine uuid generation and included in the telemetry; this will report a universally unique machine ID for each node running PCT and reporting telemetry.
+- [(GH-222)](https://github.com/puppetlabs/pdkgo/issues/222) Telemetry to the binary, which will report the operating system type and architecture when a command is run; the implementation allows for two binaries: one with telemetry configured and enabled, and one _without_ the telemetry included at all. <!-- For more information, see our [telemetry blog post](link to blog). -->
+- [(GH-223)](https://github.com/puppetlabs/pdkgo/issues/223) Added hashed machine uuid generation and included in the telemetry; this will report a universally unique machine ID for each node running PCT and reporting telemetry.
+- [(GH-136)](https://github.com/puppetlabs/pdkgo/issues/136) Added `--git-uri` flag to the `pct install` command for installation of templates from remote repositories.
 
 ## [0.4.0]
 
