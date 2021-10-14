@@ -20,8 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [(GH-183)](https://github.com/uppetlabs/pdkgo/issues/183) `pct new` handles namespaced templates
-- [(GH-184)](https://github.com/uppetlabs/pdkgo/issues/184) `pct install` works against remote `tar.gz` files
+- [(GH-183)](https://github.com/puppetlabs/pdkgo/issues/183) `pct new` handles namespaced templates
+- [(GH-184)](https://github.com/puppetlabs/pdkgo/issues/184) `pct install` works against remote `tar.gz` files
 - [(GH-185)](https://github.com/puppetlabs/pdkgo/issues/185) `pct build` validates pct-config.yml
 - [(GH-167)](https://github.com/puppetlabs/pdkgo/issues/167) Implement `pct install` CLI command
 - [(TEMPLATES-17)](https://github.com/puppetlabs/baker-round/issues/17) Ensure `puppet-content-template` includes the author key in the scaffolded config file
@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [(GH-29)](https://github.com/puppetlabs/pdkgo/issues/29) Error if template not found
 
 [Unreleased]: https://github.com/puppetlabs/pdkgo/compare/0.4.0..main
-[0.4.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.3.0
+[0.4.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.4.0
 [0.3.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.3.0
 [0.2.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.2.0
 [0.1.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.1.0
