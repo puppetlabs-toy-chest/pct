@@ -27,17 +27,10 @@ logDebug() {
   fi
 }
 
-getLatestReleaseVer() {
-  logDebug "Fetching latest releases from https://api.github.com/repos/${ORG}/${REPO}/releases"
-  resp=$(curl -Ls -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${ORG}/${REPO}/releases" --write-out "%{http_code}")
-  VER="$(echo ${resp} | grep -oE -m 1 '"tag_name": "(([0-9]+\.)+[0-9]+(-pre+)?)"' | cut -d '"' -f 4 | head -1)"
-  logDebug "Latest version: ${VER}"
-}
-
 getChecksums() {
   for i in {1..5}; do
-    FILE="${APP_PKG_NAME}_${VER}_${OS}_${ARCH}${EXT}"
-    checksumURL="https://github.com/${ORG}/${REPO}/releases/download/${VER}/checksums.txt"
+    FILE="${APP_PKG_NAME}_${OS}_${ARCH}${EXT}"
+    checksumURL="https://github.com/${ORG}/${REPO}/releases/latest/download/checksums.txt"
     resp=$(curl -Ls "${checksumURL}" -o /tmp/pct_checksums.txt --write-out "%{http_code}")
     respCode=$(echo ${resp} | tail -n 1)
     logDebug "GET ${checksumURL} | Resp: ${resp}"
@@ -59,12 +52,12 @@ downloadLatestRelease() {
   [ -d ${destination} ] || mkdir -p ${destination} ]
 
   if [ "${noTel}" = "--no-telemetry" ]; then
-      echo "Downloading and extracting ${APP_PKG_NAME} ${VER} (TELEMETRY DISABLED VERSION) to ${destination}"
+      echo "Downloading and extracting ${APP_PKG_NAME} (TELEMETRY DISABLED VERSION) to ${destination}"
   else
-      echo "Downloading and extracting ${APP_PKG_NAME} ${VER} to ${destination}"
+      echo "Downloading and extracting ${APP_PKG_NAME} to ${destination}"
   fi
 
-  downloadURL="https://github.com/${ORG}/${REPO}/releases/download/${VER}/${FILE}"
+  downloadURL="https://github.com/${ORG}/${REPO}/releases/latest/download/${FILE}"
 
   for i in {1..5}; do
     resp=$(curl -Ls ${downloadURL} -o /tmp/${FILE} --write-out "%{http_code}")
@@ -102,6 +95,5 @@ downloadLatestRelease() {
   done
 }
 
-getLatestReleaseVer
 getChecksums
 downloadLatestRelease
