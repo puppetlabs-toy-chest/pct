@@ -52,7 +52,7 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
-  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+  - name_template: "{{ .ProjectName }}_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
     replacements:
       darwin: Darwin
       linux: Linux

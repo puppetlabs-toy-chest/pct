@@ -21,9 +21,8 @@ function Install-Pct {
   $os = 'windows'
   $ext = '.zip'
 
-  $ver = (Invoke-RestMethod "https://api.github.com/repos/${org}/${repo}/releases")[0].tag_name
-  $file = "${appPkgName}_${ver}_${os}_${arch}${ext}"
-  $downloadURL = "https://github.com/${org}/${repo}/releases/download/$ver/$file"
+  $file = "${appPkgName}_${os}_${arch}${ext}"
+  $downloadURL = "https://github.com/${org}/${repo}/releases/latest/download/$file"
 
   $Destination = "~/.puppetlabs/pct"
   $Destination = $PSCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Destination)
@@ -39,9 +38,10 @@ function Install-Pct {
 
   try {
     if ($NoTelemetry) {
-      Write-Host "Downloading and extracting ${app} ${ver} (TELEMETRY DISABLED VERSION) to ${Destination}"
-    } else {
-      Write-Host "Downloading and extracting ${app} ${ver} to ${Destination}"
+      Write-Host "Downloading and extracting ${app} (TELEMETRY DISABLED VERSION) to ${Destination}"
+    }
+    else {
+      Write-Host "Downloading and extracting ${app} to ${Destination}"
     }
     Invoke-WebRequest -Uri $downloadURL -OutFile $packagePath
   }
