@@ -18,7 +18,6 @@ fi
 
 RELEASES=""
 FILE=""
-VER=""
 CHECKSUM=""
 
 logDebug() {
@@ -38,7 +37,7 @@ getChecksums() {
       echo "Fetching checksums.txt failed on attempt ${i}, retrying..."
       sleep 5
     else
-      CHECKSUM=$(grep ${FILE} /tmp/pct_checksums.txt | cut -d ' ' -f 1)
+      CHECKSUM=$(grep " ${FILE}" /tmp/pct_checksums.txt | cut -d ' ' -f 1)
       return 0
     fi
   done
