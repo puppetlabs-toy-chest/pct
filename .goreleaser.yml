@@ -52,7 +52,10 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 archives:
-  - name_template: "{{ .ProjectName }}_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+  - name_template: "pct_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+    id: pct
+    builds:
+      - pct
     replacements:
       darwin: Darwin
       linux: Linux
@@ -65,6 +68,23 @@ archives:
         format: zip
     files:
       - templates/**/*
+  - name_template: "notel_pct_{{ tolower .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+    id: notel_pct
+    builds:
+      - notel_pct
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    wrap_in_directory: false
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - templates/**/*
+
 
 checksum:
   name_template: 'checksums.txt'
