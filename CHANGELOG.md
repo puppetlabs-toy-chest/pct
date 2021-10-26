@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
+## [0.5.0]
 ### Added
 
 - [(GH-222)](https://github.com/puppetlabs/pdkgo/issues/222) Telemetry to the binary, which will report the operating system type and architecture when a command is run; the implementation allows for two binaries: one with telemetry configured and enabled, and one _without_ the telemetry included at all. <!-- For more information, see our [telemetry blog post](link to blog). -->
@@ -72,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [(GH-29)](https://github.com/puppetlabs/pdkgo/issues/29) Error if template not found
 
 [Unreleased]: https://github.com/puppetlabs/pdkgo/compare/0.4.0..main
+[0.5.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.5.0
 [0.4.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.4.0
 [0.3.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.3.0
 [0.2.0]: https://github.com/puppetlabs/pdkgo/releases/tag/0.2.0
