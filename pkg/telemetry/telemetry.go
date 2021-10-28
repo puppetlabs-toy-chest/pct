@@ -6,6 +6,7 @@ package telemetry
 import (
 	"context"
 	"runtime"
+	"strings"
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/rs/zerolog/log"
@@ -63,14 +64,14 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 			propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
 		)
 	} else {
+		var unset_values []string
 		if !api_key_set {
-			log.Info().Msgf("Unable to load honeycomb: API Key must be set and not empty")
+			unset_values = append(unset_values, "API Key")
 		}
 		if !dataset_set {
-			log.Info().Msgf("Unable to load honeycomb: Dataset must be set and not empty")
+			unset_values = append(unset_values, "Dataset")
 		}
-		// should the entire function return here?
-		// No spans will be reported, maybe it's best to return nils or error?
+		log.Fatal().Msgf("Unable to load honeycomb: %s must be set and not empty", strings.Join(unset_values, " and "))
 	}
 
 	tracer := otel.GetTracerProvider().Tracer("")
