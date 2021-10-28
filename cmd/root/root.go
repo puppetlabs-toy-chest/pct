@@ -92,6 +92,10 @@ func InitConfig() {
 // Idea borrowed from carolynvs/porter:
 // https://github.com/carolynvs/porter/blob/ccca10a63627e328616c1006600153da8411a438/cmd/porter/main.go
 func GetCalledCommand(cmd *cobra.Command) (string, string) {
+	if len(os.Args) < 2 {
+		return "", ""
+	}
+
 	calledCommandStr := os.Args[1]
 
 	// Also figure out the full called command from the CLI
