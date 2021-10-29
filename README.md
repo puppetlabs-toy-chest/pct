@@ -1,3 +1,8 @@
+---
+title: "Readme"
+draft: false
+---
+
 # Puppet Content Templates
 
 * [Overview](#overview)
@@ -56,7 +61,7 @@ iex "&{ $(irm https://pup.pt/pdkgo/install.ps1); Install-Pct }"
 
 This will install the latest release of PCT to `~/.puppetlabs/pct`.
 
-![install_pct](docs/_resources/install_and_export_path.gif)
+![install_pct](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/install_and_export_path.gif?raw=true)
 
 > :warning: If you do not use the install script and are extracting the archive yourself, be sure to use the fully qualified path to `~/.puppetlabs/pct` on *nix or `$HOME/.puppetlabs/pct` on Windows when you set your `PATH` environment variable.
 

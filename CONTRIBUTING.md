@@ -1,3 +1,8 @@
+---
+title: "Contributing"
+draft: false
+---
+
 # Contributing
 
 Hi! Thanks for your interest in contributing to the Puppet Development Kit!
