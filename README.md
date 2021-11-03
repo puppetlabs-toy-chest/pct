@@ -76,7 +76,7 @@ PCT has built in tab completion support for the following shells: `bash`, `zsh`,
 
 To view the install instructions, access the `--help` menu in `pct completion` and follow the instructions for your shell:
 
-![tab_completion](docs/_resources/completion_setup.gif)
+![tab_completion](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/completion_setup.gif?raw=true)
 
 ## Quick Start Guide
 
@@ -89,25 +89,25 @@ This quick start guide will show you how to:
 ### **STEP 1:** Create a Puppet Module
 
 Let's name our module `test_module` using the `-n` flag:
-![new_project_template](docs/_resources/new_module.gif)
+![new_project_template](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_module.gif?raw=true)
 
 ### **STEP 2:** Add a New Class
 
 If we `cd` in to the module root dir, everything will get deployed with the correct layout:
-![new_class](docs/_resources/new_class.gif)
+![new_class](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/docs/_resources/new_class.gif?raw=true)
 
 ### **STEP 3:** Add a Github Actions Workflow
 
 Want to know what configurable parameters are availble for a template and their defaults?
 Run `pct new --info <TEMPLATE_AUTHOR>/<TEMPLATE_ID>`:
 
-![new_info](docs/_resources/new_info.gif)
+![new_info](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_info.gif?raw=true)
 
 We're happy with those defaults, so let's deploy this item.
 
 Since we're outside the module root dir, we'll use the `-o` option to point at the root dir:
 
-![new_info](docs/_resources/new_ghactions.gif)
+![new_info](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_ghactions.gif?raw=true)
 
 ## Getting Started
 
