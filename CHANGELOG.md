@@ -1,3 +1,8 @@
+---
+title: "Change Log"
+description: "List of changes made across the different versions of PCT."
+---
+
 # Changelog
 All notable changes to this project will be documented in this file.
 

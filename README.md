@@ -1,3 +1,8 @@
+---
+title: "Readme"
+draft: false
+---
+
 # Puppet Content Templates
 
 * [Overview](#overview)
@@ -56,7 +61,7 @@ iex "&{ $(irm https://pup.pt/pdkgo/install.ps1); Install-Pct }"
 
 This will install the latest release of PCT to `~/.puppetlabs/pct`.
 
-![install_pct](docs/_resources/install_and_export_path.gif)
+![install_pct](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/install_and_export_path.gif?raw=true)
 
 > :warning: If you do not use the install script and are extracting the archive yourself, be sure to use the fully qualified path to `~/.puppetlabs/pct` on *nix or `$HOME/.puppetlabs/pct` on Windows when you set your `PATH` environment variable.
 
@@ -71,7 +76,7 @@ PCT has built in tab completion support for the following shells: `bash`, `zsh`,
 
 To view the install instructions, access the `--help` menu in `pct completion` and follow the instructions for your shell:
 
-![tab_completion](docs/_resources/completion_setup.gif)
+![tab_completion](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/completion_setup.gif?raw=true)
 
 ## Quick Start Guide
 
@@ -84,25 +89,25 @@ This quick start guide will show you how to:
 ### **STEP 1:** Create a Puppet Module
 
 Let's name our module `test_module` using the `-n` flag:
-![new_project_template](docs/_resources/new_module.gif)
+![new_project_template](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_module.gif?raw=true)
 
 ### **STEP 2:** Add a New Class
 
 If we `cd` in to the module root dir, everything will get deployed with the correct layout:
-![new_class](docs/_resources/new_class.gif)
+![new_class](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/docs/_resources/new_class.gif?raw=true)
 
 ### **STEP 3:** Add a Github Actions Workflow
 
 Want to know what configurable parameters are availble for a template and their defaults?
 Run `pct new --info <TEMPLATE_AUTHOR>/<TEMPLATE_ID>`:
 
-![new_info](docs/_resources/new_info.gif)
+![new_info](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_info.gif?raw=true)
 
 We're happy with those defaults, so let's deploy this item.
 
 Since we're outside the module root dir, we'll use the `-o` option to point at the root dir:
 
-![new_info](docs/_resources/new_ghactions.gif)
+![new_info](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/new_ghactions.gif?raw=true)
 
 ## Getting Started
 
