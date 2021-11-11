@@ -29,10 +29,13 @@ draft: false
 * [Sharing Templates](#sharing-templates)
   * [pct build](#pct-build)
   * [Installing template packages](#installing-template-packages)
+* [Locally host documentation site](#locally-host-documentation-site)
+  * [Prerequisites](#prerequisites)
+  * [Install site](#install-site)
+  * [Run site](#run-site)
 * [Request a feature](#request-a-feature)
 * [Reporting Problems](#reporting-problems)
 * [Installing Telemetry Free Version](#installing-telemetry-free-version)
-
 ## Overview
 
 Puppet Content Templates (PCT) codify a structure to produce content for any Puppet Product that can be authored by Puppet Product Teams or external users without direct help of the PDK team.
@@ -442,6 +445,47 @@ pct install --git-uri https://github.com/myorg/myawesometemplate
 ```
 
 This will attempt to clone the PCT template from the git repository at the specified URI and install to the default template location.
+
+## Locally host documentation site
+
+The DevX documentation site can be locally hosted and changes made to the markdown files inside of the `docs/md/content` directory will
+be visible on the site.
+
+### Prerequisites
+
+Essential software that will need to be installed to run the documentation site locally:
+
+- Git version control
+- Hugo extended version
+- Nodejs and NPM
+
+### Install site
+
+To install the documentation site run the following command from the root of this project:
+
+```bash
+./docs.sh
+```
+
+This will install and run the documentation site. The site can be found at `http://localhost:1313`. All updates will to the
+`docs/md/content` directory will hot reload the site.
+
+To stop the running `ctrl + c` in the terminal window in which it is running.
+
+### Run site
+
+Commands to run the site locally:
+```bash
+# Run without draft pages being displayed
+./docs.sh
+```
+or
+
+```bash
+# Run with draft pages being displayed
+./docs.sh -D
+```
+
 
 ## Requesting a feature
 

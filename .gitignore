@@ -22,3 +22,6 @@ templates/
 
 ./pdk
 ./pct
+
+# Documentation site
+docs/site
