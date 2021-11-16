@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/puppetlabs/pdkgo/internal/pkg/exec_runner"
 	"net/http"
+
+	"github.com/puppetlabs/pdkgo/internal/pkg/exec_runner"
 
 	"github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
 	"github.com/puppetlabs/pdkgo/cmd/install"
 	"github.com/puppetlabs/pdkgo/cmd/new"
+	"github.com/puppetlabs/pdkgo/cmd/news"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
 	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
@@ -74,6 +76,9 @@ func main() {
 
 	// new
 	rootCmd.AddCommand(new.CreateCommand())
+
+	// news
+	rootCmd.AddCommand(news.CreateCommand())
 
 	// initialize
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)
