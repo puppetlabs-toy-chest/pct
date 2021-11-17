@@ -10,12 +10,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/spf13/cobra"
 )
 
 const (
-	url = "http://feeds.bbci.co.uk/news/technology/rss.xml"
+	default_url = "http://feeds.bbci.co.uk/news/technology/rss.xml"
+)
+
+var (
+	Url string
 )
 
 // The top level structure
@@ -32,21 +37,47 @@ type Item struct {
 	PubDate     string `xml:"pubDate"`
 }
 
+type NewsCommandI interface {
+	CreateCommand() *cobra.Command
+}
+
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:   "news",
-		Short: "Retrives the xml",
-		Long:  `Retrives the xml from bbc news`,
-		RunE:  execute,
+		Use:     "news",
+		Short:   "Retrives the xml",
+		Long:    `Retrives the xml from bbc news`,
+		PreRunE: preExecute,
+		RunE:    execute,
 	}
 
 	return tmp
 }
 
+func preExecute(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		Url = default_url
+	}
+
+	if len(args) == 1 {
+		Url = args[0]
+		_, err := url.ParseRequestURI(Url)
+		if err != nil {
+			return fmt.Errorf("The first argument should be a valid URL")
+		}
+	}
+
+	if len(args) > 1 {
+		return fmt.Errorf("Incorrect number of arguments; only a url can be passed")
+	}
+
+	return nil
+}
+
 func execute(cmd *cobra.Command, args []string) error {
-	fmt.Printf("HTML code of %s ...\n", url)
+	fmt.Printf("args ...\n", args)
+	fmt.Printf("HTML code of %s ...\n", Url)
 	// Retrieve the html of the page
-	resp, err := http.Get(url)
+	resp, err := http.Get(Url)
 	if err != nil {
 		return err
 	}
