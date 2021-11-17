@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/fatih/color"
+	"github.com/rodaine/table"
 	"github.com/spf13/cobra"
 )
 
@@ -53,11 +55,14 @@ func CreateCommand() *cobra.Command {
 	return tmp
 }
 
+// Verify that the input given is as exected
 func preExecute(cmd *cobra.Command, args []string) error {
+	// If no url is given, default to the stored on
 	if len(args) < 1 {
 		Url = default_url
 	}
 
+	// If a url is given valify that it is valid
 	if len(args) == 1 {
 		Url = args[0]
 		_, err := url.ParseRequestURI(Url)
@@ -66,6 +71,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	// If more than one input is given then throw an error
 	if len(args) > 1 {
 		return fmt.Errorf("Incorrect number of arguments; only a url can be passed")
 	}
@@ -74,8 +80,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	fmt.Printf("args ...\n", args)
-	fmt.Printf("HTML code of %s ...\n", Url)
+	fmt.Printf("Retrieving HTML code of %s ...\n", Url)
 	// Retrieve the html of the page
 	resp, err := http.Get(Url)
 	if err != nil {
@@ -89,21 +94,28 @@ func execute(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Output the raw html
-	// fmt.Printf("%s\n", html)
-
 	// Create a variable of the top structure type set out above
 	var items RSS
 
 	// Unmarshal the xml
 	xml.Unmarshal([]byte(html), &items)
 
-	// Output each item's Title and Link with a divider between them
+	// Output the retrieved results as part of a table
+	// Set the tables format
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	// Add the titles to the table
+	tbl := table.New("Title", "Link")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	// Add each unmarshalled item as a new row
 	for i := 0; i < len(items.Item); i++ {
-		fmt.Println("Title: " + items.Item[i].Title)
-		fmt.Println("Link: " + items.Item[i].Link)
-		fmt.Println("----------")
+		tbl.AddRow(items.Item[i].Title, items.Item[i].Link)
 	}
+
+	// Output the table
+	tbl.Print()
 
 	return nil
 }
