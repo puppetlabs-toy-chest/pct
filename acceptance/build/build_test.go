@@ -9,8 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const APP = "pct"
+
 func Test_PctBuild_Outputs_TarGz(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	templateName := "good-project"
 
@@ -19,7 +22,7 @@ func Test_PctBuild_Outputs_TarGz(t *testing.T) {
 	wd := testutils.GetTmpDir(t)
 
 	cmd := fmt.Sprintf("build --sourcedir %v --targetdir %v", templateDir, wd)
-	stdout, stderr, exitCode := testutils.RunPctCommand(cmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, "")
 
 	expectedOutputFilePath := filepath.Join(wd, fmt.Sprintf("%v.tar.gz", templateName))
 
@@ -31,6 +34,7 @@ func Test_PctBuild_Outputs_TarGz(t *testing.T) {
 
 func Test_PctBuild_With_NoTargetDir_Outputs_TarGz(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	templateName := "good-project"
 
@@ -39,7 +43,7 @@ func Test_PctBuild_With_NoTargetDir_Outputs_TarGz(t *testing.T) {
 	wd := testutils.GetTmpDir(t)
 
 	cmd := fmt.Sprintf("build --sourcedir %v", templateDir)
-	stdout, stderr, exitCode := testutils.RunPctCommand(cmd, wd)
+	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, wd)
 
 	expectedOutputFilePath := filepath.Join(wd, "pkg", fmt.Sprintf("%v.tar.gz", templateName))
 
@@ -51,6 +55,7 @@ func Test_PctBuild_With_NoTargetDir_Outputs_TarGz(t *testing.T) {
 
 func Test_PctBuild_With_EmptySourceDir_Errors(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	templateName := "no-project-here"
 
@@ -58,7 +63,7 @@ func Test_PctBuild_With_EmptySourceDir_Errors(t *testing.T) {
 	templateDir := filepath.Join(sourceDir, templateName)
 
 	cmd := fmt.Sprintf("build --sourcedir %v", templateDir)
-	stdout, stderr, exitCode := testutils.RunPctCommand(cmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, "")
 
 	assert.Contains(t, stdout, fmt.Sprintf("No template directory at %v", templateDir))
 	assert.Equal(t, "exit status 1", stderr)
@@ -67,6 +72,7 @@ func Test_PctBuild_With_EmptySourceDir_Errors(t *testing.T) {
 
 func Test_PctBuild_With_NoPctConfig_Errors(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	templateName := "no-pct-config-project"
 
@@ -74,7 +80,7 @@ func Test_PctBuild_With_NoPctConfig_Errors(t *testing.T) {
 	templateDir := filepath.Join(sourceDir, templateName)
 
 	cmd := fmt.Sprintf("build --sourcedir %v", templateDir)
-	stdout, stderr, exitCode := testutils.RunPctCommand(cmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, "")
 
 	assert.Contains(t, stdout, fmt.Sprintf("No 'pct-config.yml' found in %v", templateDir))
 	assert.Equal(t, "exit status 1", stderr)
@@ -83,6 +89,7 @@ func Test_PctBuild_With_NoPctConfig_Errors(t *testing.T) {
 
 func Test_PctBuild_With_NoContentDir_Errors(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	templateName := "no-content-dir-project"
 
@@ -90,7 +97,7 @@ func Test_PctBuild_With_NoContentDir_Errors(t *testing.T) {
 	templateDir := filepath.Join(sourceDir, templateName)
 
 	cmd := fmt.Sprintf("build --sourcedir %v", templateDir)
-	stdout, stderr, exitCode := testutils.RunPctCommand(cmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, "")
 
 	assert.Contains(t, stdout, fmt.Sprintf("No 'content' dir found in %v", templateDir))
 	assert.Equal(t, "exit status 1", stderr)

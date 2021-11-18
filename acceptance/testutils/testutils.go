@@ -13,6 +13,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var app string
+
+func SetAppName(appName string) {
+	app = appName
+}
+
 func SkipAcceptanceTest(t *testing.T) {
 	if _, present := os.LookupEnv("TEST_ACCEPTANCE"); !present {
 		t.Skip("Skipping, Acceptance test")
@@ -43,22 +49,22 @@ func RunCommand(cmdString string, wd string) (stdout string, stderr string, exit
 	return stdout, stderr, exitCode
 }
 
-// Wraps RunCommand for PCT calls, locating the correct binary for the executing OS
-func RunPctCommand(cmdString string, wd string) (stdout string, stderr string, exitCode int) {
-	// where is pct built for this current OS?
+// Wraps RunCommand for App calls, locating the correct binary for the executing OS
+func RunAppCommand(cmdString string, wd string) (stdout string, stderr string, exitCode int) {
+	// where is app built for this current OS?
 	postfix := ""
 	if runtime.GOOS == "windows" {
 		postfix = ".exe"
 	}
 
-	pctPath := fmt.Sprintf("../../dist/pct_%s_%s/pct%s", runtime.GOOS, runtime.GOARCH, postfix)
-	absPath, err := filepath.Abs(pctPath)
+	appPath := fmt.Sprintf("../../dist/%s_%s_%s/%s%s", app, runtime.GOOS, runtime.GOARCH, app, postfix)
+	absPath, err := filepath.Abs(appPath)
 
 	if err != nil {
-		log.Error().Msgf("Unable to run create path for %s: %s", pctPath, err.Error())
+		log.Error().Msgf("Unable to run create path for %s: %s", appPath, err.Error())
 	}
 
-	log.Debug().Msgf("Testing Command: pct %s", cmdString)
+	log.Debug().Msgf("Testing Command: %s %s", app, cmdString)
 
 	executeString := fmt.Sprintf("%s %s", absPath, cmdString)
 

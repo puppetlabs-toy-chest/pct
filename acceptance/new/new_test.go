@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const APP = "pct"
+
 var templatePath string
 
 func TestMain(m *testing.M) {
@@ -27,8 +29,9 @@ func TestMain(m *testing.M) {
 
 func TestPctNew(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("new", "")
 	assert.Contains(t, stdout, "DISPLAYNAME")
 	assert.Contains(t, stdout, "AUTHOR")
 	assert.Contains(t, stdout, "NAME")
@@ -39,8 +42,9 @@ func TestPctNew(t *testing.T) {
 
 func TestPctNewUnknownTag(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new --foo", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("new --foo", "")
 	assert.Contains(t, stdout, "unknown flag: --foo")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
@@ -48,8 +52,9 @@ func TestPctNewUnknownTag(t *testing.T) {
 
 func TestPctNewTemplatePath(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new --templatepath "+templatePath, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("new --templatepath "+templatePath, "")
 	assert.Contains(t, stdout, "DISPLAYNAME")
 	assert.Contains(t, stdout, "NAME")
 	assert.Contains(t, stdout, "TYPE")
@@ -60,8 +65,9 @@ func TestPctNewTemplatePath(t *testing.T) {
 
 func TestPctNewUnknownTemplate(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new foo/bar", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("new foo/bar", "")
 	assert.Contains(t, stdout, "Error: Couldn't find an installed template that matches 'foo/bar'")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
@@ -69,8 +75,9 @@ func TestPctNewUnknownTemplate(t *testing.T) {
 
 func TestPctNewAuthorNoId(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new puppetlabs", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("new puppetlabs", "")
 	assert.Contains(t, stdout, "Error: Selected template must be in AUTHOR/ID format")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
@@ -78,8 +85,9 @@ func TestPctNewAuthorNoId(t *testing.T) {
 
 func TestPctNewKnownTemplate(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
+	stdout, stderr, exitCode := testutils.RunAppCommand("new puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
 	assert.Contains(t, stdout, "Deployed:")
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
@@ -87,8 +95,9 @@ func TestPctNewKnownTemplate(t *testing.T) {
 
 func TestPctNewInfo(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new --info puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
+	stdout, stderr, exitCode := testutils.RunAppCommand("new --info puppetlabs/full-project --templatepath "+templatePath, os.TempDir())
 
 	expectedYaml := `puppet_module:
   license: Apache-2.0
@@ -115,8 +124,9 @@ func TestPctNewInfo(t *testing.T) {
 
 func TestPctNewInfoJson(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
-	stdout, stderr, exitCode := testutils.RunPctCommand("new --info puppetlabs/full-project --format json --templatepath "+templatePath, os.TempDir())
+	stdout, stderr, exitCode := testutils.RunAppCommand("new --info puppetlabs/full-project --format json --templatepath "+templatePath, os.TempDir())
 
 	expectedJson := `{
   "puppet_module": {

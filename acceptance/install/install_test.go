@@ -10,17 +10,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const APP = "pct"
+
 var defaultTemplatePath string
 
 func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePkgPath, _ := filepath.Abs(fmt.Sprintf("../../acceptance/install/testdata/%v.tar.gz", "good-project"))
 	installCmd := fmt.Sprintf("install %v", templatePkgPath)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
 	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0")))
@@ -30,7 +33,7 @@ func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0", "content", "empty.txt"))
 	assert.FileExists(t, filepath.Join(getDefaultTemplatePath(), "gooder", "good-project", "0.1.0", "content", "goodfile.txt.tmpl"))
 
-	stdout, stderr, exitCode = testutils.RunPctCommand("new --list", "")
+	stdout, stderr, exitCode = testutils.RunAppCommand("new --list", "")
 	assert.Regexp(t, "Good\\sProject\\s+\\|\\sgooder\\s+\\|\\sgood-project\\s+\\|\\sproject", stdout)
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
@@ -49,6 +52,7 @@ type templateData struct {
 
 func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
@@ -82,7 +86,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 		installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
 
 		// Exec
-		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 		// Assert
 		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
@@ -97,7 +101,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 		}
 
 		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
-		stdout, stderr, exitCode := testutils.RunPctCommand(listCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(listCmd, "")
 
 		assert.Regexp(t, template.listExpRegex, stdout)
 		assert.Equal(t, "", stderr)
@@ -112,6 +116,7 @@ func Test_PctInstall_InstallsTo_DefinedTemplatePath(t *testing.T) {
 
 func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
@@ -145,7 +150,7 @@ func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
 		installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
 
 		// Exec
-		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 		// Assert
 		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
@@ -160,7 +165,7 @@ func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
 		}
 
 		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
-		stdout, stderr, exitCode := testutils.RunPctCommand(listCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(listCmd, "")
 
 		assert.Regexp(t, template.listExpRegex, stdout)
 		assert.Equal(t, "", stderr)
@@ -175,9 +180,10 @@ func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
 
 func Test_PctInstall_Errors_When_NoTemplatePkgDefined(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand("install", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("install", "")
 
 	// Assert
 	assert.Contains(t, stdout, "Path to template package (tar.gz) should be first argument")
@@ -187,13 +193,14 @@ func Test_PctInstall_Errors_When_NoTemplatePkgDefined(t *testing.T) {
 
 func Test_PctInstall_Errors_When_TemplatePkgNotExist(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePkgPath, _ := filepath.Abs("/path/to/nowhere/good-project.tar.gz")
 	installCmd := fmt.Sprintf("install %v", templatePkgPath)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
 	assert.Contains(t, stdout, fmt.Sprintf("No template package at %v", templatePkgPath))
@@ -203,13 +210,14 @@ func Test_PctInstall_Errors_When_TemplatePkgNotExist(t *testing.T) {
 
 func Test_PctInstall_Errors_When_InvalidGzProvided(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/invalid-gz-project.tar.gz")
 	installCmd := fmt.Sprintf("install %v", templatePkgPath)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
 	assert.Contains(t, stdout, fmt.Sprintf("Could not extract TAR from GZIP (%v)", templatePkgPath))
@@ -219,13 +227,14 @@ func Test_PctInstall_Errors_When_InvalidGzProvided(t *testing.T) {
 
 func Test_PctInstall_Errors_When_InvalidTarProvided(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/invalid-tar-project.tar.gz")
 	installCmd := fmt.Sprintf("install %v", templatePkgPath)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
 	assert.Contains(t, stdout, fmt.Sprintf("Could not UNTAR template (%v)", templatePkgPath))
@@ -235,6 +244,7 @@ func Test_PctInstall_Errors_When_InvalidTarProvided(t *testing.T) {
 
 func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
@@ -242,7 +252,7 @@ func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
 	// Install template
 	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
 	installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// verify the template installed
 	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
@@ -252,7 +262,7 @@ func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
 	// Attempt to reinstall the template
 	templatePkgPath, _ = filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
 	installCmd = fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
-	stdout, stderr, exitCode = testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode = testutils.RunAppCommand(installCmd, "")
 
 	// verify that the template failed to install
 	assert.Contains(t, stdout, "Unable to install in namespace: Template already installed")
@@ -265,6 +275,7 @@ func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
 
 func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
@@ -272,7 +283,7 @@ func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
 	// Install template
 	templatePkgPath, _ := filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
 	installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// verify the template installed
 	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
@@ -282,7 +293,7 @@ func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
 	// Attempt to reinstall the template
 	templatePkgPath, _ = filepath.Abs("../../acceptance/install/testdata/additional-project.tar.gz")
 	installCmd = fmt.Sprintf("install %v --force --templatepath %v", templatePkgPath, templatePath)
-	stdout, stderr, exitCode = testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode = testutils.RunAppCommand(installCmd, "")
 
 	// verify that the template reinstall exited successfully
 	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
@@ -330,6 +341,7 @@ func getDefaultTemplatePath() string {
 
 func Test_PctInstall_WithGitUri_InstallTemplate(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
@@ -359,7 +371,7 @@ func Test_PctInstall_WithGitUri_InstallTemplate(t *testing.T) {
 		installCmd := fmt.Sprintf("install --git-uri %v --templatepath %v", template.gitUri, templatePath)
 
 		// Exec
-		stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 		// Assert
 		assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, template.author, template.name, "0.1.0")))
@@ -374,7 +386,7 @@ func Test_PctInstall_WithGitUri_InstallTemplate(t *testing.T) {
 		}
 
 		listCmd := fmt.Sprintf("new --list --templatepath %v", templatePath)
-		stdout, stderr, exitCode := testutils.RunPctCommand(listCmd, "")
+		stdout, stderr, exitCode := testutils.RunAppCommand(listCmd, "")
 
 		assert.Regexp(t, template.listExpRegex, stdout)
 		assert.Equal(t, "", stderr)
@@ -389,9 +401,10 @@ func Test_PctInstall_WithGitUri_InstallTemplate(t *testing.T) {
 
 func Test_PctInstall_WithGitUri_FailsWithNonExistentUri(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand("install --git-uri https://example.com/fake-git-uri", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("install --git-uri https://example.com/fake-git-uri", "")
 
 	// Assert
 	assert.Contains(t, stdout, "Could not clone git repository:")
@@ -401,9 +414,10 @@ func Test_PctInstall_WithGitUri_FailsWithNonExistentUri(t *testing.T) {
 
 func Test_PctInstall_WithGitUri_FailsWithInvalidUri(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Exec
-	stdout, stderr, exitCode := testutils.RunPctCommand("install --git-uri example.com/invalid-git-uri", "")
+	stdout, stderr, exitCode := testutils.RunAppCommand("install --git-uri example.com/invalid-git-uri", "")
 
 	// Assert
 	assert.Contains(t, stdout, "Could not parse template uri")
@@ -413,13 +427,14 @@ func Test_PctInstall_WithGitUri_FailsWithInvalidUri(t *testing.T) {
 
 func Test_PctInstall_WithGitUri_RemovesHiddenGitDir(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SetAppName(APP)
 
 	// Setup
 	templatePath := testutils.GetTmpDir(t)
 
 	// Install template
 	installCmd := fmt.Sprint("install --git-uri https://github.com/puppetlabs/pct-test-template-01.git --templatepath ", templatePath)
-	stdout, stderr, exitCode := testutils.RunPctCommand(installCmd, "")
+	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Verify the template installed
 	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "test-user", "test-template-1", "0.1.0")))
