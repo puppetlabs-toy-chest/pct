@@ -18,7 +18,8 @@ const (
 )
 
 var (
-	Url string
+	Url          string
+	outputFormat string
 )
 
 type NewsCommandI interface {
@@ -27,12 +28,15 @@ type NewsCommandI interface {
 
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:     "news",
+		Use:     "news <url> [flags]",
 		Short:   "Retrives the xml",
 		Long:    `Retrives the xml from bbc news`,
 		PreRunE: preExecute,
 		RunE:    execute,
 	}
+
+	tmp.Flags().SortFlags = false
+	tmp.Flags().StringVarP(&outputFormat, "format", "f", "table", "the desired format of the output; either json or table.")
 
 	return tmp
 }
@@ -62,6 +66,6 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	pct.News(Url)
+	pct.News(Url, outputFormat)
 	return nil
 }

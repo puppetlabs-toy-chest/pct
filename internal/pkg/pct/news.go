@@ -1,6 +1,8 @@
 package pct
 
 import (
+	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -12,19 +14,16 @@ import (
 
 // The top level structure
 type RSS struct {
-	Item []Item `xml:"channel>item"`
+	Item []Item `xml:"channel>item" json:"news"`
 }
 
 // The structure of the information we wish to retrieve
 type Item struct {
-	Title       string `xml:"title"`
-	Description string `xml:"description"`
-	Link        string `xml:"link"`
-	Guid        string `xml:"guid"`
-	PubDate     string `xml:"pubDate"`
+	Title string `xml:"title" json:"title"`
+	Link  string `xml:"link" json:"link"`
 }
 
-func News(Url string) error {
+func News(Url string, Format string) error {
 	fmt.Printf("Retrieving HTML code of %s ...\n", Url)
 	// Retrieve the html of the page
 	resp, err := http.Get(Url)
@@ -45,6 +44,16 @@ func News(Url string) error {
 	// Unmarshal the xml
 	xml.Unmarshal([]byte(html), &items)
 
+	if Format == "table" {
+		outputAsTable(items)
+	} else if Format == "json" {
+		outputAsJson(items)
+	}
+
+	return nil
+}
+
+func outputAsTable(data RSS) {
 	// Output the retrieved results as part of a table
 	// Set the tables format
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
@@ -55,12 +64,18 @@ func News(Url string) error {
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	// Add each unmarshalled item as a new row
-	for i := 0; i < len(items.Item); i++ {
-		tbl.AddRow(items.Item[i].Title, items.Item[i].Link)
+	for i := 0; i < len(data.Item); i++ {
+		tbl.AddRow(data.Item[i].Title, data.Item[i].Link)
 	}
 
 	// Output the table
 	tbl.Print()
+}
 
-	return nil
+func outputAsJson(data RSS) {
+	jsonData, _ := json.Marshal(data)
+
+	var cleanedJsonData bytes.Buffer
+	json.Indent(&cleanedJsonData, jsonData, "", "    ")
+	fmt.Println(cleanedJsonData.String())
 }
