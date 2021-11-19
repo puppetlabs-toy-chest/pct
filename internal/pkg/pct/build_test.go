@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )

@@ -11,7 +11,7 @@ type PctInstaller struct {
 	ExpectedGitUri      string
 }
 
-func (p *PctInstaller) Install(templatePkg string, targetDir string, force bool) (string, error) {
+func (p *PctInstaller) Install(templatePkg, targetDir string, force bool) (string, error) {
 	if templatePkg != p.ExpectedTemplatePkg {
 		return "", fmt.Errorf("templatePkg (%v) did not match expected value (%v)", templatePkg, p.ExpectedTemplatePkg)
 	}
@@ -37,4 +37,9 @@ func (p *PctInstaller) InstallClone(gitUri, targetDir, tempDir string, force boo
 	}
 
 	return filepath.Clean("/unit/test/path"), nil
+}
+
+func (p *PctInstaller) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
+	// WIP
+	return "", nil
 }

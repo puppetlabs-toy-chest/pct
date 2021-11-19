@@ -1,15 +1,16 @@
 package pct
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
-	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
+	"github.com/puppetlabs/pdkgo/pkg/gzip"
+	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
 
 type BuilderI interface {
@@ -69,14 +70,20 @@ func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath str
 }
 
 func (b *Builder) checkConfig(configFile string) error {
-
 	fileBytes, err := b.AFS.ReadFile(configFile)
 	if err != nil {
 		return err
 	}
 
 	var info PuppetContentTemplateInfo
-	err = yaml.Unmarshal(fileBytes, &info)
+	viper.SetConfigType("yaml")
+
+	err = viper.ReadConfig(bytes.NewBuffer(fileBytes))
+	if err != nil {
+		return err
+	}
+
+	err = viper.Unmarshal(&info)
 	if err != nil {
 		return err
 	}

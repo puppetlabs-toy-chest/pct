@@ -8,8 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/pkg/install"
+	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
@@ -290,10 +291,12 @@ template:
 				},
 			},
 			want: pct.PuppetContentTemplate{
-				Id:      "full-project",
+				ConfigParams: install.ConfigParams{
+					Id:      "full-project",
+					Version: "0.1.0",
+				},
 				Type:    "project",
 				Display: "Full Project",
-				Version: "0.1.0",
 				URL:     "https://github.com/puppetlabs/pct-full-project",
 			},
 			wantErr: false,
@@ -483,11 +486,13 @@ func TestFormatTemplates(t *testing.T) {
 			args: args{
 				tmpls: []pct.PuppetContentTemplate{
 					{
-						Id:      "foo",
-						Author:  "bar",
+						ConfigParams: install.ConfigParams{
+							Id:      "foo",
+							Author:  "bar",
+							Version: "0.1.0",
+						},
 						Type:    "Item",
 						Display: "Foo Item",
-						Version: "0.1.0",
 						URL:     "https://github.com/puppetlabs/pct-good-project",
 					},
 				},
@@ -507,19 +512,23 @@ func TestFormatTemplates(t *testing.T) {
 			args: args{
 				tmpls: []pct.PuppetContentTemplate{
 					{
-						Id:      "foo",
-						Author:  "baz",
+						ConfigParams: install.ConfigParams{
+							Id:      "foo",
+							Author:  "baz",
+							Version: "0.1.0",
+						},
 						Type:    "Item",
 						Display: "Foo Item",
-						Version: "0.1.0",
 						URL:     "https://github.com/puppetlabs/pct-good-project",
 					},
 					{
-						Id:      "bar",
-						Author:  "baz",
+						ConfigParams: install.ConfigParams{
+							Id:      "bar",
+							Author:  "baz",
+							Version: "0.1.0",
+						},
 						Type:    "Item",
 						Display: "Bar Item",
-						Version: "0.1.0",
 						URL:     "https://github.com/puppetlabs/pct-good-project",
 					},
 				},
@@ -536,19 +545,23 @@ func TestFormatTemplates(t *testing.T) {
 			args: args{
 				tmpls: []pct.PuppetContentTemplate{
 					{
-						Id:      "foo",
-						Author:  "baz",
+						ConfigParams: install.ConfigParams{
+							Id:      "foo",
+							Author:  "baz",
+							Version: "0.1.0",
+						},
 						Type:    "Item",
 						Display: "Foo Item",
-						Version: "0.1.0",
 						URL:     "https://github.com/puppetlabs/pct-good-project",
 					},
 					{
-						Id:      "bar",
-						Author:  "baz",
+						ConfigParams: install.ConfigParams{
+							Id:      "bar",
+							Author:  "baz",
+							Version: "0.1.0",
+						},
 						Type:    "Item",
 						Display: "Bar Item",
-						Version: "0.1.0",
 						URL:     "https://github.com/puppetlabs/pct-good-project",
 					},
 				},
@@ -640,19 +653,23 @@ template:
 			},
 			want: []pct.PuppetContentTemplate{
 				{
-					Author:  "some_author",
-					Id:      "first",
+					ConfigParams: install.ConfigParams{
+						Author:  "some_author",
+						Id:      "first",
+						Version: "0.1.0",
+					},
 					Type:    "project",
 					Display: "First Template",
-					Version: "0.1.0",
 					URL:     "https://github.com/some_author/pct-first-template",
 				},
 				{
-					Author:  "some_author",
-					Id:      "second",
+					ConfigParams: install.ConfigParams{
+						Author:  "some_author",
+						Id:      "second",
+						Version: "0.1.0",
+					},
 					Type:    "project",
 					Display: "Second Template",
-					Version: "0.1.0",
 					URL:     "https://github.com/some_author/pct-second-template",
 				},
 			},
@@ -690,11 +707,13 @@ template:
 			},
 			want: []pct.PuppetContentTemplate{
 				{
-					Author:  "some_author",
-					Id:      "first",
+					ConfigParams: install.ConfigParams{
+						Author:  "some_author",
+						Id:      "first",
+						Version: "0.2.0",
+					},
 					Type:    "project",
 					Display: "First Template",
-					Version: "0.2.0",
 					URL:     "https://github.com/some_author/pct-first-template",
 				},
 			},
@@ -733,11 +752,13 @@ template:
 			},
 			want: []pct.PuppetContentTemplate{
 				{
-					Author:  "some_author",
-					Id:      "first",
+					ConfigParams: install.ConfigParams{
+						Author:  "some_author",
+						Id:      "first",
+						Version: "0.1.0",
+					},
 					Type:    "project",
 					Display: "First Template",
-					Version: "0.1.0",
 					URL:     "https://github.com/some_author/pct-first-template",
 				},
 			},
@@ -777,8 +798,8 @@ template:
 // 	type args struct {
 // 		info         pct.DeployInfo
 // 		configFile   string
-// 		templateFile pct.PuppetContentTemplateFileInfo
-// 		tmpl         pct.PuppetContentTemplate
+// 		templateFile pct.pct.PuppetContentTemplateFileInfo
+// 		tmpl         pct.pct.PuppetContentTemplate
 // 	}
 
 // 	tmp := t.TempDir()
@@ -800,14 +821,14 @@ template:
 // 					},
 // 				},
 // 				configFile: "testdata/examples/good-project/pct.yml",
-// 				tmpl: pct.PuppetContentTemplate{
+// 				tmpl: pct.pct.PuppetContentTemplate{
 // 					Type:    "project",
 // 					Display: "Good Project",
 // 					URL:     "https://github.com/puppetlabs/pct-good-project",
 // 					Version: "0.1.0",
 // 					Id:      "good-project",
 // 				},
-// 				templateFile: pct.PuppetContentTemplateFileInfo{
+// 				templateFile: pct.pct.PuppetContentTemplateFileInfo{
 // 					TemplatePath:   "testdata/examples/good-project/content/goodfile.txt.tmpl",
 // 					TargetFilePath: filepath.Join(tmp, "foo.txt"),
 // 					TargetDir:      tmp,
@@ -835,7 +856,7 @@ template:
 // 		info            pct.DeployInfo
 // 		configFile      string
 // 		projectTemplate string
-// 		tmpl            pct.PuppetContentTemplate
+// 		tmpl            pct.pct.PuppetContentTemplate
 // 	}
 // 	cwd, _ := os.Getwd()
 // 	hostName, _ := os.Hostname()
@@ -858,7 +879,7 @@ template:
 // 				},
 // 				configFile:      "testdata/examples/good-project/pct.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.PuppetContentTemplate{},
+// 				tmpl:            pct.pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"user":     u,
@@ -899,7 +920,7 @@ template:
 // 				},
 // 				configFile:      "testdata/examples/good-project/pct.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.PuppetContentTemplate{},
+// 				tmpl:            pct.pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"user":     u,
@@ -939,7 +960,7 @@ template:
 // 				},
 // 				configFile:      "testdata/notthere/notthere/notthere.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.PuppetContentTemplate{},
+// 				tmpl:            pct.pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"pct_name": "good-project",
@@ -974,15 +995,15 @@ template:
 // 	tests := []struct {
 // 		name string
 // 		args args
-// 		want pct.PuppetContentTemplateInfo
+// 		want pct.pct.PuppetContentTemplateInfo
 // 	}{
 // 		{
 // 			name: "returns tmpl struct from good config file",
 // 			args: args{
 // 				configFile: "testdata/examples/good-project/pct-config.yml",
 // 			},
-// 			want: pct.PuppetContentTemplateInfo{
-// 				Template: pct.PuppetContentTemplate{
+// 			want: pct.pct.PuppetContentTemplateInfo{
+// 				Template: pct.pct.PuppetContentTemplate{
 // 					Id:      "good-project",
 // 					Display: "Good Project",
 // 					Type:    "project",
@@ -1003,8 +1024,8 @@ template:
 // 			args: args{
 // 				configFile: "testdata/examples/does-not-exist-project/pct.yml",
 // 			},
-// 			want: pct.PuppetContentTemplateInfo{
-// 				Template: PuppetContentTemplate{},
+// 			want: pct.pct.PuppetContentTemplateInfo{
+// 				Template: pct.PuppetContentTemplate{},
 // 				Defaults: map[string]interface{}{},
 // 			},
 // 		},

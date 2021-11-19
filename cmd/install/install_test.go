@@ -2,12 +2,13 @@ package install_test
 
 import (
 	"bytes"
-	"github.com/spf13/afero"
 	"io/ioutil"
 	"testing"
 
+	"github.com/spf13/afero"
+
 	"github.com/puppetlabs/pdkgo/cmd/install"
-	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
+	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )

@@ -1,4 +1,4 @@
-package pct_test
+package install_test
 
 import (
 	"bytes"
@@ -9,8 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct_install"
+	"github.com/puppetlabs/pdkgo/pkg/install"
+	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
@@ -444,13 +445,14 @@ template:
 				config.Write([]byte(content)) //nolint:errcheck
 			}
 
-			installer := &pct.PctInstaller{
-				Tar:        &mock.Tar{UntarResponse: tt.mockReponses.untar},
-				Gunzip:     &mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
-				AFS:        afs,
-				IOFS:       &afero.IOFS{Fs: fs},
-				HTTPClient: &mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
-				Exec:       &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseCmd: tt.mockExecutions.responseCmd},
+			installer := &install.Installer{
+				Tar:           &mock.Tar{UntarResponse: tt.mockReponses.untar},
+				Gunzip:        &mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
+				AFS:           afs,
+				IOFS:          &afero.IOFS{Fs: fs},
+				HTTPClient:    &mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
+				Exec:          &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseCmd: tt.mockExecutions.responseCmd},
+				InstallConfig: &pct_install.PctInstall{AFS: afs},
 			}
 
 			var err error
