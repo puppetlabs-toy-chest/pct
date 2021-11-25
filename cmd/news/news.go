@@ -66,6 +66,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, args []string) error {
-	pct.News(Url, outputFormat)
+	_ = args
+	_ = pct.News(Url, outputFormat)
 	return nil
 }

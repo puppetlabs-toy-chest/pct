@@ -42,12 +42,15 @@ func News(Url string, Format string) error {
 	var items RSS
 
 	// Unmarshal the xml
-	xml.Unmarshal([]byte(html), &items)
+	err = xml.Unmarshal([]byte(html), &items)
+	if err != nil {
+		return fmt.Errorf("Error ith retrieved yaml")
+	}
 
 	if Format == "table" {
 		outputAsTable(items)
 	} else if Format == "json" {
-		outputAsJson(items)
+		_ = outputAsJson(items)
 	}
 
 	return nil
@@ -72,10 +75,15 @@ func outputAsTable(data RSS) {
 	tbl.Print()
 }
 
-func outputAsJson(data RSS) {
+func outputAsJson(data RSS) error {
 	jsonData, _ := json.Marshal(data)
 
 	var cleanedJsonData bytes.Buffer
-	json.Indent(&cleanedJsonData, jsonData, "", "    ")
+	err := json.Indent(&cleanedJsonData, jsonData, "", "    ")
+	if err != nil {
+		return fmt.Errorf("Error formating Json")
+	}
 	fmt.Println(cleanedJsonData.String())
+
+	return nil
 }
