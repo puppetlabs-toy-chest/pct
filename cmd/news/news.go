@@ -7,7 +7,6 @@ http://feeds.bbci.co.uk/news/technology/rss.xml
 
 import (
 	"fmt"
-	"net/url"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/spf13/cobra"
@@ -19,7 +18,14 @@ const (
 
 var (
 	Url          string
-	outputFormat string
+	OutputFormat string
+
+	Urls = map[string]string{
+		"bbc":        "http://feeds.bbci.co.uk/news/technology/rss.xml",
+		"nasa":       "https://www.nasa.gov/rss/dyn/breaking_news.rss",
+		"nytimes":    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+		"lifehacker": "https://lifehacker.com/rss",
+	}
 )
 
 type NewsCommandI interface {
@@ -29,14 +35,15 @@ type NewsCommandI interface {
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:     "news <url> [flags]",
-		Short:   "Retrives the xml",
-		Long:    `Retrives the xml from bbc news`,
+		Short:   "Retrives the xml from selet websites",
+		Long:    `Retrives the xml from a selection of websites, valid options are 'bbc', 'nasa', 'nytimes' and 'lifehacker'`,
 		PreRunE: preExecute,
 		RunE:    execute,
+		ValidArgs: []string{"bbc", "nasa", "nytimes", "lifehacker"},
 	}
 
 	tmp.Flags().SortFlags = false
-	tmp.Flags().StringVarP(&outputFormat, "format", "f", "table", "the desired format of the output; either json or table.")
+	tmp.Flags().StringVarP(&OutputFormat, "format", "f", "table", "the desired format of the output; either json or table.")
 
 	return tmp
 }
@@ -45,15 +52,14 @@ func CreateCommand() *cobra.Command {
 func preExecute(cmd *cobra.Command, args []string) error {
 	// If no url is given, default to the stored on
 	if len(args) < 1 {
-		Url = default_url
+		Url = Urls["bbc"]
 	}
 
 	// If a url is given valify that it is valid
 	if len(args) == 1 {
-		Url = args[0]
-		_, err := url.ParseRequestURI(Url)
-		if err != nil {
-			return fmt.Errorf("The first argument should be a valid URL")
+		Url = Urls[args[0]]
+		if Url == "" {
+			return fmt.Errorf("The first argument should be a valid URL key")
 		}
 	}
 
@@ -67,6 +73,6 @@ func preExecute(cmd *cobra.Command, args []string) error {
 
 func execute(cmd *cobra.Command, args []string) error {
 	_ = args
-	_ = pct.News(Url, outputFormat)
+	_ = pct.News(Url, OutputFormat)
 	return nil
 }

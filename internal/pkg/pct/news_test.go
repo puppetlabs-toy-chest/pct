@@ -7,20 +7,20 @@ import (
 )
 
 type NewsTest struct {
-	name           string
-	args           newsArgs
-	expected       newsExpected
+	name     string
+	args     newsArgs
+	expected newsExpected
 }
 
 // what goes in
 type newsArgs struct {
-	url 	string
-	format	string
+	url    string
+	format string
 }
 
 // what comes out
 type newsExpected struct {
-	errorMsg 	string
+	errorMsg    string
 	fmt_println string
 }
 
@@ -30,7 +30,7 @@ func TestNews(t *testing.T) {
 		{
 			name: "valid url and table flag",
 			args: newsArgs{
-				url: "http://feeds.bbci.co.uk/news/technology/rss.xml",
+				url:    "http://feeds.bbci.co.uk/news/technology/rss.xml",
 				format: "table",
 			},
 			expected: newsExpected{
