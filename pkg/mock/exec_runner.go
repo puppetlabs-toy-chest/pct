@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"os/exec"
+	"fmt"
 	"reflect"
 )
 
@@ -9,12 +9,20 @@ type Exec struct {
 	ExpectedName string
 	ExpectedArg  []string
 
-	ResponseCmd *exec.Cmd
+	ResponseMsg string
+	ResponseError bool
 }
 
-func (e *Exec) Command(name string, arg ...string) *exec.Cmd {
+func (e *Exec) Command(name string, arg ...string) error {
 	if name == e.ExpectedName && reflect.DeepEqual(arg, e.ExpectedArg) {
-		return e.ResponseCmd
+		return nil
 	}
-	return nil
+	return fmt.Errorf("Unexpected Command %v %v", name, arg)
+}
+
+func (e *Exec) Output() ([]byte, error) {
+	if e.ResponseError {
+		return nil, fmt.Errorf(e.ResponseMsg)
+ 	}
+	return []byte(e.ResponseMsg), nil
 }

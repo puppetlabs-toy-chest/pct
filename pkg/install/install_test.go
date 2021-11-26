@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -53,9 +52,10 @@ type mockReponses struct {
 }
 
 type mockExecutions struct {
-	name        string
-	args        []string
-	responseCmd *exec.Cmd
+	name         string
+	args         []string
+	responseMsg  string
+	responseError bool
 }
 
 func TestInstall(t *testing.T) {
@@ -356,7 +356,8 @@ template:
 			mockExecutions: mockExecutions{
 				name:        "git",
 				args:        []string{"clone", "http://example.com/templates", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("exit", "1"),
+				responseMsg: "not a git repo",
+				responseError: true,
 			},
 		},
 		{
@@ -372,7 +373,7 @@ template:
 			mockExecutions: mockExecutions{
 				name:        "git",
 				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("echo", "test"),
+				responseError: false,
 			},
 			mocks: mocks{
 				dirs: []string{
@@ -400,7 +401,7 @@ template:
 			mockExecutions: mockExecutions{
 				name:        "git",
 				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("echo", "test"),
+				responseError: false,
 			},
 			mocks: mocks{
 				dirs: []string{
@@ -420,7 +421,7 @@ template:
 			mockExecutions: mockExecutions{
 				name:        "git",
 				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("exit,", " 1"),
+				responseError: true,
 			},
 			mocks: mocks{
 				dirs: []string{
@@ -451,7 +452,7 @@ template:
 				AFS:           afs,
 				IOFS:          &afero.IOFS{Fs: fs},
 				HTTPClient:    &mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
-				Exec:          &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseCmd: tt.mockExecutions.responseCmd},
+				Exec:          &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseMsg: tt.mockExecutions.responseMsg, ResponseError: tt.mockExecutions.responseError},
 				InstallConfig: &pct_install.PctInstall{AFS: afs},
 			}
 

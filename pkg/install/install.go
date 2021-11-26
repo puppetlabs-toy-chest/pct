@@ -138,8 +138,12 @@ func (p *Installer) InstallClone(gitUri, targetDir, tempDir string, force bool) 
 
 func (p *Installer) cloneTemplate(gitUri string, tempDir string) (string, error) {
 	clonePath := filepath.Join(tempDir, "temp")
-	command := p.Exec.Command("git", "clone", gitUri, clonePath)
-	output, err := command.Output()
+	err := p.Exec.Command("git", "clone", gitUri, clonePath)
+	if err != nil {
+		return "", err
+	}
+
+	output, err := p.Exec.Output()
 	log.Info().Msgf(string(output))
 	if err != nil {
 		return "", err
