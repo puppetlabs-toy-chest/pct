@@ -12,10 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	default_url = "http://feeds.bbci.co.uk/news/technology/rss.xml"
-)
-
 var (
 	Url          string
 	OutputFormat string
@@ -71,8 +67,7 @@ func preExecute(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func execute(cmd *cobra.Command, args []string) error {
-	_ = args
+func execute(cmd *cobra.Command, _ []string) error {
 	_ = pct.News(Url, OutputFormat)
 	return nil
 }

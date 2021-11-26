@@ -21,7 +21,6 @@ type newsArgs struct {
 // what comes out
 type newsExpected struct {
 	errorMsg    string
-	fmt_println string
 }
 
 func TestNews(t *testing.T) {
@@ -37,11 +36,23 @@ func TestNews(t *testing.T) {
 				errorMsg: "",
 			},
 		},
+		{
+			name: "valid url and json flag",
+			args: newsArgs{
+				url:    "http://feeds.bbci.co.uk/news/technology/rss.xml",
+				format: "json",
+			},
+			expected: newsExpected{
+				errorMsg: "",
+			},
+		},
+
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
+			_ = tt.args
 			if tt.expected.errorMsg != "" && err != nil {
 				assert.Contains(t, err.Error(), tt.expected.errorMsg)
 			} else {
