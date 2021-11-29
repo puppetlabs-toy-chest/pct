@@ -30,11 +30,11 @@ type NewsCommandI interface {
 
 func CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
-		Use:     "news <url> [flags]",
-		Short:   "Retrives the xml from selet websites",
-		Long:    `Retrives the xml from a selection of websites, valid options are 'bbc', 'nasa', 'nytimes' and 'lifehacker'`,
-		PreRunE: preExecute,
-		RunE:    execute,
+		Use:       "news <url> [flags]",
+		Short:     "Retrives the xml from selet websites",
+		Long:      `Retrives the xml from a selection of websites, valid options are 'bbc', 'nasa', 'nytimes' and 'lifehacker'`,
+		PreRunE:   preExecute,
+		RunE:      execute,
 		ValidArgs: []string{"bbc", "nasa", "nytimes", "lifehacker"},
 	}
 
@@ -62,6 +62,11 @@ func preExecute(cmd *cobra.Command, args []string) error {
 	// If more than one input is given then throw an error
 	if len(args) > 1 {
 		return fmt.Errorf("Incorrect number of arguments; only a url can be passed")
+	}
+
+	// If flag is invalid
+	if OutputFormat != "table" && OutputFormat != "json" {
+		return fmt.Errorf("Invalid value for format flag has been given")
 	}
 
 	return nil

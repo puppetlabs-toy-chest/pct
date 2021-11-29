@@ -20,7 +20,7 @@ type newsArgs struct {
 
 // what comes out
 type newsExpected struct {
-	errorMsg    string
+	errorMsg string
 }
 
 func TestNews(t *testing.T) {
@@ -46,7 +46,6 @@ func TestNews(t *testing.T) {
 				errorMsg: "",
 			},
 		},
-
 	}
 
 	for _, tt := range tests {

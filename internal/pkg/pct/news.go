@@ -26,7 +26,7 @@ type Item struct {
 func News(Url string, Format string) error {
 	fmt.Printf("Retrieving HTML code of %s ...\n", Url)
 	// Retrieve the html of the page
-	resp, err := http.Get(Url) //nolint:gosec
+	resp, err := http.Get(Url) //#nosec G107
 	if err != nil {
 		return err
 	}
