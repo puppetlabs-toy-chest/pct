@@ -52,9 +52,9 @@ type mockReponses struct {
 }
 
 type mockExecutions struct {
-	name         string
-	args         []string
-	responseMsg  string
+	name          string
+	args          []string
+	responseMsg   string
 	responseError bool
 }
 
@@ -354,9 +354,9 @@ template:
 				filepath: "",
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "http://example.com/templates", filepath.Join(tempWorkingPath, "temp")},
-				responseMsg: "not a git repo",
+				name:          "git",
+				args:          []string{"clone", "http://example.com/templates", filepath.Join(tempWorkingPath, "temp")},
+				responseMsg:   "not a git repo",
 				responseError: true,
 			},
 		},
@@ -371,8 +371,8 @@ template:
 				filepath: filepath.Join(templatePath, "test-user", "test-template", "0.1.0"),
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
 				responseError: false,
 			},
 			mocks: mocks{
@@ -399,8 +399,8 @@ template:
 				errorMsg: "Invalid config:",
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
 				responseError: false,
 			},
 			mocks: mocks{
@@ -419,8 +419,8 @@ template:
 				errorMsg: "Could not clone git repository:",
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
 				responseError: true,
 			},
 			mocks: mocks{

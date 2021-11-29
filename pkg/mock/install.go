@@ -38,8 +38,3 @@ func (p *PctInstaller) InstallClone(gitUri, targetDir, tempDir string, force boo
 
 	return filepath.Clean("/unit/test/path"), nil
 }
-
-func (p *PctInstaller) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
-	// WIP
-	return "", nil
-}

@@ -63,8 +63,6 @@ func (p *PctInstall) setupTemplateNamespace(targetDir string, info pct.PuppetCon
 
 	// finally move to the full path
 	err = p.AFS.Rename(untarPath, namespacePath)
-	// unable to check for this specific error as windows may instead return `access denied`
-	// if err != nil && os.IsExist(err) {
 	if err != nil {
 		// if a template already exists
 		if !force {

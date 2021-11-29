@@ -9,7 +9,7 @@ type Exec struct {
 	ExpectedName string
 	ExpectedArg  []string
 
-	ResponseMsg string
+	ResponseMsg   string
 	ResponseError bool
 }
 
@@ -23,6 +23,6 @@ func (e *Exec) Command(name string, arg ...string) error {
 func (e *Exec) Output() ([]byte, error) {
 	if e.ResponseError {
 		return nil, fmt.Errorf(e.ResponseMsg)
- 	}
+	}
 	return []byte(e.ResponseMsg), nil
 }

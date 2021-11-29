@@ -798,8 +798,8 @@ template:
 // 	type args struct {
 // 		info         pct.DeployInfo
 // 		configFile   string
-// 		templateFile pct.pct.PuppetContentTemplateFileInfo
-// 		tmpl         pct.pct.PuppetContentTemplate
+// 		templateFile pct.PuppetContentTemplateFileInfo
+// 		tmpl         pct.PuppetContentTemplate
 // 	}
 
 // 	tmp := t.TempDir()
@@ -821,14 +821,14 @@ template:
 // 					},
 // 				},
 // 				configFile: "testdata/examples/good-project/pct.yml",
-// 				tmpl: pct.pct.PuppetContentTemplate{
+// 				tmpl: pct.PuppetContentTemplate{
 // 					Type:    "project",
 // 					Display: "Good Project",
 // 					URL:     "https://github.com/puppetlabs/pct-good-project",
 // 					Version: "0.1.0",
 // 					Id:      "good-project",
 // 				},
-// 				templateFile: pct.pct.PuppetContentTemplateFileInfo{
+// 				templateFile: pct.PuppetContentTemplateFileInfo{
 // 					TemplatePath:   "testdata/examples/good-project/content/goodfile.txt.tmpl",
 // 					TargetFilePath: filepath.Join(tmp, "foo.txt"),
 // 					TargetDir:      tmp,
@@ -856,7 +856,7 @@ template:
 // 		info            pct.DeployInfo
 // 		configFile      string
 // 		projectTemplate string
-// 		tmpl            pct.pct.PuppetContentTemplate
+// 		tmpl            pct.PuppetContentTemplate
 // 	}
 // 	cwd, _ := os.Getwd()
 // 	hostName, _ := os.Hostname()
@@ -879,7 +879,7 @@ template:
 // 				},
 // 				configFile:      "testdata/examples/good-project/pct.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.pct.PuppetContentTemplate{},
+// 				tmpl:            pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"user":     u,
@@ -920,7 +920,7 @@ template:
 // 				},
 // 				configFile:      "testdata/examples/good-project/pct.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.pct.PuppetContentTemplate{},
+// 				tmpl:            pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"user":     u,
@@ -960,7 +960,7 @@ template:
 // 				},
 // 				configFile:      "testdata/notthere/notthere/notthere.yml",
 // 				projectTemplate: "",
-// 				tmpl:            pct.pct.PuppetContentTemplate{},
+// 				tmpl:            pct.PuppetContentTemplate{},
 // 			},
 // 			want: map[string]interface{}{
 // 				"pct_name": "good-project",
@@ -995,15 +995,15 @@ template:
 // 	tests := []struct {
 // 		name string
 // 		args args
-// 		want pct.pct.PuppetContentTemplateInfo
+// 		want pct.PuppetContentTemplateInfo
 // 	}{
 // 		{
 // 			name: "returns tmpl struct from good config file",
 // 			args: args{
 // 				configFile: "testdata/examples/good-project/pct-config.yml",
 // 			},
-// 			want: pct.pct.PuppetContentTemplateInfo{
-// 				Template: pct.pct.PuppetContentTemplate{
+// 			want: pct.PuppetContentTemplateInfo{
+// 				Template: pct.PuppetContentTemplate{
 // 					Id:      "good-project",
 // 					Display: "Good Project",
 // 					Type:    "project",
@@ -1024,7 +1024,7 @@ template:
 // 			args: args{
 // 				configFile: "testdata/examples/does-not-exist-project/pct.yml",
 // 			},
-// 			want: pct.pct.PuppetContentTemplateInfo{
+// 			want: pct.PuppetContentTemplateInfo{
 // 				Template: pct.PuppetContentTemplate{},
 // 				Defaults: map[string]interface{}{},
 // 			},
