@@ -11,50 +11,50 @@ import (
 
 func TestCreateCommand(t *testing.T) {
 	tests := []struct {
-		name    	string
-		args    	[]string
-		out     	string
-		expectErr 	bool
+		name      string
+		args      []string
+		out       string
+		expectErr bool
 	}{
 		{
-			name:    "executes without error",
-			out:     "",
+			name:      "executes without error",
+			out:       "",
 			expectErr: false,
 		},
 		{
-			name:    "executes without error for valid url key",
-			args:    []string{"bbc"},
-			out:     "",
+			name:      "executes without error for valid url key",
+			args:      []string{"bbc"},
+			out:       "",
 			expectErr: false,
 		},
 		{
-			name:    "executes without error for valid url key and format flag table",
-			args:    []string{"bbc", "-f", "table"},
-			out:     "",
+			name:      "executes without error for valid url key and format flag table",
+			args:      []string{"bbc", "-f", "table"},
+			out:       "",
 			expectErr: false,
 		},
 		{
-			name:    "executes without error for valid url key and format flag json",
-			args:    []string{"bbc", "-f", "json"},
-			out:     "",
+			name:      "executes without error for valid url key and format flag json",
+			args:      []string{"bbc", "-f", "json"},
+			out:       "",
 			expectErr: false,
 		},
 		{
-			name:    "executes with error for invalid url key",
-			args:    []string{"bbs"},
-			out:     "Error: The first argument should be a valid URL key\n",
+			name:      "executes with error for invalid url key",
+			args:      []string{"bbs"},
+			out:       "Error: The first argument should be a valid URL key\n",
 			expectErr: true,
 		},
 		{
-			name:    "executes with error for to many arguments",
-			args:    []string{"bbc", "nasa"},
-			out:     "Error: Incorrect number of arguments; only a url can be passed\n",
+			name:      "executes with error for to many arguments",
+			args:      []string{"bbc", "nasa"},
+			out:       "Error: Incorrect number of arguments; only a url can be passed\n",
 			expectErr: true,
 		},
 		{
-			name:    "executes with error for invalid format flag",
-			args:    []string{"-f", "jso"},
-			out:     "Error: Invalid value for format flag has been given\n",
+			name:      "executes with error for invalid format flag",
+			args:      []string{"-f", "jso"},
+			out:       "Error: Invalid value for format flag has been given\n",
 			expectErr: true,
 		},
 	}
@@ -73,6 +73,8 @@ func TestCreateCommand(t *testing.T) {
 				out, _ := ioutil.ReadAll(b)
 				assert.Equal(t, string(out), tt.out)
 			} else {
+				// Unable to test output directly as it is directed entirely through a printf command
+				// 	which does not seem to be aught by the output stream.
 				assert.NoError(t, err)
 				out, _ := ioutil.ReadAll(b)
 				assert.Equal(t, string(out), tt.out)
