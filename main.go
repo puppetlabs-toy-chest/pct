@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/exec_runner"
 
 	"github.com/puppetlabs/pdkgo/cmd/build"
@@ -12,7 +13,6 @@ import (
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct_install"
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/pkg/install"
 	"github.com/puppetlabs/pdkgo/pkg/tar"
@@ -69,7 +69,7 @@ func main() {
 			IOFS:       &iofs,
 			HTTPClient: &http.Client{},
 			Exec:       &exec_runner.Exec{},
-			InstallConfig: &pct_install.PctInstall{
+			ConfigProcessor: &pct_config_processor.PctConfigProcessor{
 				AFS: &afs,
 			},
 		},

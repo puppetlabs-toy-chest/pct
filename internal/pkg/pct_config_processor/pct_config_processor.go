@@ -1,4 +1,4 @@
-package pct_install
+package pct_config_processor
 
 import (
 	"bytes"
@@ -10,11 +10,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type PctInstall struct {
+type PctConfigProcessor struct {
 	AFS *afero.Afero
 }
 
-func (p *PctInstall) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
+func (p *PctConfigProcessor) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
 	// Read config to determine template properties
 	info, err := p.readConfig(filepath.Join(sourceDir, "pct-config.yml"))
 	if err != nil {
@@ -29,7 +29,7 @@ func (p *PctInstall) ProcessConfig(sourceDir, targetDir string, force bool) (str
 	return namespacedPath, nil
 }
 
-func (p *PctInstall) readConfig(configFile string) (info pct.PuppetContentTemplateInfo, err error) {
+func (p *PctConfigProcessor) readConfig(configFile string) (info pct.PuppetContentTemplateInfo, err error) {
 	fileBytes, err := p.AFS.ReadFile(configFile)
 	if err != nil {
 		return info, err
@@ -50,7 +50,7 @@ func (p *PctInstall) readConfig(configFile string) (info pct.PuppetContentTempla
 	return info, err
 }
 
-func (p *PctInstall) setupTemplateNamespace(targetDir string, info pct.PuppetContentTemplateInfo, untarPath string, force bool) (string, error) {
+func (p *PctConfigProcessor) setupTemplateNamespace(targetDir string, info pct.PuppetContentTemplateInfo, untarPath string, force bool) (string, error) {
 	// author/id/version
 	templatePath := filepath.Join(targetDir, info.Template.Author, info.Template.Id)
 

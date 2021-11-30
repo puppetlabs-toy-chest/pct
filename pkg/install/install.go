@@ -30,7 +30,7 @@ type Installer struct {
 	IOFS          *afero.IOFS
 	HTTPClient    httpclient.HTTPClientI
 	Exec          exec_runner.ExecI
-	InstallConfig InstallConfigI
+	ConfigProcessor ConfigProcessorI
 }
 
 type InstallerI interface {
@@ -38,7 +38,7 @@ type InstallerI interface {
 	InstallClone(gitUri, targetDir, tempDir string, force bool) (string, error)
 }
 
-type InstallConfigI interface {
+type ConfigProcessorI interface {
 	ProcessConfig(sourceDir, targetDir string, force bool) (string, error)
 }
 
@@ -79,7 +79,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 	}
 
 	// Process the configuration file and set up namespacedPath and relocate config and content to it
-	namespacedPath, err := p.InstallConfig.ProcessConfig(untarPath, targetDir, force)
+	namespacedPath, err := p.ConfigProcessor.ProcessConfig(untarPath, targetDir, force)
 	if err != nil {
 		return "", fmt.Errorf("Invalid config: %v", err.Error())
 	}
@@ -128,7 +128,7 @@ func (p *Installer) InstallClone(gitUri, targetDir, tempDir string, force bool) 
 		return "", fmt.Errorf("Failed to remove '.git' directory")
 	}
 
-	namespacedPath, err := p.InstallConfig.ProcessConfig(folderPath, targetDir, force)
+	namespacedPath, err := p.ConfigProcessor.ProcessConfig(folderPath, targetDir, force)
 	if err != nil {
 		return "", err
 	}
