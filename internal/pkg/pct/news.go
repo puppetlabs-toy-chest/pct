@@ -6,11 +6,19 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/fatih/color"
+	"github.com/puppetlabs/pdkgo/internal/pkg/httpclient"
 	"github.com/rodaine/table"
 )
+
+type NewsCommand struct {
+	HttpClient httpclient.HTTPClientI
+}
+
+type NewsCommandI interface {
+	News(Url string, Format string) error
+}
 
 // The top level structure
 type RSS struct {
@@ -23,10 +31,10 @@ type Item struct {
 	Link  string `xml:"link" json:"link"`
 }
 
-func News(Url string, Format string) error {
+func (nc *NewsCommand) News(Url string, Format string) error {
 	fmt.Printf("Retrieving HTML code of %s ...\n", Url)
 	// Retrieve the html of the page
-	resp, err := http.Get(Url) //#nosec G107
+	resp, err := nc.HttpClient.Get(Url) //#nosec G107
 	if err != nil {
 		return err
 	}
@@ -48,15 +56,15 @@ func News(Url string, Format string) error {
 	}
 
 	if Format == "table" {
-		outputAsTable(items)
+		nc.outputAsTable(items)
 	} else if Format == "json" {
-		err = outputAsJson(items)
+		err = nc.outputAsJson(items)
 	}
 
 	return err
 }
 
-func outputAsTable(data RSS) {
+func (nc *NewsCommand) outputAsTable(data RSS) {
 	// Output the retrieved results as part of a table
 	// Set the tables format
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
@@ -75,7 +83,7 @@ func outputAsTable(data RSS) {
 	tbl.Print()
 }
 
-func outputAsJson(data RSS) error {
+func (nc *NewsCommand) outputAsJson(data RSS) error {
 	jsonData, _ := json.Marshal(data)
 
 	var cleanedJsonData bytes.Buffer

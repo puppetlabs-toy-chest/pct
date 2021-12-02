@@ -7,6 +7,7 @@ http://feeds.bbci.co.uk/news/technology/rss.xml
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/spf13/cobra"
@@ -73,6 +74,9 @@ func preExecute(cmd *cobra.Command, args []string) error {
 }
 
 func execute(cmd *cobra.Command, _ []string) error {
-	err := pct.News(Url, OutputFormat)
+	nc := pct.NewsCommand{
+		HttpClient: &http.Client{},
+	}
+	err := nc.News(Url, OutputFormat)
 	return err
 }
