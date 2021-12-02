@@ -1,25 +1,36 @@
 package exec_runner
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/rs/zerolog/log"
 )
 
 type ExecI interface {
-	Command(name string, arg ...string) *exec.Cmd
+	Command(name string, arg ...string) error
+	Output() ([]byte, error)
 }
 
-type Exec struct{}
+type Exec struct {
+	cmd *exec.Cmd
+}
 
-func (e *Exec) Command(name string, arg ...string) *exec.Cmd {
-	pathToExecutable := ""
+func (e *Exec) Command(name string, arg ...string) error {
+	var pathToExecutable string
+	var err error
+
 	if runtime.GOOS == "windows" {
-		pathToExecutable, _ = exec.LookPath("cmd.exe")
+		pathToExecutable, err = exec.LookPath("cmd.exe")
 	} else {
-		pathToExecutable, _ = exec.LookPath(name)
+		pathToExecutable, err = exec.LookPath(name)
 	}
+
+	if err != nil {
+		return err
+	}
+
 	correctArgs := buildCommandArgs(name, arg)
 	log.Debug().Msgf("Path to executable: %v", pathToExecutable)
 	log.Debug().Msgf("Command args: %v", correctArgs)
@@ -28,7 +39,12 @@ func (e *Exec) Command(name string, arg ...string) *exec.Cmd {
 		Args: correctArgs,
 		Env:  os.Environ(),
 	}
-	return cmd
+	e.cmd = cmd
+	return nil
+}
+
+func (e *Exec) Output() ([]byte, error) {
+	return e.cmd.Output()
 }
 
 func buildCommandArgs(commandName string, args []string) []string {

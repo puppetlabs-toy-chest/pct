@@ -2,18 +2,20 @@ package main
 
 import (
 	"context"
-	"github.com/puppetlabs/pdkgo/internal/pkg/exec_runner"
 	"net/http"
+
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
+	"github.com/puppetlabs/pdkgo/pkg/exec_runner"
 
 	"github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
-	"github.com/puppetlabs/pdkgo/cmd/install"
+	cmd_install "github.com/puppetlabs/pdkgo/cmd/install"
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
-	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
+	"github.com/puppetlabs/pdkgo/pkg/gzip"
+	"github.com/puppetlabs/pdkgo/pkg/install"
+	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/puppetlabs/pdkgo/pkg/telemetry"
 
 	"github.com/spf13/afero"
@@ -59,14 +61,17 @@ func main() {
 	rootCmd.AddCommand(build.CreateCommand())
 
 	// install
-	installCmd := install.InstallCommand{
-		PctInstaller: &pct.PctInstaller{
+	installCmd := cmd_install.InstallCommand{
+		PctInstaller: &install.Installer{
 			Tar:        &tar.Tar{AFS: &afs},
 			Gunzip:     &gzip.Gunzip{AFS: &afs},
 			AFS:        &afs,
 			IOFS:       &iofs,
 			HTTPClient: &http.Client{},
 			Exec:       &exec_runner.Exec{},
+			ConfigProcessor: &pct_config_processor.PctConfigProcessor{
+				AFS: &afs,
+			},
 		},
 		AFS: &afs,
 	}

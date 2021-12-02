@@ -1,27 +1,27 @@
-package pct_test
+package install_test
 
 import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/mock"
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/pkg/install"
+	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
 
 type InstallTest struct {
-	name           string
-	args           args
-	expected       expected
-	mocks          mocks
-	mockReponses   mockReponses
-	mockExecutions mockExecutions
+	name              string
+	args              args
+	expected          expected
+	mocks             mocks
+	mockReponses      mockReponses
+	mockExecutions    mockExecutions
+	mockInstallConfig mockInstallConfig
 }
 
 // what goes in
@@ -52,9 +52,18 @@ type mockReponses struct {
 }
 
 type mockExecutions struct {
-	name        string
-	args        []string
-	responseCmd *exec.Cmd
+	name          string
+	args          []string
+	responseMsg   string
+	responseError bool
+}
+
+type mockInstallConfig struct {
+	ExpectedSourceDir      string
+	ExpectedTargetDir      string
+	ExpectedForce          bool
+	NamespacedPathResponse string
+	ErrResponse            error
 }
 
 func TestInstall(t *testing.T) {
@@ -109,6 +118,11 @@ func TestInstall(t *testing.T) {
 					},
 				},
 			},
+			mockInstallConfig: mockInstallConfig{
+				ExpectedSourceDir:      filepath.Join(extractionPath, "good-project"),
+				ExpectedTargetDir:      extractionPath,
+				NamespacedPathResponse: filepath.Join(extractionPath, "puppetlabs/good-project/1.0.0"),
+			},
 			mocks: mocks{
 				dirs: []string{
 					templatePath,
@@ -117,12 +131,6 @@ func TestInstall(t *testing.T) {
 				},
 				files: map[string]string{
 					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
-					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
-template:
-  id: good-project
-  author: puppetlabs
-  version: 1.0.0
-`,
 				},
 			},
 		},
@@ -183,13 +191,13 @@ template:
 			},
 		},
 		{
-			name: "If the tarball doesnt contain an valid config",
+			name: "If the tarball doesnt contain a valid config",
 			args: args{
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    extractionPath,
 			},
 			expected: expected{
-				errorMsg: "Invalid config: open " + filepath.FromSlash("path/to/extract/to/good-project/pct-config.yml") + ": file does not exist",
+				errorMsg: "Invalid config:",
 			},
 			mockReponses: mockReponses{
 				untar: []mock.UntarResponse{
@@ -209,6 +217,7 @@ template:
 					},
 				},
 			},
+			mockInstallConfig: mockInstallConfig{ErrResponse: fmt.Errorf("Invalid config:")},
 			mocks: mocks{
 				dirs: []string{
 					templatePath,
@@ -227,7 +236,7 @@ template:
 				targetDir:    extractionPath,
 			},
 			expected: expected{
-				filepath: filepath.Join(extractionPath, "puppetlabs", "good-project", "1.0.0"),
+				errorMsg: "Template already installed",
 			},
 			mockReponses: mockReponses{
 				untar: []mock.UntarResponse{
@@ -247,6 +256,7 @@ template:
 					},
 				},
 			},
+			mockInstallConfig: mockInstallConfig{ErrResponse: fmt.Errorf("Template already installed")},
 			mocks: mocks{
 				dirs: []string{
 					templatePath,
@@ -256,12 +266,6 @@ template:
 				},
 				files: map[string]string{
 					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
-					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
-template:
-  id: good-project
-  author: puppetlabs
-  version: 1.0.0
-`,
 				},
 			},
 		},
@@ -317,21 +321,10 @@ template:
 					},
 				},
 			},
-			mocks: mocks{
-				dirs: []string{
-					templatePath,
-					extractionPath,
-					filepath.Join(extractionPath, "good-project"),
-				},
-				files: map[string]string{
-					filepath.Join(templatePath, "good-project.tar.gz"): string(tarballBytes),
-					filepath.Join(extractionPath, "good-project", "pct-config.yml"): `---
-template:
-  id: good-project
-  author: puppetlabs
-  version: 1.0.0
-`,
-				},
+			mockInstallConfig: mockInstallConfig{
+				ExpectedSourceDir:      filepath.Join(extractionPath, "good-project"),
+				ExpectedTargetDir:      extractionPath,
+				NamespacedPathResponse: filepath.Join(extractionPath, "puppetlabs/good-project/1.0.0"),
 			},
 		},
 		{
@@ -353,9 +346,10 @@ template:
 				filepath: "",
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "http://example.com/templates", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("exit", "1"),
+				name:          "git",
+				args:          []string{"clone", "http://example.com/templates", filepath.Join(tempWorkingPath, "temp")},
+				responseMsg:   "not a git repo",
+				responseError: true,
 			},
 		},
 		{
@@ -365,26 +359,17 @@ template:
 				targetDir: templatePath,
 			},
 			expected: expected{
-				errorMsg: "",
 				filepath: filepath.Join(templatePath, "test-user", "test-template", "0.1.0"),
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("echo", "test"),
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				responseError: false,
 			},
-			mocks: mocks{
-				dirs: []string{
-					filepath.Join(tempWorkingPath, "temp"),
-				},
-				files: map[string]string{
-					filepath.Join(tempWorkingPath, "temp", "pct-config.yml"): `---
-template:
-  id: test-template
-  author: test-user
-  version: 0.1.0
-`,
-				},
+			mockInstallConfig: mockInstallConfig{
+				ExpectedSourceDir:      filepath.Join(tempWorkingPath, "temp"),
+				ExpectedTargetDir:      templatePath,
+				NamespacedPathResponse: filepath.Join(templatePath, "test-user/test-template/0.1.0"),
 			},
 		},
 		{
@@ -396,15 +381,11 @@ template:
 			expected: expected{
 				errorMsg: "Invalid config:",
 			},
+			mockInstallConfig: mockInstallConfig{ErrResponse: fmt.Errorf("Invalid config:")},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("echo", "test"),
-			},
-			mocks: mocks{
-				dirs: []string{
-					filepath.Join(tempWorkingPath, "temp"),
-				},
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				responseError: false,
 			},
 		},
 		{
@@ -417,14 +398,9 @@ template:
 				errorMsg: "Could not clone git repository:",
 			},
 			mockExecutions: mockExecutions{
-				name:        "git",
-				args:        []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
-				responseCmd: exec.Command("exit,", " 1"),
-			},
-			mocks: mocks{
-				dirs: []string{
-					filepath.Join(tempWorkingPath, "temp"),
-				},
+				name:          "git",
+				args:          []string{"clone", "https://github.com/puppetlabs/pct-test-template-01.git", filepath.Join(tempWorkingPath, "temp")},
+				responseError: true,
 			},
 		},
 	}
@@ -444,13 +420,14 @@ template:
 				config.Write([]byte(content)) //nolint:errcheck
 			}
 
-			installer := &pct.PctInstaller{
-				Tar:        &mock.Tar{UntarResponse: tt.mockReponses.untar},
-				Gunzip:     &mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
-				AFS:        afs,
-				IOFS:       &afero.IOFS{Fs: fs},
-				HTTPClient: &mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
-				Exec:       &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseCmd: tt.mockExecutions.responseCmd},
+			installer := &install.Installer{
+				Tar:             &mock.Tar{UntarResponse: tt.mockReponses.untar},
+				Gunzip:          &mock.Gunzip{Fs: fs, GunzipResponse: tt.mockReponses.gunzip},
+				AFS:             afs,
+				IOFS:            &afero.IOFS{Fs: fs},
+				HTTPClient:      &mock.HTTPClient{RequestResponse: tt.mockReponses.get.RequestResponse},
+				Exec:            &mock.Exec{ExpectedName: tt.mockExecutions.name, ExpectedArg: tt.mockExecutions.args, ResponseMsg: tt.mockExecutions.responseMsg, ResponseError: tt.mockExecutions.responseError},
+				ConfigProcessor: &mock.InstallConfig{ExpectedSourceDir: tt.mockInstallConfig.ExpectedSourceDir, ExpectedTargetDir: tt.mockInstallConfig.ExpectedTargetDir, NamespacedPathResponse: tt.mockInstallConfig.NamespacedPathResponse, ExpectedForce: tt.mockInstallConfig.ExpectedForce, ErrResponse: tt.mockInstallConfig.ErrResponse},
 			}
 
 			var err error

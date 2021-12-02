@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/internal/pkg/tar"
+	"github.com/puppetlabs/pdkgo/pkg/gzip"
+	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

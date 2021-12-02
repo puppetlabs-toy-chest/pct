@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
+	"github.com/puppetlabs/pdkgo/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 )

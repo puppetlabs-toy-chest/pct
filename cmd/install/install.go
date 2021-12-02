@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
+	"github.com/puppetlabs/pdkgo/pkg/install"
 	"github.com/puppetlabs/pdkgo/pkg/telemetry"
+	"github.com/puppetlabs/pdkgo/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +17,7 @@ type InstallCommand struct {
 	TemplatePkgPath string
 	InstallPath     string
 	Force           bool
-	PctInstaller    pct.PctInstallerI
+	PctInstaller    install.InstallerI
 	GitUri          string
 	AFS             *afero.Afero
 }

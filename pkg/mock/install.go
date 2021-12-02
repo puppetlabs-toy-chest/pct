@@ -11,7 +11,7 @@ type PctInstaller struct {
 	ExpectedGitUri      string
 }
 
-func (p *PctInstaller) Install(templatePkg string, targetDir string, force bool) (string, error) {
+func (p *PctInstaller) Install(templatePkg, targetDir string, force bool) (string, error) {
 	if templatePkg != p.ExpectedTemplatePkg {
 		return "", fmt.Errorf("templatePkg (%v) did not match expected value (%v)", templatePkg, p.ExpectedTemplatePkg)
 	}

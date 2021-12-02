@@ -22,7 +22,8 @@ import (
 	"github.com/hashicorp/go-version"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olekukonko/tablewriter"
-	"github.com/puppetlabs/pdkgo/internal/pkg/utils"
+	"github.com/puppetlabs/pdkgo/pkg/install"
+	"github.com/puppetlabs/pdkgo/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
@@ -44,12 +45,10 @@ type PuppetContentTemplateInfo struct {
 
 // PuppetContentTemplate houses the actual information about each template
 type PuppetContentTemplate struct {
-	Id      string `mapstructure:"id"`
-	Author  string `mapstructure:"author"`
-	Type    string `mapstructure:"type"`
-	Display string `mapstructure:"display"`
-	Version string `mapstructure:"version"`
-	URL     string `mapstructure:"url"`
+	install.ConfigParams `mapstructure:",squash"`
+	Type                 string `mapstructure:"type"`
+	Display              string `mapstructure:"display"`
+	URL                  string `mapstructure:"url"`
 }
 
 // PuppetContentTemplateFileInfo represents the resolved target path information
