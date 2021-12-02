@@ -15,12 +15,12 @@ import (
 )
 
 type InstallTest struct {
-	name           string
-	args           args
-	expected       expected
-	mocks          mocks
-	mockReponses   mockReponses
-	mockExecutions mockExecutions
+	name              string
+	args              args
+	expected          expected
+	mocks             mocks
+	mockReponses      mockReponses
+	mockExecutions    mockExecutions
 	mockInstallConfig mockInstallConfig
 }
 
@@ -46,9 +46,9 @@ type mocks struct {
 
 // package mock responses
 type mockReponses struct {
-	get           mock.GetResponse
-	untar         []mock.UntarResponse
-	gunzip        []mock.GunzipResponse
+	get    mock.GetResponse
+	untar  []mock.UntarResponse
+	gunzip []mock.GunzipResponse
 }
 
 type mockExecutions struct {
@@ -59,11 +59,11 @@ type mockExecutions struct {
 }
 
 type mockInstallConfig struct {
-	ExpectedSourceDir string
-	ExpectedTargetDir string
-	ExpectedForce bool
+	ExpectedSourceDir      string
+	ExpectedTargetDir      string
+	ExpectedForce          bool
 	NamespacedPathResponse string
-	ErrResponse error
+	ErrResponse            error
 }
 
 func TestInstall(t *testing.T) {
@@ -119,8 +119,8 @@ func TestInstall(t *testing.T) {
 				},
 			},
 			mockInstallConfig: mockInstallConfig{
-				ExpectedSourceDir: filepath.Join(extractionPath, "good-project"),
-				ExpectedTargetDir: extractionPath,
+				ExpectedSourceDir:      filepath.Join(extractionPath, "good-project"),
+				ExpectedTargetDir:      extractionPath,
 				NamespacedPathResponse: filepath.Join(extractionPath, "puppetlabs/good-project/1.0.0"),
 			},
 			mocks: mocks{
@@ -322,8 +322,8 @@ func TestInstall(t *testing.T) {
 				},
 			},
 			mockInstallConfig: mockInstallConfig{
-				ExpectedSourceDir: filepath.Join(extractionPath, "good-project"),
-				ExpectedTargetDir: extractionPath,
+				ExpectedSourceDir:      filepath.Join(extractionPath, "good-project"),
+				ExpectedTargetDir:      extractionPath,
 				NamespacedPathResponse: filepath.Join(extractionPath, "puppetlabs/good-project/1.0.0"),
 			},
 		},
@@ -367,8 +367,8 @@ func TestInstall(t *testing.T) {
 				responseError: false,
 			},
 			mockInstallConfig: mockInstallConfig{
-				ExpectedSourceDir: filepath.Join(tempWorkingPath, "temp"),
-				ExpectedTargetDir: templatePath,
+				ExpectedSourceDir:      filepath.Join(tempWorkingPath, "temp"),
+				ExpectedTargetDir:      templatePath,
 				NamespacedPathResponse: filepath.Join(templatePath, "test-user/test-template/0.1.0"),
 			},
 		},

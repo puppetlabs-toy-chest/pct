@@ -3,9 +3,9 @@ package mock
 import "fmt"
 
 type InstallConfig struct {
-	ExpectedSourceDir string
-	ExpectedTargetDir string
-	ExpectedForce bool
+	ExpectedSourceDir      string
+	ExpectedTargetDir      string
+	ExpectedForce          bool
 	NamespacedPathResponse string
 
 	ErrResponse error
@@ -20,7 +20,7 @@ func (ic *InstallConfig) ProcessConfig(sourceDir, targetDir string, force bool) 
 		return "", fmt.Errorf("sourceDir (%v) did not match expected value (%v)", sourceDir, ic.ExpectedSourceDir)
 	}
 
-	if targetDir != ic.ExpectedTargetDir{
+	if targetDir != ic.ExpectedTargetDir {
 		return "", fmt.Errorf("targetDir (%v) did not match expected value (%v)", targetDir, ic.ExpectedTargetDir)
 	}
 

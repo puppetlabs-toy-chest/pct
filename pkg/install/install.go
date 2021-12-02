@@ -24,12 +24,12 @@ type ConfigParams struct {
 }
 
 type Installer struct {
-	Tar           tar.TarI
-	Gunzip        gzip.GunzipI
-	AFS           *afero.Afero
-	IOFS          *afero.IOFS
-	HTTPClient    httpclient.HTTPClientI
-	Exec          exec_runner.ExecI
+	Tar             tar.TarI
+	Gunzip          gzip.GunzipI
+	AFS             *afero.Afero
+	IOFS            *afero.IOFS
+	HTTPClient      httpclient.HTTPClientI
+	Exec            exec_runner.ExecI
 	ConfigProcessor ConfigProcessorI
 }
 
@@ -143,8 +143,7 @@ func (p *Installer) cloneTemplate(gitUri string, tempDir string) (string, error)
 		return "", err
 	}
 
-	output, err := p.Exec.Output()
-	log.Info().Msgf(string(output))
+	_, err = p.Exec.Output()
 	if err != nil {
 		return "", err
 	}
