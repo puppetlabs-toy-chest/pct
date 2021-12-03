@@ -63,11 +63,7 @@ func CreateCommand() *cobra.Command {
 
 	tmp.Flags().StringVar(&format, "format", "table", "display output in table or json format")
 	err = tmp.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		if len(args) != 0 {
-			return nil, cobra.ShellCompDirectiveNoFileComp
-		}
-		var formats = []string{"table", "json"}
-		return utils.Find(formats, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+		return []string{"table", "json"}, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
 	cobra.CheckErr(err)
 
