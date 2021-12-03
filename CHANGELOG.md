@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [(GH-285)](https://github.com/puppetlabs/pdkgo/issues/285) Ensure running PCT without arguments does not fail unexpectedly.
 - [(GH-287)](https://github.com/puppetlabs/pdkgo/issues/287) Ensure a misconfigured telemetry binary fails early and cleanly.
+- [(GH-312)](https://github.com/puppetlabs/pdkgo/issues/312) Ensure that the format flag correctly autocompletes valid format options.
 
 ## [0.5.0]
 ### Added
