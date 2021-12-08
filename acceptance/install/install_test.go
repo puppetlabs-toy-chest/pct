@@ -203,7 +203,7 @@ func Test_PctInstall_Errors_When_TemplatePkgNotExist(t *testing.T) {
 	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
-	assert.Contains(t, stdout, fmt.Sprintf("No template package at %v", templatePkgPath))
+	assert.Contains(t, stdout, fmt.Sprintf("No package at %v", templatePkgPath))
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }
@@ -237,7 +237,7 @@ func Test_PctInstall_Errors_When_InvalidTarProvided(t *testing.T) {
 	stdout, stderr, exitCode := testutils.RunAppCommand(installCmd, "")
 
 	// Assert
-	assert.Contains(t, stdout, fmt.Sprintf("Could not UNTAR template (%v)", templatePkgPath))
+	assert.Contains(t, stdout, fmt.Sprintf("Could not UNTAR package (%v)", templatePkgPath))
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }
@@ -309,7 +309,7 @@ func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
 func removeInstalledTemplate(templatePath string) {
 	_, err := os.Stat(templatePath)
 	if err != nil {
-		panic(fmt.Sprintf("removeInstalledTemplate(): Could not determine if template path (%v) exists: %v", templatePath, err))
+		panic(fmt.Sprintf("removeInstalledTemplate(): Could not determine if Package path (%v) exists: %v", templatePath, err))
 	}
 
 	os.RemoveAll(templatePath)
@@ -420,7 +420,7 @@ func Test_PctInstall_WithGitUri_FailsWithInvalidUri(t *testing.T) {
 	stdout, stderr, exitCode := testutils.RunAppCommand("install --git-uri example.com/invalid-git-uri", "")
 
 	// Assert
-	assert.Contains(t, stdout, "Could not parse template uri")
+	assert.Contains(t, stdout, "Could not parse package uri")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }

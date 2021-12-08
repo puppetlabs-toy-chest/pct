@@ -82,13 +82,13 @@ func TestInstall(t *testing.T) {
 
 	tests := []InstallTest{
 		{
-			name: "if it the file does not exist",
+			name: "if the file does not exist",
 			args: args{
 				templatePath: filepath.Join(templatePath, "good-project.tar.gz"),
 				targetDir:    templatePath,
 			},
 			expected: expected{
-				errorMsg: fmt.Sprintf("No template package at %v", filepath.Join(templatePath, "good-project.tar.gz")),
+				errorMsg: fmt.Sprintf("No package at %v", filepath.Join(templatePath, "good-project.tar.gz")),
 			},
 		},
 		{
@@ -236,7 +236,7 @@ func TestInstall(t *testing.T) {
 				targetDir:    extractionPath,
 			},
 			expected: expected{
-				errorMsg: "Template already installed",
+				errorMsg: "Package already installed",
 			},
 			mockReponses: mockReponses{
 				untar: []mock.UntarResponse{
@@ -256,7 +256,7 @@ func TestInstall(t *testing.T) {
 					},
 				},
 			},
-			mockInstallConfig: mockInstallConfig{ErrResponse: fmt.Errorf("Template already installed")},
+			mockInstallConfig: mockInstallConfig{ErrResponse: fmt.Errorf("Package already installed")},
 			mocks: mocks{
 				dirs: []string{
 					templatePath,
@@ -289,7 +289,7 @@ func TestInstall(t *testing.T) {
 			},
 		},
 		{
-			name: "should download and extract a remote tar.gz to a template folder",
+			name: "should download and extract a remote tar.gz to a package folder",
 			args: args{
 				templatePath: fmt.Sprintf("%s/%s", remoteTemplatPath, "good-project.tar.gz"),
 				targetDir:    extractionPath,
@@ -333,7 +333,7 @@ func TestInstall(t *testing.T) {
 				gitUri: "invalid-uri",
 			},
 			expected: expected{
-				errorMsg: "Could not parse template uri",
+				errorMsg: "Could not parse package uri",
 			},
 		},
 		{
