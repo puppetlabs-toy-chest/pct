@@ -53,7 +53,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 	}
 
 	if _, err := p.AFS.Stat(templatePkg); os.IsNotExist(err) {
-		return "", fmt.Errorf("No template package at %v", templatePkg)
+		return "", fmt.Errorf("No package at %v", templatePkg)
 	}
 
 	// create a temporary Directory to extract the tar.gz to
@@ -63,7 +63,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 		log.Debug().Msgf("Failed to remove temp dir: %v", err)
 	}()
 	if err != nil {
-		return "", fmt.Errorf("Could not create tempdir to gunzip template: %v", err)
+		return "", fmt.Errorf("Could not create tempdir to gunzip package: %v", err)
 	}
 
 	// gunzip the tar.gz to created tempdir
@@ -75,7 +75,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 	// untar the above archive to the temp dir
 	untarPath, err := p.Tar.Untar(tarfile, tempDir)
 	if err != nil {
-		return "", fmt.Errorf("Could not UNTAR template (%v): %v", templatePkg, err)
+		return "", fmt.Errorf("Could not UNTAR package (%v): %v", templatePkg, err)
 	}
 
 	// Process the configuration file and set up namespacedPath and relocate config and content to it
@@ -90,7 +90,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 func (p *Installer) processDownload(templatePkg *string) error {
 	u, err := url.ParseRequestURI(*templatePkg)
 	if err != nil {
-		return fmt.Errorf("Could not parse template url %s: %v", *templatePkg, err)
+		return fmt.Errorf("Could not parse package url %s: %v", *templatePkg, err)
 	}
 	// Create a temporary Directory to download the tar.gz to
 	tempDownloadDir, err := p.AFS.TempDir("", "")
@@ -99,12 +99,12 @@ func (p *Installer) processDownload(templatePkg *string) error {
 		log.Debug().Msgf("Failed to remove temp dir: %v", err)
 	}()
 	if err != nil {
-		return fmt.Errorf("Could not create tempdir to download template: %v", err)
+		return fmt.Errorf("Could not create tempdir to download package: %v", err)
 	}
 	// Download template and assign location to templatePkg
 	*templatePkg, err = p.downloadTemplate(u, tempDownloadDir)
 	if err != nil {
-		return fmt.Errorf("Could not effectively download template: %v", err)
+		return fmt.Errorf("Could not effectively download package: %v", err)
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func (p *Installer) InstallClone(gitUri, targetDir, tempDir string, force bool) 
 	// Validate git URI
 	_, err := url.ParseRequestURI(gitUri)
 	if err != nil {
-		return "", fmt.Errorf("Could not parse template uri %s: %v", gitUri, err)
+		return "", fmt.Errorf("Could not parse package uri %s: %v", gitUri, err)
 	}
 
 	// Clone git repository to temp folder
