@@ -25,6 +25,12 @@ func SkipAcceptanceTest(t *testing.T) {
 	}
 }
 
+func SkipTestInNonCIEnv(t *testing.T) {
+	if _, ci := os.LookupEnv("CI"); !ci {
+		t.Skip("Skipping test execution in non-CI environment")
+	}
+}
+
 // Run Command takes a command to execute and the directory in which to execute the command.
 // if wd is and empty string it will default to the current working directory
 func RunCommand(cmdString string, wd string) (stdout string, stderr string, exitCode int) {
