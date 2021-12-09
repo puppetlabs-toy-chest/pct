@@ -16,6 +16,7 @@ var defaultTemplatePath string
 
 func Test_PctInstall_InstallsTo_DefaultTemplatePath(t *testing.T) {
 	testutils.SkipAcceptanceTest(t)
+	testutils.SkipTestInNonCIEnv(t) // We cannot exec this in a local Dev environment
 	testutils.SetAppName(APP)
 
 	// Setup

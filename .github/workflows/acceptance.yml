@@ -6,6 +6,7 @@ on:
 
 env:
   go_version: 1.16
+  CI: true
 
 jobs:
   build:
