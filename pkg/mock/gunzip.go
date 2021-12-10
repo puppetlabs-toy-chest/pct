@@ -32,10 +32,11 @@ func (g *Gunzip) Gunzip(source, target string) (string, error) {
 	// this code extracts a tar.gz, producing a tar witin target
 	// using the mock fs, ensure that this exists
 	// unless we want to test that NOT EXIST condition
+	/* #nosec */
 	if !g.GunzipResponse[g.gunzipCalled].Fail {
 		afs := &afero.Afero{Fs: g.Fs}
 		tar := strings.TrimSuffix(filepath.Join(target, filepath.Base(source)), ".gz")
-		afs.Create(tar) // nolint:errcheck  // #nosec // this result is not used in a secure application
+		afs.Create(tar) // nolint:errcheck  // this result is not used in a secure application
 	}
 
 	path := g.GunzipResponse[g.gunzipCalled].FilePath
