@@ -30,7 +30,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        . .\tools\install.ps1; Install-Pct
+        . .\scripts\install.ps1; Install-Pct
     - name: Validate install (Windows)
       if: runner.os == 'Windows'
       run: |
@@ -47,7 +47,7 @@ jobs:
         }
     - name: Install PCT (Unix)
       if: runner.os != 'Windows'
-      run: ./tools/install.sh
+      run: ./scripts/install.sh
     - name: Validate install (Unix)
       if: runner.os != 'Windows'
       run: $HOME/.puppetlabs/pct/pct --version | grep "pct $(git tag | tail -n 1)"
