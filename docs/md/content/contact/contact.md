@@ -1,6 +1,9 @@
 ---
 title: "Contact DevX about PCT"
 description: "Contact us about a feature request or a problem report regarding PCT."
+category: concept
+tags:
+  - meta
 ---
 
 ## Requesting a feature

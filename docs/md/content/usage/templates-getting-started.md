@@ -1,10 +1,12 @@
 ---
 title: "Getting Started With Templates"
 description: "Learn how to get starting using templates."
+category: narrative
+tags:
+  - templates
+  - usage
 weight: 10
 ---
-
-## Getting Started with Templates
 
 The `$INSTALLATION_ROOT/templates` directory will be subsequently referred to as the **Default Template Location**.
 
@@ -26,23 +28,22 @@ pct new --list
 
 Example output:
 
-```bash
-           DISPLAYNAME          |   AUTHOR   |          NAME           |  TYPE
---------------------------------+------------+-------------------------+------
-                                |            |                         |
-  Bolt Plan                     | puppetlabs | bolt-plan               | item
-  Bolt Project                  | puppetlabs | bolt-project            | project
-  Bolt PowerShell Task          | puppetlabs | bolt-pwsh-task          | item
-  Bolt YAML Plan                | puppetlabs | bolt-yaml-plan          | item
-  Puppet Module Managed Gemfile | puppetlabs | git-attributes          | item
-  Puppet Class                  | puppetlabs | puppet-class            | item
-  Puppet Content Template       | puppetlabs | puppet-content-template | project
-  Puppet Defined Type           | puppetlabs | puppet-defined-type     | item
-  Puppet Fact                   | puppetlabs | puppet-fact             | item
-  Puppet Module                 | puppetlabs | puppet-module           | project
-  Puppet Resource API Provider  | puppetlabs | rsapi-provider          | item
-  Puppet Resource API Transport | puppetlabs | puppet-transport        | item
-```
+<!-- This breaks glamour for some reason -->
+
+    DISPLAYNAME                   | AUTHOR     | NAME                    | TYPE
+    ──────────────────────────────┼────────────┼─────────────────────────┼─────────
+    Bolt Plan                     | puppetlabs | bolt-plan               | item
+    Bolt Project                  | puppetlabs | bolt-project            | project
+    Bolt PowerShell Task          | puppetlabs | bolt-pwsh-task          | item
+    Bolt YAML Plan                | puppetlabs | bolt-yaml-plan          | item
+    Puppet Module Managed Gemfile | puppetlabs | git-attributes          | item
+    Puppet Class                  | puppetlabs | puppet-class            | item
+    Puppet Content Template       | puppetlabs | puppet-content-template | project
+    Puppet Defined Type           | puppetlabs | puppet-defined-type     | item
+    Puppet Fact                   | puppetlabs | puppet-fact             | item
+    Puppet Module                 | puppetlabs | puppet-module           | project
+    Puppet Resource API Provider  | puppetlabs | rsapi-provider          | item
+    Puppet Resource API Transport | puppetlabs | puppet-transport        | item
 
 Using the available templates above, its time to generate some content.
 
@@ -66,9 +67,9 @@ To override this behavour use the `--output` or `-o` flag.
 pct new <author>/<template> --output /path/to/your/project
 ```
 
-{{% alert color="light" %}}
-Not all templates require a `name`. If a template doesn't require one, providing a value to the `--name` parameter will have no effect on the generated content.
-{{% /alert %}}
+> **Note:**
+> Not all templates require a `name`.
+> If a template doesn't require one, providing a value to the `--name` parameter will have no effect on the generated content.
 
 ### Example workflows
 

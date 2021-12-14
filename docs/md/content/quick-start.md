@@ -1,10 +1,12 @@
 ---
 title: "Quick Start Guide"
 description: "Quick start guide to using PCT."
+category: narrative
+tags:
+  - fundamentals
+  - quickstart
 weight: 20
 ---
-
-## Quick Start Guide
 
 This quick start guide will show you how to:
 

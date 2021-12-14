@@ -1,9 +1,11 @@
 ---
 title: "Sharing Templates"
 description: "Learn how to share PCT templates."
+category: narrative
+tags:
+  - templates
+  - usage
 ---
-
-## Sharing Templates
 
 After you've written your own template you may wish to share it with other members of your team or the wider Puppet community. Work is underway to improve this initial functionality.
 
