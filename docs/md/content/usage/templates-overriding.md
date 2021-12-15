@@ -1,16 +1,17 @@
 ---
 title: "Overriding Template Defaults"
 description: "Learn how to override default template values."
+category: narrative
+tags:
+  - templates
+  - usage
 ---
-
-## Overriding Template Defaults
 
 Perhaps you use a template often and find that you set the same values over and over?
 As a template user, you can choose to override the default values specified by a template author.
 
-{{% alert color="light" %}}
-To view the default parameters for a template run `pct new --info <TEMPLATE_ID>`.
-{{% /alert %}}
+> **Note:**
+> To view the default parameters for a template run `pct new --info <TEMPLATE_ID>`.
 
 To override these defaults you need to create a `pct.yml` containing the template id along with the values you wish to override.
 
@@ -28,15 +29,14 @@ another_template:
   key: "value"
 ```
 
+You don't need to override everything.
+For example:
 
-{{% alert color="light" %}}
-You don't need to override everything
-
-``` yaml
+```yaml
 example_template:
-isPuppet: false
+  isPuppet: false
 ```
-{{% /alert %}}
+
 ### User level configuration
 
 Placing a `pct.yml` within `$HOME/.pdk/` allows you to create global overrides. Everytime you generate content from a template the configuration will be used.

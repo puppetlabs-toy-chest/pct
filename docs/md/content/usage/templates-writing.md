@@ -1,10 +1,12 @@
 ---
 title: "Writing Templates"
 description: "Learn how to write PCT templates."
+category: narrative
+tags:
+  - templates
+  - usage
 weight: 20
 ---
-
-## Writing Templates
 
 ### Structure
 
@@ -26,9 +28,8 @@ The `content` directory contains the files and folders required to produce the `
 
 To mark a file as a template, use the `.tmpl` extension. Templated files can also use the global variable of `{{pct_name}}` to access the input from the `--name` cli argument.
 
-{{% alert color="light" %}}
-Folders within the `content` directory can also use the `{{pct_name}}` variable
-{{% /alert %}}
+> **Note:**
+> Folders within the `content` directory can also use the `{{pct_name}}` variable.
 
 Example template file names:
 
@@ -37,9 +38,8 @@ myConfig.json.tmpl
 {{pct_name}}_spec.rb
 ```
 
-{{% alert color="light" %}}
-One, all or none of the files can be templated.
-{{% /alert %}}
+> **Note:**
+> One, all or none of the files can be templated.
 
 #### pct-config.yml
 
@@ -58,9 +58,9 @@ template:
 <template parameters>
 ```
 
-{{% alert color="light" %}}
-Template `id` and `author` must not contain spaces or special characters. We recommend using a hyphen to break up the identifier.
-{{% /alert %}}
+> **Note:**
+> Template `id` and `author` must not contain spaces or special characters.
+> We recommend using a hyphen to break up the identifier.
 
 Example pct-config.yml:
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
+	"github.com/puppetlabs/pdkgo/cmd/explain"
 	cmd_install "github.com/puppetlabs/pdkgo/cmd/install"
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
@@ -79,6 +80,9 @@ func main() {
 
 	// new
 	rootCmd.AddCommand(new.CreateCommand())
+
+	// explain
+	rootCmd.AddCommand(explain.CreateCommand())
 
 	// initialize
 	cobra.OnInitialize(root.InitLogger, root.InitConfig)
