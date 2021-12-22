@@ -29,6 +29,9 @@ func SkipAcceptanceTest(t *testing.T) {
 // if wd is and empty string it will default to the current working directory
 func RunCommand(cmdString string, wd string) (stdout string, stderr string, exitCode int) {
 	cmds := strings.Split(cmdString, " ")
+
+	cmds = toolArgsAsSingleArg(cmds) // Remove when GH-52 is resolved
+
 	cmd := exec.Command(cmds[0], cmds[1:]...) // #nosec // used only for testing
 	if wd != "" {
 		cmd.Dir = wd
@@ -83,4 +86,30 @@ func GetTmpDir(t *testing.T) string {
 	}
 
 	return tmpDir
+}
+
+// Remove when GH-52 is resolved
+// This function assumes that '--toolArgs' is the final argument passed to the app
+func toolArgsAsSingleArg(cmds []string) []string {
+	toolArgsFragmentIndex := 0
+	var reassembled strings.Builder
+
+	for i, arg := range cmds {
+		if strings.HasPrefix(arg, "--toolArgs=") {
+			toolArgsFragmentIndex = i
+		}
+		if toolArgsFragmentIndex > 0 {
+			reassembled.WriteString(fmt.Sprintf("%s ", arg))
+		}
+	}
+
+	if toolArgsFragmentIndex > 0 {
+		var cmdAndArgs []string
+		cmdAndArgs = append(cmdAndArgs, cmds[0])
+		cmdAndArgs = append(cmdAndArgs, cmds[1:toolArgsFragmentIndex]...)
+		cmdAndArgs = append(cmdAndArgs, reassembled.String())
+		return cmdAndArgs
+	}
+
+	return cmds
 }
