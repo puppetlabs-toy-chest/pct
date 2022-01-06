@@ -10,7 +10,7 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gernest/front v0.0.0-20210301115436-8a0b0a782d0a
 	github.com/go-logr/logr v1.2.2 // indirect
-	github.com/hashicorp/go-version v1.3.0
+	github.com/hashicorp/go-version v1.4.0
 	github.com/json-iterator/go v1.1.12
 	github.com/microcosm-cc/bluemonday v1.0.16 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
