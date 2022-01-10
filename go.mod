@@ -2,8 +2,6 @@ module github.com/puppetlabs/pdkgo
 
 go 1.16
 
-replace github.com/puppetlabs/pdkgo/docs/md => ./docs/md
-
 require (
 	github.com/alecthomas/chroma v0.9.4 // indirect
 	github.com/charmbracelet/glamour v0.3.0
@@ -17,7 +15,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.9.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/puppetlabs/pdkgo/docs/md v0.0.0-00010101000000-000000000000
+	github.com/puppetlabs/pdkgo/docs/md v0.0.0-20211222164114-ec8a1116e97a
 	github.com/rs/zerolog v1.26.0
 	github.com/spf13/afero v1.6.0
 	github.com/spf13/cobra v1.3.0
