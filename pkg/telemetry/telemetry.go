@@ -5,6 +5,7 @@ package telemetry
 
 import (
 	"context"
+	"os"
 	"runtime"
 	"strings"
 
@@ -86,6 +87,11 @@ func Start(ctx context.Context, honeycomb_api_key string, honeycomb_dataset stri
 	AddStringSpanAttribute(span, "uuid", machineUUID)
 	AddStringSpanAttribute(span, "osinfo/os", runtime.GOOS)
 	AddStringSpanAttribute(span, "osinfo/arch", runtime.GOARCH)
+	runningInCi := os.Getenv("CI")
+	if runningInCi == "" {
+		runningInCi = "false"
+	}
+	AddStringSpanAttribute(span, "ci", strings.ToLower(runningInCi))
 
 	return ctx, tp, span
 }
