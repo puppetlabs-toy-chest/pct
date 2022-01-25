@@ -3,7 +3,7 @@ module github.com/puppetlabs/pdkgo
 go 1.16
 
 require (
-	github.com/charmbracelet/glamour v0.4.0
+	github.com/charmbracelet/glamour v0.5.0
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gernest/front v0.0.0-20210301115436-8a0b0a782d0a
 	github.com/go-logr/logr v1.2.2 // indirect
