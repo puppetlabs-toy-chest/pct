@@ -29,3 +29,7 @@ func (ic *InstallConfig) ProcessConfig(sourceDir, targetDir string, force bool) 
 	}
 	return ic.NamespacedPathResponse, nil
 }
+
+func (ic *InstallConfig) CheckConfig(configFile string) error {
+	return nil
+}
