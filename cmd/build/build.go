@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/rs/zerolog/log"
@@ -33,9 +34,10 @@ func CreateCommand() *cobra.Command {
 
 	fs := afero.NewOsFs() // configure afero to use real filesystem
 	builder = &pct.Builder{
-		Tar:  &tar.Tar{AFS: &afero.Afero{Fs: fs}},
-		Gzip: &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
-		AFS:  &afero.Afero{Fs: fs},
+		Tar:             &tar.Tar{AFS: &afero.Afero{Fs: fs}},
+		Gzip:            &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
+		AFS:             &afero.Afero{Fs: fs},
+		ConfigProcessor: &pct_config_processor.PctConfigProcessor{AFS: &afero.Afero{Fs: fs}},
 	}
 
 	return tmp

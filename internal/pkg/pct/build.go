@@ -1,16 +1,15 @@
 package pct
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/puppetlabs/pdkgo/pkg/config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 type BuilderI interface {
@@ -18,9 +17,10 @@ type BuilderI interface {
 }
 
 type Builder struct {
-	Tar  tar.TarI
-	Gzip gzip.GzipI
-	AFS  *afero.Afero
+	Tar             tar.TarI
+	Gzip            gzip.GzipI
+	AFS             *afero.Afero
+	ConfigProcessor config_processor.ConfigProcessorI
 }
 
 func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath string, err error) {
@@ -34,7 +34,7 @@ func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath str
 		return "", fmt.Errorf("No 'pct-config.yml' found in %v", templatePath)
 	}
 
-	err = b.checkConfig(filepath.Join(templatePath, "pct-config.yml"))
+	err = b.ConfigProcessor.CheckConfig(filepath.Join(templatePath, "pct-config.yml"))
 	if err != nil {
 		return "", fmt.Errorf("Invalid config: %v", err.Error())
 	}
@@ -67,43 +67,4 @@ func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath str
 	}
 
 	return gzipArchiveFilePath, nil
-}
-
-func (b *Builder) checkConfig(configFile string) error {
-	fileBytes, err := b.AFS.ReadFile(configFile)
-	if err != nil {
-		return err
-	}
-
-	var info PuppetContentTemplateInfo
-	viper.SetConfigType("yaml")
-
-	err = viper.ReadConfig(bytes.NewBuffer(fileBytes))
-	if err != nil {
-		return err
-	}
-
-	err = viper.Unmarshal(&info)
-	if err != nil {
-		return err
-	}
-
-	msg := "The following attributes are missing in pct-config.yml:\n"
-	orig := msg
-	// These parts are essential for build and deployment.
-
-	if info.Template.Id == "" {
-		msg = msg + "  * id\n"
-	}
-	if info.Template.Author == "" {
-		msg = msg + "  * author\n"
-	}
-	if info.Template.Version == "" {
-		msg = msg + "  * version\n"
-	}
-	if msg != orig {
-		return fmt.Errorf(msg)
-	}
-
-	return nil
 }

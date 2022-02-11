@@ -1,10 +1,12 @@
 package pct_test
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -18,6 +20,7 @@ func TestBuild(t *testing.T) {
 	}
 
 	var mockTemplateDir = "/path/to/my/cool-template"
+	var mockConfigFilePath = filepath.Clean(filepath.Join(mockTemplateDir, "pct-config.yml"))
 
 	tests := []struct {
 		name                    string
@@ -160,7 +163,7 @@ template:
   version: 1.0.0
 `,
 			},
-			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * id\n",
+			expectedErr: fmt.Sprintf("Invalid config: The following attributes are missing in %s:\n  * id\n", mockConfigFilePath),
 			mockTarErr:  false,
 		},
 		{
@@ -180,7 +183,7 @@ template:
   version: 1.0.0
 `,
 			},
-			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * author\n",
+			expectedErr: fmt.Sprintf("Invalid config: The following attributes are missing in %s:\n  * author\n", mockConfigFilePath),
 			mockTarErr:  false,
 		},
 		{
@@ -200,7 +203,7 @@ template:
   author: puppetlabs
 `,
 			},
-			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * version\n",
+			expectedErr: fmt.Sprintf("Invalid config: The following attributes are missing in %s:\n  * version\n", mockConfigFilePath),
 			mockTarErr:  false,
 		},
 		{
@@ -219,7 +222,7 @@ template:
   foo: bar
 `,
 			},
-			expectedErr: "Invalid config: The following attributes are missing in pct-config.yml:\n  * id\n  * author\n  * version\n",
+			expectedErr: fmt.Sprintf("Invalid config: The following attributes are missing in %s:\n  * id\n  * author\n  * version\n", mockConfigFilePath),
 			mockTarErr:  false,
 		},
 	}
@@ -242,6 +245,7 @@ template:
 				&mock.Tar{ReturnedPath: tt.tarFile, ErrResponse: tt.mockTarErr},
 				&mock.Gzip{ReturnedPath: tt.gzipFile, ErrResponse: tt.mockGzipErr},
 				afs,
+				&pct_config_processor.PctConfigProcessor{AFS: afs},
 			}
 
 			gotGzipArchiveFilePath, err := p.Build(tt.args.templatePath, tt.args.targetDir)
