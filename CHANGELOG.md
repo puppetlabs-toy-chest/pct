@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [(GH-342)](https://github.com/puppetlabs/pdkgo/issues/342) The `build` package as a genericized public package for turning packages with a config file and content folder into `tar.gz` files.
+
+### Changed
+
+- [(GH-342)](https://github.com/puppetlabs/pdkgo/issues/342) Improved the messaging for `build` failures to point to the full path of the config being processed.
+
 ### Fixed
 
 - [(GH-285)](https://github.com/puppetlabs/pdkgo/issues/285) Ensure running PCT without arguments does not fail unexpectedly.

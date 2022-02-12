@@ -1,12 +1,12 @@
-package pct_test
+package build_test
 
 import (
 	"fmt"
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
+	"github.com/puppetlabs/pdkgo/pkg/build"
 	"github.com/puppetlabs/pdkgo/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -241,7 +241,7 @@ template:
 				config.Write([]byte(content)) //nolint:errcheck
 			}
 
-			p := &pct.Builder{
+			p := &build.Builder{
 				&mock.Tar{ReturnedPath: tt.tarFile, ErrResponse: tt.mockTarErr},
 				&mock.Gzip{ReturnedPath: tt.gzipFile, ErrResponse: tt.mockGzipErr},
 				afs,

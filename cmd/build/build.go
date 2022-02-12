@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
+	"github.com/puppetlabs/pdkgo/pkg/build"
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/pkg/tar"
 	"github.com/rs/zerolog/log"
@@ -17,7 +17,7 @@ import (
 var (
 	sourceDir string
 	targetDir string
-	builder   *pct.Builder
+	builder   *build.Builder
 )
 
 func CreateCommand() *cobra.Command {
@@ -33,7 +33,7 @@ func CreateCommand() *cobra.Command {
 	tmp.Flags().StringVar(&targetDir, "targetdir", "", "The target directory where you want the packaged template to be output to")
 
 	fs := afero.NewOsFs() // configure afero to use real filesystem
-	builder = &pct.Builder{
+	builder = &build.Builder{
 		Tar:             &tar.Tar{AFS: &afero.Afero{Fs: fs}},
 		Gzip:            &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
 		AFS:             &afero.Afero{Fs: fs},
