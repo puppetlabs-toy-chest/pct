@@ -38,6 +38,7 @@ func CreateCommand() *cobra.Command {
 		Gzip:            &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
 		AFS:             &afero.Afero{Fs: fs},
 		ConfigProcessor: &pct_config_processor.PctConfigProcessor{AFS: &afero.Afero{Fs: fs}},
+		ConfigFile:      "pct-config.yml",
 	}
 
 	return tmp

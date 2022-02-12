@@ -246,6 +246,7 @@ template:
 				&mock.Gzip{ReturnedPath: tt.gzipFile, ErrResponse: tt.mockGzipErr},
 				afs,
 				&pct_config_processor.PctConfigProcessor{AFS: afs},
+				"pct-config.yml",
 			}
 
 			gotGzipArchiveFilePath, err := p.Build(tt.args.templatePath, tt.args.targetDir)

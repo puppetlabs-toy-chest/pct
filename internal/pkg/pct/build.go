@@ -21,6 +21,7 @@ type Builder struct {
 	Gzip            gzip.GzipI
 	AFS             *afero.Afero
 	ConfigProcessor config_processor.ConfigProcessorI
+	ConfigFile      string
 }
 
 func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath string, err error) {
@@ -29,12 +30,12 @@ func (b *Builder) Build(templatePath, targetDir string) (gzipArchiveFilePath str
 		return "", fmt.Errorf("No template directory at %v", templatePath)
 	}
 
-	// Check if pct-config.yml exists
-	if _, err := b.AFS.Stat(filepath.Join(templatePath, "pct-config.yml")); os.IsNotExist(err) {
-		return "", fmt.Errorf("No 'pct-config.yml' found in %v", templatePath)
+	// Check if config file exists
+	if _, err := b.AFS.Stat(filepath.Join(templatePath, b.ConfigFile)); os.IsNotExist(err) {
+		return "", fmt.Errorf("No '%v' found in %v", b.ConfigFile, templatePath)
 	}
 
-	err = b.ConfigProcessor.CheckConfig(filepath.Join(templatePath, "pct-config.yml"))
+	err = b.ConfigProcessor.CheckConfig(filepath.Join(templatePath, b.ConfigFile))
 	if err != nil {
 		return "", fmt.Errorf("Invalid config: %v", err.Error())
 	}
