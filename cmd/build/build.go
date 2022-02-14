@@ -5,68 +5,63 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/pkg/gzip"
-	"github.com/puppetlabs/pdkgo/pkg/tar"
+	"github.com/puppetlabs/pdkgo/pkg/build"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
-var (
-	sourceDir string
-	targetDir string
-	builder   *pct.Builder
-)
+type BuildCommand struct {
+	SourceDir   string
+	TargetDir   string
+	ProjectType string
+	Builder     build.BuilderI
+}
 
-func CreateCommand() *cobra.Command {
+type BuildCommandI interface {
+	CreateCommand() *cobra.Command
+}
+
+func (bc *BuildCommand) CreateCommand() *cobra.Command {
 	tmp := &cobra.Command{
 		Use:     "build [flags]",
-		Short:   "Builds a package from the template",
-		Long:    `Builds a package from the template. Assumes the current working directory is the template you wish to package`,
-		PreRunE: preExecute,
-		RunE:    execute,
+		Short:   fmt.Sprintf("Builds a package from the %s project", bc.ProjectType),
+		Long:    fmt.Sprintf("Builds a package from the %s project. Assumes the current working directory is the template you wish to package", bc.ProjectType),
+		PreRunE: bc.preExecute,
+		RunE:    bc.execute,
 	}
 
-	tmp.Flags().StringVar(&sourceDir, "sourcedir", "", "The template directory you wish to package up")
-	tmp.Flags().StringVar(&targetDir, "targetdir", "", "The target directory where you want the packaged template to be output to")
-
-	fs := afero.NewOsFs() // configure afero to use real filesystem
-	builder = &pct.Builder{
-		Tar:  &tar.Tar{AFS: &afero.Afero{Fs: fs}},
-		Gzip: &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
-		AFS:  &afero.Afero{Fs: fs},
-	}
+	tmp.Flags().StringVar(&bc.SourceDir, "sourcedir", "", fmt.Sprintf("The %s project directory you wish to package up", bc.ProjectType))
+	tmp.Flags().StringVar(&bc.TargetDir, "targetdir", "", fmt.Sprintf("The target directory where you want the packaged %s project to be output to", bc.ProjectType))
 
 	return tmp
 }
 
-func preExecute(cmd *cobra.Command, args []string) error {
+func (bc *BuildCommand) preExecute(cmd *cobra.Command, args []string) error {
 
 	wd, err := os.Getwd()
 	log.Trace().Msgf("WD: %v", wd)
 
-	if (sourceDir == "" || targetDir == "") && err != nil {
+	if (bc.SourceDir == "" || bc.TargetDir == "") && err != nil {
 		return err
 	}
 
-	if sourceDir == "" {
-		sourceDir = wd
+	if bc.SourceDir == "" {
+		bc.SourceDir = wd
 	}
 
-	if targetDir == "" {
-		targetDir = filepath.Join(wd, "pkg")
+	if bc.TargetDir == "" {
+		bc.TargetDir = filepath.Join(wd, "pkg")
 	}
 
 	return nil
 }
 
-func execute(cmd *cobra.Command, args []string) error {
-	gzipArchiveFilePath, err := builder.Build(sourceDir, targetDir)
+func (bc *BuildCommand) execute(cmd *cobra.Command, args []string) error {
+	gzipArchiveFilePath, err := bc.Builder.Build(bc.SourceDir, bc.TargetDir)
 
 	if err != nil {
-		return fmt.Errorf("`sourcedir` is not a valid template: %s", err.Error())
+		return fmt.Errorf("`sourcedir` is not a valid %s project: %s", bc.ProjectType, err.Error())
 	}
-	log.Info().Msgf("Template output to %v", gzipArchiveFilePath)
+	log.Info().Msgf("Packaged %s output to %v", bc.ProjectType, gzipArchiveFilePath)
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/puppetlabs/pdkgo/pkg/config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/exec_runner"
 
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
@@ -30,16 +31,12 @@ type Installer struct {
 	IOFS            *afero.IOFS
 	HTTPClient      httpclient.HTTPClientI
 	Exec            exec_runner.ExecI
-	ConfigProcessor ConfigProcessorI
+	ConfigProcessor config_processor.ConfigProcessorI
 }
 
 type InstallerI interface {
 	Install(templatePkg, targetDir string, force bool) (string, error)
 	InstallClone(gitUri, targetDir, tempDir string, force bool) (string, error)
-}
-
-type ConfigProcessorI interface {
-	ProcessConfig(sourceDir, targetDir string, force bool) (string, error)
 }
 
 func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, error) {

@@ -7,13 +7,14 @@ import (
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
 	"github.com/puppetlabs/pdkgo/pkg/exec_runner"
 
-	"github.com/puppetlabs/pdkgo/cmd/build"
+	cmd_build "github.com/puppetlabs/pdkgo/cmd/build"
 	"github.com/puppetlabs/pdkgo/cmd/completion"
 	"github.com/puppetlabs/pdkgo/cmd/explain"
 	cmd_install "github.com/puppetlabs/pdkgo/cmd/install"
 	"github.com/puppetlabs/pdkgo/cmd/new"
 	"github.com/puppetlabs/pdkgo/cmd/root"
 	appver "github.com/puppetlabs/pdkgo/cmd/version"
+	"github.com/puppetlabs/pdkgo/pkg/build"
 	"github.com/puppetlabs/pdkgo/pkg/gzip"
 	"github.com/puppetlabs/pdkgo/pkg/install"
 	"github.com/puppetlabs/pdkgo/pkg/tar"
@@ -59,7 +60,17 @@ func main() {
 	iofs := afero.IOFS{Fs: fs}
 
 	// build
-	rootCmd.AddCommand(build.CreateCommand())
+	buildCmd := cmd_build.BuildCommand{
+		ProjectType: "template",
+		Builder: &build.Builder{
+			Tar:             &tar.Tar{AFS: &afero.Afero{Fs: fs}},
+			Gzip:            &gzip.Gzip{AFS: &afero.Afero{Fs: fs}},
+			AFS:             &afero.Afero{Fs: fs},
+			ConfigProcessor: &pct_config_processor.PctConfigProcessor{AFS: &afero.Afero{Fs: fs}},
+			ConfigFile:      "pct-config.yml",
+		},
+	}
+	rootCmd.AddCommand(buildCmd.CreateCommand())
 
 	// install
 	installCmd := cmd_install.InstallCommand{

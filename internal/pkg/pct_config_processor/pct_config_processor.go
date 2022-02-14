@@ -29,6 +29,32 @@ func (p *PctConfigProcessor) ProcessConfig(sourceDir, targetDir string, force bo
 	return namespacedPath, nil
 }
 
+func (p *PctConfigProcessor) CheckConfig(configFile string) error {
+	info, err := p.readConfig(configFile)
+	if err != nil {
+		return err
+	}
+
+	msg := fmt.Sprintf("The following attributes are missing in %s:\n", configFile)
+	orig := msg
+	// These parts are essential for build and deployment.
+
+	if info.Template.Id == "" {
+		msg = msg + "  * id\n"
+	}
+	if info.Template.Author == "" {
+		msg = msg + "  * author\n"
+	}
+	if info.Template.Version == "" {
+		msg = msg + "  * version\n"
+	}
+	if msg != orig {
+		return fmt.Errorf(msg)
+	}
+
+	return nil
+}
+
 func (p *PctConfigProcessor) readConfig(configFile string) (info pct.PuppetContentTemplateInfo, err error) {
 	fileBytes, err := p.AFS.ReadFile(configFile)
 	if err != nil {
