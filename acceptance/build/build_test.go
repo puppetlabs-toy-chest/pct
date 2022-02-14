@@ -26,7 +26,7 @@ func Test_PctBuild_Outputs_TarGz(t *testing.T) {
 
 	expectedOutputFilePath := filepath.Join(wd, fmt.Sprintf("%v.tar.gz", templateName))
 
-	assert.Contains(t, stdout, fmt.Sprintf("Template output to %v", expectedOutputFilePath))
+	assert.Contains(t, stdout, fmt.Sprintf("Packaged template output to %v", expectedOutputFilePath))
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 	assert.FileExists(t, expectedOutputFilePath)
@@ -47,7 +47,7 @@ func Test_PctBuild_With_NoTargetDir_Outputs_TarGz(t *testing.T) {
 
 	expectedOutputFilePath := filepath.Join(wd, "pkg", fmt.Sprintf("%v.tar.gz", templateName))
 
-	assert.Contains(t, stdout, fmt.Sprintf("Template output to %v", expectedOutputFilePath))
+	assert.Contains(t, stdout, fmt.Sprintf("Packaged template output to %v", expectedOutputFilePath))
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 	assert.FileExists(t, expectedOutputFilePath)
@@ -65,7 +65,7 @@ func Test_PctBuild_With_EmptySourceDir_Errors(t *testing.T) {
 	cmd := fmt.Sprintf("build --sourcedir %v", templateDir)
 	stdout, stderr, exitCode := testutils.RunAppCommand(cmd, "")
 
-	assert.Contains(t, stdout, fmt.Sprintf("No template directory at %v", templateDir))
+	assert.Contains(t, stdout, fmt.Sprintf("No project directory at %v", templateDir))
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 }
