@@ -18,7 +18,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.opentelemetry.io/otel v1.4.1
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.4.0
-	go.opentelemetry.io/otel/sdk v1.4.0
+	go.opentelemetry.io/otel/sdk v1.4.1
 	go.opentelemetry.io/otel/trace v1.4.1
 	google.golang.org/grpc v1.44.0
 	gopkg.in/yaml.v2 v2.4.0
