@@ -1,35 +1,36 @@
 package mock
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/puppetlabs/pdkgo/pkg/config_processor"
+)
 
 type InstallConfig struct {
-	ExpectedSourceDir      string
-	ExpectedTargetDir      string
-	ExpectedForce          bool
-	NamespacedPathResponse string
-
-	ErrResponse error
+	ExpectedConfigFile string
+	Metadata           config_processor.ConfigMetadata
+	ErrResponse        error
 }
 
-func (ic *InstallConfig) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
+func (ic *InstallConfig) GetConfigMetadata(configFile string) (metadata config_processor.ConfigMetadata, err error) {
 	if ic.ErrResponse != nil {
-		return "", ic.ErrResponse
+		return metadata, ic.ErrResponse
 	}
 
-	if sourceDir != ic.ExpectedSourceDir {
-		return "", fmt.Errorf("sourceDir (%v) did not match expected value (%v)", sourceDir, ic.ExpectedSourceDir)
+	if ic.ExpectedConfigFile != configFile {
+		return ic.Metadata, fmt.Errorf("configFile (%v) did not match expected value (%v)", configFile, ic.ExpectedConfigFile)
 	}
 
-	if targetDir != ic.ExpectedTargetDir {
-		return "", fmt.Errorf("targetDir (%v) did not match expected value (%v)", targetDir, ic.ExpectedTargetDir)
-	}
-
-	if force != ic.ExpectedForce {
-		return "", fmt.Errorf("force (%v) did not match expected value (%v)", force, ic.ExpectedForce)
-	}
-	return ic.NamespacedPathResponse, nil
+	return ic.Metadata, nil
 }
 
 func (ic *InstallConfig) CheckConfig(configFile string) error {
-	return nil
+	if ic.ErrResponse != nil {
+		return ic.ErrResponse
+	}
+
+	if ic.ExpectedConfigFile != configFile {
+		return fmt.Errorf("configFile (%v) did not match expected value (%v)", configFile, ic.ExpectedConfigFile)
+	}
+
+	return ic.ErrResponse
 }
