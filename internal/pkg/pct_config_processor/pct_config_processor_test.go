@@ -1,7 +1,11 @@
 package pct_config_processor_test
 
 import (
+	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/pkg/config_processor"
+	"github.com/puppetlabs/pdkgo/pkg/install"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"testing"
 
@@ -9,98 +13,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
-
-type ProcessConfigTest struct {
-	name     string
-	args     args
-	expected expected
-	mocks    mocks
-}
-
-type args struct {
-	targetDir string
-	sourceDir string
-	force     bool
-}
-
-type expected struct {
-	errorMsg       string
-	namespacedPath string
-}
-
-type mocks struct {
-	dirs  []string
-	files map[string]string
-}
-
-func TestProcessConfig(t *testing.T) {
-	configDir := "path/to/config"
-
-	tests := []ProcessConfigTest{
-		{
-			name:     "Config file is present and is correctly constructed",
-			args:     args{targetDir: "templates", sourceDir: configDir, force: false},
-			expected: expected{errorMsg: "", namespacedPath: filepath.Join("templates", "test-user/test-template/0.1.0")},
-			mocks: mocks{
-				dirs: []string{"templates"},
-				files: map[string]string{
-					filepath.Join(configDir, "pct-config.yml"): `---
-template:
-  id: test-template
-  author: test-user
-  version: 0.1.0
-`,
-				},
-			},
-		},
-		{
-			name:     "Config file does not exist",
-			args:     args{targetDir: "templates", sourceDir: configDir, force: false},
-			expected: expected{errorMsg: "Invalid config: "},
-		},
-		{
-			name:     "Config files exists but has invalid yaml",
-			args:     args{targetDir: "templates", sourceDir: configDir, force: false},
-			expected: expected{errorMsg: "Invalid config: "},
-			mocks: mocks{
-				dirs: []string{"templates"},
-				files: map[string]string{
-					filepath.Join(configDir, "pct-config.yml"): `---
-		template: id: test-template author: test-user version: 0.1.0
-		`,
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			fs := afero.NewMemMapFs()
-			afs := &afero.Afero{Fs: fs}
-
-			for _, path := range tt.mocks.dirs {
-				afs.Mkdir(path, 0750) //nolint:gosec,errcheck // this result is not used in a secure application
-			}
-
-			for file, content := range tt.mocks.files {
-				config, _ := afs.Create(file) //nolint:gosec,errcheck // this result is not used in a secure application
-				config.Write([]byte(content)) //nolint:errcheck
-			}
-
-			configProcessor := pct_config_processor.PctConfigProcessor{AFS: afs}
-
-			returnedPath, err := configProcessor.ProcessConfig(tt.args.sourceDir, tt.args.targetDir, tt.args.force)
-
-			if tt.expected.errorMsg != "" && err != nil {
-				assert.Contains(t, err.Error(), tt.expected.errorMsg)
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tt.expected.namespacedPath, returnedPath)
-		})
-	}
-
-}
 
 type CheckConfigTest struct {
 	name           string
@@ -218,6 +130,171 @@ foo: bar
 				assert.Regexp(t, regexp.MustCompile(tt.errorMsg), err.Error())
 			} else {
 				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestPctConfigProcessor_GetConfigMetadata(t *testing.T) {
+	type args struct {
+		configFile string
+	}
+	configParentPath := "path/to/extract/to/"
+
+	tests := []struct {
+		name           string
+		args           args
+		wantMetadata   config_processor.ConfigMetadata
+		wantErr        bool
+		templateConfig string // Leave blank for config file not to be created
+	}{
+		{
+			name: "Successfully gets config metadata",
+			args: args{
+				configFile: filepath.Join(configParentPath, "pct-config.yml"),
+			},
+			wantMetadata: config_processor.ConfigMetadata{Author: "test-user", Id: "full-project", Version: "0.1.0"},
+			templateConfig: `---
+template:
+  id: full-project
+  author: test-user
+  version: 0.1.0
+`,
+		},
+		{
+			name: "Missing vital metadata from pct-config.yml (id omitted)",
+			args: args{
+				configFile: filepath.Join(configParentPath, "pct-config.yml"),
+			},
+			wantErr:      true,
+			wantMetadata: config_processor.ConfigMetadata{},
+			templateConfig: `---
+template:
+  author: test-user
+  version: 0.1.0
+`,
+		},
+		{
+			name: "Malformed pct-config (extra indentation)",
+			args: args{
+				configFile: filepath.Join(configParentPath, "pct-config.yml"),
+			},
+			wantErr:      true,
+			wantMetadata: config_processor.ConfigMetadata{},
+			templateConfig: `---
+	template:
+		id: full-project
+  	author: test-user
+  	version: 0.1.0
+`, // Contains an erroneous extra indent
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Instantiate afs
+			fs := afero.NewMemMapFs()
+			afs := &afero.Afero{Fs: fs}
+			p := &pct_config_processor.PctConfigProcessor{
+				AFS: afs,
+			}
+
+			// Create all useful directories
+			afs.MkdirAll(configParentPath, 0750) //nolint:gosec,errcheck
+			if tt.templateConfig != "" {
+				config, _ := afs.Create(tt.args.configFile)
+				config.Write([]byte(tt.templateConfig)) //nolint:errcheck
+			}
+
+			gotMetadata, err := p.GetConfigMetadata(tt.args.configFile)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetConfigMetadata() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotMetadata, tt.wantMetadata) {
+				t.Errorf("GetConfigMetadata() gotMetadata = %v, want %v", gotMetadata, tt.wantMetadata)
+			}
+		})
+	}
+}
+
+func TestPctConfigProcessor_ReadConfig(t *testing.T) {
+	type fields struct {
+		AFS *afero.Afero
+	}
+	type args struct {
+		configFile string
+	}
+	configParentPath := "path/to/extract/to/"
+
+	tests := []struct {
+		name           string
+		fields         fields
+		args           args
+		wantInfo       pct.PuppetContentTemplateInfo
+		wantErr        bool
+		templateConfig string
+	}{
+		{
+			name: "Successfully read file and return filled struct",
+			wantInfo: pct.PuppetContentTemplateInfo{
+				Template: pct.PuppetContentTemplate{
+					ConfigParams: install.ConfigParams{
+						Id:      "full-project",
+						Author:  "test-user",
+						Version: "0.1.0",
+					},
+					Type:    "class",
+					Display: "Full Project",
+					URL:     "github.com/puppetlabs/pdkgo",
+				},
+			},
+			templateConfig: `---
+template:
+  id: full-project
+  author: test-user
+  version: 0.1.0
+  type: class
+  display: Full Project
+  url: github.com/puppetlabs/pdkgo
+`,
+		},
+		{
+			name:    "Returns an error because of the malformed template config",
+			wantErr: true,
+			templateConfig: `---
+	template:
+		id: full-project
+		author: test-user
+		version: 0.1.0
+		type: class
+		display: Full Project
+		url: github.com/puppetlabs/pdkgo
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Instantiate afs
+			fs := afero.NewMemMapFs()
+			afs := &afero.Afero{Fs: fs}
+			p := &pct_config_processor.PctConfigProcessor{
+				AFS: afs,
+			}
+
+			// Create all useful directories
+			afs.MkdirAll(configParentPath, 0750) //nolint:gosec,errcheck
+			if tt.templateConfig != "" {
+				config, _ := afs.Create(tt.args.configFile)
+				config.Write([]byte(tt.templateConfig)) //nolint:errcheck
+			}
+
+			gotInfo, err := p.ReadConfig(tt.args.configFile)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReadConfig() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotInfo, tt.wantInfo) {
+				t.Errorf("ReadConfig() gotInfo = %v, want %v", gotInfo, tt.wantInfo)
 			}
 		})
 	}
