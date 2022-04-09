@@ -1,6 +1,12 @@
 package config_processor
 
 type ConfigProcessorI interface {
-	ProcessConfig(sourceDir, targetDir string, force bool) (string, error)
+	GetConfigMetadata(configFile string) (metadata ConfigMetadata, err error)
 	CheckConfig(configFile string) error
+}
+
+type ConfigMetadata struct {
+	Id      string
+	Author  string
+	Version string
 }

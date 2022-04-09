@@ -84,6 +84,7 @@ func main() {
 			ConfigProcessor: &pct_config_processor.PctConfigProcessor{
 				AFS: &afs,
 			},
+			ConfigFileName: "pct-config.yml",
 		},
 		AFS: &afs,
 	}

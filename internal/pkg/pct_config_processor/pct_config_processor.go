@@ -3,9 +3,9 @@ package pct_config_processor
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 
 	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
+	"github.com/puppetlabs/pdkgo/pkg/config_processor"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
@@ -14,23 +14,27 @@ type PctConfigProcessor struct {
 	AFS *afero.Afero
 }
 
-func (p *PctConfigProcessor) ProcessConfig(sourceDir, targetDir string, force bool) (string, error) {
-	// Read config to determine template properties
-	info, err := p.readConfig(filepath.Join(sourceDir, "pct-config.yml"))
+func (p *PctConfigProcessor) GetConfigMetadata(configFile string) (metadata config_processor.ConfigMetadata, err error) {
+	configInfo, err := p.ReadConfig(configFile)
 	if err != nil {
-		return "", fmt.Errorf("Invalid config: %v", err.Error())
+		return metadata, err
 	}
 
-	// Create namespaced directory and move contents of temp folder to it
-	namespacedPath, err := p.setupTemplateNamespace(targetDir, info, sourceDir, force)
+	err = p.CheckConfig(configFile)
 	if err != nil {
-		return "", fmt.Errorf("Unable to install in namespace: %v", err.Error())
+		return metadata, err
 	}
-	return namespacedPath, nil
+
+	metadata = config_processor.ConfigMetadata{
+		Author:  configInfo.Template.Author,
+		Id:      configInfo.Template.Id,
+		Version: configInfo.Template.Version,
+	}
+	return metadata, nil
 }
 
 func (p *PctConfigProcessor) CheckConfig(configFile string) error {
-	info, err := p.readConfig(configFile)
+	info, err := p.ReadConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -55,7 +59,7 @@ func (p *PctConfigProcessor) CheckConfig(configFile string) error {
 	return nil
 }
 
-func (p *PctConfigProcessor) readConfig(configFile string) (info pct.PuppetContentTemplateInfo, err error) {
+func (p *PctConfigProcessor) ReadConfig(configFile string) (info pct.PuppetContentTemplateInfo, err error) {
 	fileBytes, err := p.AFS.ReadFile(configFile)
 	if err != nil {
 		return info, err
@@ -74,39 +78,4 @@ func (p *PctConfigProcessor) readConfig(configFile string) (info pct.PuppetConte
 	}
 
 	return info, err
-}
-
-func (p *PctConfigProcessor) setupTemplateNamespace(targetDir string, info pct.PuppetContentTemplateInfo, untarPath string, force bool) (string, error) {
-	// author/id/version
-	templatePath := filepath.Join(targetDir, info.Template.Author, info.Template.Id)
-
-	err := p.AFS.MkdirAll(templatePath, 0750)
-	if err != nil {
-		return "", err
-	}
-
-	namespacePath := filepath.Join(targetDir, info.Template.Author, info.Template.Id, info.Template.Version)
-
-	// finally move to the full path
-	err = p.AFS.Rename(untarPath, namespacePath)
-	if err != nil {
-		// if a template already exists
-		if !force {
-			// error unless forced
-			return "", fmt.Errorf("Template already installed (%s)", namespacePath)
-		} else {
-			// remove the exiting template
-			err = p.AFS.RemoveAll(namespacePath)
-			if err != nil {
-				return "", fmt.Errorf("Unable to overwrite existing template: %v", err)
-			}
-			// perform the move again
-			err = p.AFS.Rename(untarPath, namespacePath)
-			if err != nil {
-				return "", fmt.Errorf("Unable to force install: %v", err)
-			}
-		}
-	}
-
-	return namespacePath, err
 }

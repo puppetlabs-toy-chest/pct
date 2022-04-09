@@ -32,6 +32,7 @@ type Installer struct {
 	HTTPClient      httpclient.HTTPClientI
 	Exec            exec_runner.ExecI
 	ConfigProcessor config_processor.ConfigProcessorI
+	ConfigFileName  string
 }
 
 type InstallerI interface {
@@ -56,8 +57,10 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 	// create a temporary Directory to extract the tar.gz to
 	tempDir, err := p.AFS.TempDir("", "")
 	defer func() {
-		err := p.AFS.Remove(tempDir)
-		log.Debug().Msgf("Failed to remove temp dir: %v", err)
+		err := p.AFS.RemoveAll(tempDir)
+		if err != nil {
+			log.Debug().Msgf("Failed to remove temp dir: %v", err)
+		}
 	}()
 	if err != nil {
 		return "", fmt.Errorf("Could not create tempdir to gunzip package: %v", err)
@@ -76,7 +79,7 @@ func (p *Installer) Install(templatePkg, targetDir string, force bool) (string, 
 	}
 
 	// Process the configuration file and set up namespacedPath and relocate config and content to it
-	namespacedPath, err := p.ConfigProcessor.ProcessConfig(untarPath, targetDir, force)
+	namespacedPath, err := p.InstallFromConfig(filepath.Join(untarPath, p.ConfigFileName), targetDir, force)
 	if err != nil {
 		return "", fmt.Errorf("Invalid config: %v", err.Error())
 	}
@@ -125,7 +128,7 @@ func (p *Installer) InstallClone(gitUri, targetDir, tempDir string, force bool) 
 		return "", fmt.Errorf("Failed to remove '.git' directory")
 	}
 
-	namespacedPath, err := p.ConfigProcessor.ProcessConfig(folderPath, targetDir, force)
+	namespacedPath, err := p.InstallFromConfig(filepath.Join(folderPath, p.ConfigFileName), targetDir, force)
 	if err != nil {
 		return "", err
 	}
@@ -176,4 +179,46 @@ func (p *Installer) downloadTemplate(targetURL *url.URL, downloadDir string) (st
 	}
 
 	return downloadPath, nil
+}
+
+func (p *Installer) InstallFromConfig(configFile, targetDir string, force bool) (string, error) {
+	info, err := p.ConfigProcessor.GetConfigMetadata(configFile)
+	if err != nil {
+		return "", err
+	}
+
+	// Create namespaced directory and move contents of temp folder to it
+	installedPkgPath := filepath.Join(targetDir, info.Author, info.Id)
+
+	err = p.AFS.MkdirAll(installedPkgPath, 0750)
+	if err != nil {
+		return "", err
+	}
+
+	installedPkgPath = filepath.Join(installedPkgPath, info.Version)
+	untarredPkgDir := filepath.Dir(configFile)
+
+	// finally move to the full path
+	errMsgPrefix := "Unable to install in namespace:"
+	err = p.AFS.Rename(untarredPkgDir, installedPkgPath)
+	if err != nil {
+		// if a template already exists
+		if !force {
+			// error unless forced
+			return "", fmt.Errorf("%s Template already installed (%s)", errMsgPrefix, installedPkgPath)
+		} else {
+			// remove the exiting template
+			err = p.AFS.RemoveAll(installedPkgPath)
+			if err != nil {
+				return "", fmt.Errorf("%s Unable to overwrite existing template: %v", errMsgPrefix, err)
+			}
+			// perform the move again
+			err = p.AFS.Rename(untarredPkgDir, installedPkgPath)
+			if err != nil {
+				return "", fmt.Errorf("%s Unable to force install: %v", errMsgPrefix, err)
+			}
+		}
+	}
+
+	return installedPkgPath, err
 }
