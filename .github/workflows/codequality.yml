@@ -2,7 +2,7 @@ name: codequality
 on: [pull_request]
 
 env:
-  go_version: 1.16
+  go_version: 1.18
 
 jobs:
   security:

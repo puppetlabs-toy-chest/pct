@@ -25,3 +25,5 @@ templates/
 
 # Documentation site
 docs/site
+
+.hugo_build.lock
