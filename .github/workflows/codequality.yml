@@ -18,7 +18,7 @@ jobs:
       - name: Snyk Scan for vulnerabilities in dependencies
         uses: snyk/actions/golang@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_DIO_KEY }}
+          SNYK_TOKEN: ${{ secrets.SNYK_FOSS_KEY }}
         with:
           command: monitor
   format:
