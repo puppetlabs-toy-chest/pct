@@ -60,7 +60,12 @@ func RunAppCommand(cmdString string, wd string) (stdout string, stderr string, e
 		postfix = ".exe"
 	}
 
-	appPath := fmt.Sprintf("../../dist/%s_%s_%s/%s%s", app, runtime.GOOS, runtime.GOARCH, app, postfix)
+	goArch := runtime.GOARCH
+	if goArch == "amd64" {
+		goArch = fmt.Sprintf("%s_v1", runtime.GOARCH)
+	}
+
+	appPath := fmt.Sprintf("../../dist/%s_%s_%s/%s%s", app, runtime.GOOS, goArch, app, postfix)
 	absPath, err := filepath.Abs(appPath)
 
 	if err != nil {

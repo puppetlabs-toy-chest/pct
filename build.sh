@@ -8,6 +8,12 @@ platform=$(go env GOHOSTOS)
 binPath="$(pwd)/dist/pct_${platform}_${arch}"
 binPath2="$(pwd)/dist/notel_pct_${platform}_${arch}"
 
+amd64=$(go env GOAMD64)
+if [[ ! -z "${amd64+z}" ]]; then
+	binPath="${binPath}_${amd64}"
+	binPath2="${binPath2}_${amd64}"
+fi
+
 if [ "$target" == "build" ]; then
   # Set goreleaser to build for current platform only
   if [ -z "${HONEYCOMB_API_KEY}" ]; then
