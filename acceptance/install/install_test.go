@@ -265,7 +265,7 @@ func Test_PctInstall_FailsWhenTemplateAlreadyExists(t *testing.T) {
 	stdout, stderr, exitCode = testutils.RunAppCommand(installCmd, "")
 
 	// verify that the template failed to install
-	assert.Contains(t, stdout, "Unable to install in namespace: Template already installed")
+	assert.Contains(t, stdout, "Unable to install in namespace: Package already installed")
 	assert.Equal(t, "exit status 1", stderr)
 	assert.Equal(t, 1, exitCode)
 
@@ -296,7 +296,7 @@ func Test_PctInstall_ForceSuccessWhenTemplateAlreadyExists(t *testing.T) {
 	stdout, stderr, exitCode = testutils.RunAppCommand(installCmd, "")
 
 	// verify that the template reinstall exited successfully
-	assert.Contains(t, stdout, fmt.Sprintf("Template installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
+	assert.Contains(t, stdout, fmt.Sprintf("Package installed to %v", filepath.Join(templatePath, "adder", "additional-project", "0.1.0")))
 	assert.Equal(t, "", stderr)
 	assert.Equal(t, 0, exitCode)
 
