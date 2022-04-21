@@ -205,12 +205,12 @@ func (p *Installer) InstallFromConfig(configFile, targetDir string, force bool) 
 		// if a template already exists
 		if !force {
 			// error unless forced
-			return "", fmt.Errorf("%s Template already installed (%s)", errMsgPrefix, installedPkgPath)
+			return "", fmt.Errorf("%s Package already installed (%s)", errMsgPrefix, installedPkgPath)
 		} else {
 			// remove the exiting template
 			err = p.AFS.RemoveAll(installedPkgPath)
 			if err != nil {
-				return "", fmt.Errorf("%s Unable to overwrite existing template: %v", errMsgPrefix, err)
+				return "", fmt.Errorf("%s Unable to overwrite existing package: %v", errMsgPrefix, err)
 			}
 			// perform the move again
 			err = p.AFS.Rename(untarredPkgDir, installedPkgPath)
