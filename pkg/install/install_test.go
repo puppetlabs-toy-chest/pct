@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pctkg/config_processor"
+	"github.com/puppetlabs/pct/pkg/config_processor"
 
-	"github.com/puppetlabs/pctkg/install"
-	"github.com/puppetlabs/pctkg/mock"
+	"github.com/puppetlabs/pct/pkg/install"
+	"github.com/puppetlabs/pct/pkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )

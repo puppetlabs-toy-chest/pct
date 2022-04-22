@@ -221,8 +221,8 @@ github.com/pkg/sftp v1.13.1/go.mod h1:3HaPG6Dq1ILlpPZRO0HVMrsydcdLt6HRDccSgb87qR
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/puppetlabs/pct/docs/md v0.0.0-20211222164114-ec8a1116e97a h1:uodh4NoBhFzS/AxUm7eo6yNLgOgNAG46PQ1V/nn8jQw=
-github.com/puppetlabs/pct/docs/md v0.0.0-20211222164114-ec8a1116e97a/go.mod h1:ZP68DAFqSxcmtVQ4WNS1uzO5ruFuL0geGIXoznIZx6w=
+github.com/puppetlabs/pct/docs/md v0.0.0-20220422101006-289589bd4d5d h1:/N3eR3kFJUhh8pKwhaQqrst5KR4zKO72S/Vw7rhAXJU=
+github.com/puppetlabs/pct/docs/md v0.0.0-20220422101006-289589bd4d5d/go.mod h1:yYLqP/WN4nIDIcWSPOcR65rj9vtFYs8QlrG7In2/W2Y=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

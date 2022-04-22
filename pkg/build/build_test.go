@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pctkg/build"
-	"github.com/puppetlabs/pctkg/mock"
-	"github.com/puppetlabs/pctnternal/pkg/pct_config_processor"
+	"github.com/puppetlabs/pct/pkg/build"
+	"github.com/puppetlabs/pct/pkg/mock"
+	"github.com/puppetlabs/pct/internal/pkg/pct_config_processor"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
