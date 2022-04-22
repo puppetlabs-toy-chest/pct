@@ -54,7 +54,7 @@ To test the PCT command, run the following command.
 To run the acceptance tests, ensure that you have built the PCT binary using the build scripts, then:
 
 ```bash
-TEST_ACCEPTANCE=true go test -count=1 -v github.com/puppetlabs/pdkgo/acceptance
+TEST_ACCEPTANCE=true go test -count=1 -v github.com/puppetlabs/pct/acceptance
 ```
 
 ## Running the project

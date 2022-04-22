@@ -15,7 +15,7 @@ jobs:
       WORKINGDIR: ${{ github.workspace }}
     steps:
       -
-        name: Checkout pdkgo
+        name: Checkout pct
         uses: actions/checkout@v2
         with:
           fetch-depth: 0

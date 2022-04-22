@@ -13,18 +13,18 @@ While the PCT is in early release, we provide an archive and a simple script to 
 ### Bash
 
 ```bash
-curl -L https://pup.pt/pdkgo/install.sh | sh
+curl -L https://pup.pt/pct/install.sh | sh
 ```
 
 ### PowerShell
 
 ```powershell
-iex "&{ $(irm 'https://pup.pt/pdkgo/install.ps1'); Install-Pct }"
+iex "&{ $(irm 'https://pup.pt/pct/install.ps1'); Install-Pct }"
 ```
 
 This will install the latest release of PCT to `~/.puppetlabs/pct`.
 
-![install_pct](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/install_and_export_path.gif?raw=true)
+![install_pct](https://github.com/puppetlabs/pct/blob/main/docs/_resources/install_and_export_path.gif?raw=true)
 
 > **Warning!**
 >
@@ -41,7 +41,7 @@ PCT has built in tab completion support for the following shells: `bash`, `zsh`,
 
 To view the install instructions, access the `--help` menu in `pct completion` and follow the instructions for your shell:
 
-![tab_completion](https://github.com/puppetlabs/pdkgo/blob/main/docs/_resources/completion_setup.gif?raw=true)
+![tab_completion](https://github.com/puppetlabs/pct/blob/main/docs/_resources/completion_setup.gif?raw=true)
 
 ## Installing Telemetry Free Version
 
@@ -62,13 +62,13 @@ To install:
 ### Bash
 
 ```bash
-curl -L https://pup.pt/pdkgo/install.sh | sh -s -- --no-telemetry
+curl -L https://pup.pt/pct/install.sh | sh -s -- --no-telemetry
 ```
 
 ### PowerShell
 
 ```powershell
-iex "&{ $(irm 'https://pup.pt/pdkgo/install.ps1'); Install-Pct -NoTelemetry }"
+iex "&{ $(irm 'https://pup.pt/pct/install.ps1'); Install-Pct -NoTelemetry }"
 ```
 
 This will install the latest release of PCT, without telemetry functionality, to `~/.puppetlabs/pct`.

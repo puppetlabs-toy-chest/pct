@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/acceptance/testutils"
+	"github.com/puppetlabs/pct/acceptance/testutils"
 	"github.com/stretchr/testify/assert"
 )
 

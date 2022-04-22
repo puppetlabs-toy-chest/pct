@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/acceptance/testutils"
+	"github.com/puppetlabs/pct/acceptance/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -146,7 +146,7 @@ func Test_PctInstall_InstallsFrom_RemoteTemplatePath(t *testing.T) {
 
 	for _, template := range templatePkgs {
 		// Setup
-		templatePkgPath := fmt.Sprintf("https://github.com/puppetlabs/pdkgo/raw/main/acceptance/install/testdata/%s.tar.gz", template.name)
+		templatePkgPath := fmt.Sprintf("https://github.com/puppetlabs/pct/raw/main/acceptance/install/testdata/%s.tar.gz", template.name)
 		installCmd := fmt.Sprintf("install %v --templatepath %v", templatePkgPath, templatePath)
 
 		// Exec

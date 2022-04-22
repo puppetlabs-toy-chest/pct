@@ -3,15 +3,16 @@ package install_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/puppetlabs/pdkgo/pkg/config_processor"
 	"io/ioutil"
 	"net/http"
 	"path"
 	"path/filepath"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/pkg/install"
-	"github.com/puppetlabs/pdkgo/pkg/mock"
+	"github.com/puppetlabs/pctkg/config_processor"
+
+	"github.com/puppetlabs/pctkg/install"
+	"github.com/puppetlabs/pctkg/mock"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )

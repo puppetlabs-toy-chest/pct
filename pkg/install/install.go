@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/puppetlabs/pdkgo/pkg/config_processor"
-	"github.com/puppetlabs/pdkgo/pkg/exec_runner"
+	"github.com/puppetlabs/pctkg/config_processor"
+	"github.com/puppetlabs/pctkg/exec_runner"
 
-	"github.com/puppetlabs/pdkgo/pkg/gzip"
-	"github.com/puppetlabs/pdkgo/pkg/httpclient"
-	"github.com/puppetlabs/pdkgo/pkg/tar"
+	"github.com/puppetlabs/pctkg/gzip"
+	"github.com/puppetlabs/pctkg/httpclient"
+	"github.com/puppetlabs/pctkg/tar"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 )

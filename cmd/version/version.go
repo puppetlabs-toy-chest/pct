@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/puppetlabs/pdkgo/pkg/telemetry"
+	"github.com/puppetlabs/pct/pkg/telemetry"
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +46,7 @@ func Format(version, buildDate string, commit string) string {
 }
 
 func changelogURL(version string) string {
-	path := "https://github.com/puppetlabs/pdkgo"
+	path := "https://github.com/puppetlabs/pct"
 	r := regexp.MustCompile(`^v?\d+\.\d+\.\d+(-[\w.]+)?$`)
 	if !r.MatchString(version) {
 		return fmt.Sprintf("%s/releases/latest", path)

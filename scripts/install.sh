@@ -6,7 +6,7 @@ OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 EXT=".tar.gz"
 
 ORG="puppetlabs"
-REPO="pdkgo"
+REPO="pct"
 APP="pct"
 APP_PKG_NAME="pct"
 

@@ -53,7 +53,7 @@ Will attempt to download the PCT template from the specified url and then afterw
 
 **Git** must be installed for this feature to work. The git repository must contain only one template and must be structured with the `pct-config.yml` file and the `content` directory in the root directory of the repository.
 
-For more information on template structures see the [Writing Templates](https://github.com/puppetlabs/pdkgo#writing-templates) section in the `README`.
+For more information on template structures see the [Writing Templates](https://github.com/puppetlabs/pct#writing-templates) section in the `README`.
 
 For example, this command:
 

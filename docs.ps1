@@ -11,9 +11,9 @@ param(
     [Switch]$BuildDrafts
 )
 
-# Check working directory is the root directory of the PDKGO repository
+# Check working directory is the root directory of the PCTepository
 if (!(Test-Path -Path ".\docs\md")) {
-    Throw 'Please run this script from the root directory of the PDKGO project.'
+    Throw 'Please run this script from the root directory of the PCTroject.'
 }
 # Check hugo extended is installed
 if ([string]::IsNullOrEmpty((hugo version | Select-String -Pattern "extended"))) {
@@ -35,7 +35,7 @@ foreach ($Program in $Programs) {
 if (!(Test-Path -Path ".\docs\site")) {
     git clone https://github.com/puppetlabs/devx.git docs\site
     Push-Location docs\site
-    Add-Content -Path .\go.mod -value 'replace github.com/puppetlabs/pdkgo/docs/md => ..\md'
+    Add-Content -Path .\go.mod -value 'replace github.com/puppetlabs/pctocs/md => ..\md'
     npm install
 }
 else {

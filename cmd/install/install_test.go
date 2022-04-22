@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/puppetlabs/pdkgo/cmd/install"
-	"github.com/puppetlabs/pdkgo/pkg/mock"
+	"github.com/puppetlabs/pct/cmd/install"
+	"github.com/puppetlabs/pct/pkg/mock"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )

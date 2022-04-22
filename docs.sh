@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Check working directory is the root directory of the PDKGO repository
+# Check working directory is the root directory of the PCT repository
 if [ ! -d "docs/md" ]; then
-    echo 'Please run this script from the root directory of the PDKGO project.'
+    echo 'Please run this script from the root directory of the PCT project.'
     exit 1
 fi
 # Check hugo extended is installed
@@ -24,7 +24,7 @@ fi
 if [ ! -d "docs/site" ]; then
     git clone https://github.com/puppetlabs/devx.git docs/site
     cd docs/site
-    echo "replace github.com/puppetlabs/pdkgo/docs/md => ../md" >> go.mod
+    echo "replace github.com/puppetlabs/pct/docs/md => ../md" >> go.mod
     npm install
 else
     cd docs/site

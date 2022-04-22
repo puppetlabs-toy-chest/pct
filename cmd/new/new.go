@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/pkg/telemetry"
-	"github.com/puppetlabs/pdkgo/pkg/utils"
+	"github.com/puppetlabs/pct/internal/pkg/pct"
+	"github.com/puppetlabs/pct/pkg/telemetry"
+	"github.com/puppetlabs/pct/pkg/utils"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"

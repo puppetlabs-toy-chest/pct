@@ -9,7 +9,7 @@ import (
 
 	"strings"
 
-	"github.com/puppetlabs/pdkgo/pkg/utils"
+	"github.com/puppetlabs/pct/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 )

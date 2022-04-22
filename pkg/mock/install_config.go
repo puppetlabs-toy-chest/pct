@@ -2,7 +2,8 @@ package mock
 
 import (
 	"fmt"
-	"github.com/puppetlabs/pdkgo/pkg/config_processor"
+
+	"github.com/puppetlabs/pct/config_processor"
 )
 
 type InstallConfig struct {

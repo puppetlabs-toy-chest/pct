@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: 📢 Feedback
     about: Have an idea for a new feature? Open a discussion and let's talk about it!
-    url: https://github.com/puppetlabs/pdkgo/discussions/new
+    url: https://github.com/puppetlabs/pct/discussions/new
   - name: ❔ Ask a question about Puppet Content Templates
     about: Please check out the community forum for discussions about the Puppet Content Templates.
-    url: https://github.com/puppetlabs/pdkgo/discussions/new
+    url: https://github.com/puppetlabs/pct/discussions/new

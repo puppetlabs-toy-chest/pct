@@ -1,4 +1,4 @@
-module github.com/puppetlabs/pdkgo
+module github.com/puppetlabs/pct
 
 go 1.18
 
@@ -10,7 +10,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/puppetlabs/pdkgo/docs/md v0.0.0-20211222164114-ec8a1116e97a
+	github.com/puppetlabs/pct/docs/md v0.0.0-20211222164114-ec8a1116e97a
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/afero v1.8.2
 	github.com/spf13/cobra v1.4.0

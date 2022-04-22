@@ -1,11 +1,11 @@
 <!--
 Ensure you have read over
 
-CONTRIBUTING - https://github.com/puppetlabs/pdkgo/blob/main/CONTRIBUTING.md
+CONTRIBUTING - https://github.com/puppetlabs/pct/blob/main/CONTRIBUTING.md
 
 and
 
-CODE_OF_CONDUCT - https://github.com/puppetlabs/pdkgo/blob/main/CODE_OF_CONDUCT.md
+CODE_OF_CONDUCT - https://github.com/puppetlabs/pct/blob/main/CODE_OF_CONDUCT.md
 
 Submitting a Pull Request:
 

@@ -8,7 +8,7 @@ function Install-Pct {
   $ErrorActionPreference = "Stop"
 
   $org = 'puppetlabs'
-  $repo = 'pdkgo'
+  $repo = 'pct'
 
   $app = 'pct'
 

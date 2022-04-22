@@ -1,15 +1,16 @@
 package pct_config_processor_test
 
 import (
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct"
-	"github.com/puppetlabs/pdkgo/pkg/config_processor"
-	"github.com/puppetlabs/pdkgo/pkg/install"
 	"path/filepath"
 	"reflect"
 	"regexp"
 	"testing"
 
-	"github.com/puppetlabs/pdkgo/internal/pkg/pct_config_processor"
+	"github.com/puppetlabs/pct/internal/pkg/pct"
+	"github.com/puppetlabs/pct/pkg/config_processor"
+	"github.com/puppetlabs/pct/pkg/install"
+
+	"github.com/puppetlabs/pct/internal/pkg/pct_config_processor"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
@@ -245,7 +246,7 @@ func TestPctConfigProcessor_ReadConfig(t *testing.T) {
 					},
 					Type:    "class",
 					Display: "Full Project",
-					URL:     "github.com/puppetlabs/pdkgo",
+					URL:     "github.com/puppetlabs/pct",
 				},
 			},
 			templateConfig: `---
@@ -255,7 +256,7 @@ template:
   version: 0.1.0
   type: class
   display: Full Project
-  url: github.com/puppetlabs/pdkgo
+  url: github.com/puppetlabs/pct
 `,
 		},
 		{
@@ -268,7 +269,7 @@ template:
 		version: 0.1.0
 		type: class
 		display: Full Project
-		url: github.com/puppetlabs/pdkgo
+		url: github.com/puppetlabs/pct
 `,
 		},
 	}
