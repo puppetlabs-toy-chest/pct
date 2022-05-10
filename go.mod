@@ -16,18 +16,18 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
-	go.opentelemetry.io/otel v1.6.3
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.6.3
-	go.opentelemetry.io/otel/sdk v1.6.3
-	go.opentelemetry.io/otel/trace v1.6.3
-	google.golang.org/grpc v1.45.0
+	go.opentelemetry.io/otel v1.7.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.7.0
+	go.opentelemetry.io/otel/sdk v1.7.0
+	go.opentelemetry.io/otel/trace v1.7.0
+	google.golang.org/grpc v1.46.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -58,9 +58,9 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/yuin/goldmark v1.4.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.6.3 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.6.3 // indirect
-	go.opentelemetry.io/proto/otlp v0.15.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.7.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.7.0 // indirect
+	go.opentelemetry.io/proto/otlp v0.16.0 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
