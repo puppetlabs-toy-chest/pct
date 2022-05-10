@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/puppetlabs/pct/pkg/config_processor"
 	"github.com/puppetlabs/pct/internal/pkg/pct"
+	"github.com/puppetlabs/pct/pkg/config_processor"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
 )
