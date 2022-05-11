@@ -39,13 +39,19 @@ func TestCreateBuildCommand(t *testing.T) {
 		{
 			name:              "uses sourcedir, targetdir when passed in",
 			args:              []string{"--sourcedir", "/path/to/template", "--targetdir", "/path/to/output"},
-			expectedSourceDir: "/path/to/template",
+			expectedSourceDir: filepath.Clean("/path/to/template"),
 			expectedTargetDir: "/path/to/output",
 		},
 		{
 			name:              "Sets correct defaults if sourcedir and targetdir undefined",
 			args:              []string{},
 			expectedSourceDir: defaultSourceDir,
+			expectedTargetDir: defaultTargetDir,
+		},
+		{
+			name:              "Cleans sourcedir of initial ./",
+			args:              []string{"--sourcedir", "./path/to/template"},
+			expectedSourceDir: filepath.Clean("path/to/template"),
 			expectedTargetDir: defaultTargetDir,
 		},
 	}

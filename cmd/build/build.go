@@ -49,6 +49,8 @@ func (bc *BuildCommand) preExecute(cmd *cobra.Command, args []string) error {
 		bc.SourceDir = wd
 	}
 
+	bc.SourceDir = filepath.Clean(bc.SourceDir)
+
 	if bc.TargetDir == "" {
 		bc.TargetDir = filepath.Join(wd, "pkg")
 	}
