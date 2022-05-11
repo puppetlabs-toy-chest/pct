@@ -15,6 +15,12 @@ jobs:
         uses: securego/gosec@master
         with:
           args: '-exclude-dir=testutils  -exclude-dir=pkg/mock ./...'
+      - name: Snyk Scan for vulnerabilities in dependencies
+        uses: snyk/actions/golang@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_FOSS_KEY }}
+        with:
+          command: monitor
   format:
     name: fmt, makes sure there are no formatting issues
     runs-on: ubuntu-latest
