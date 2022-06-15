@@ -10,44 +10,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
-        with:
-          args: '-exclude-dir=testutils  -exclude-dir=pkg/mock ./...'
+        uses: actions/checkout@v3
       - name: Snyk Scan for vulnerabilities in dependencies
         uses: snyk/actions/golang@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_FOSS_KEY }}
         with:
           command: monitor
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.go_version }}
+      - run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.12.0
+          gosec -exclude-dir=testutils  -exclude-dir=pkg/mock ./...
   format:
     name: fmt, makes sure there are no formatting issues
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v2
         with:
-         go-version: ${{ env.go_version }}
-      -
-        name: Check out code
+          go-version: ${{ env.go_version }}
+      - name: Check out code
         uses: actions/checkout@v1
-      -
-        name: Run fmt
+      - name: Run fmt
         run: make format
   mod_tidy:
     name: go mod tidy, makes sure are dependencies are cool
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v2
         with:
-         go-version: ${{ env.go_version }}
-      -
-        name: Check out code
+          go-version: ${{ env.go_version }}
+      - name: Check out code
         uses: actions/checkout@v1
-      -
-        name: Run go mod tidy
+      - name: Run go mod tidy
         run: make tidy
