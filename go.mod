@@ -13,7 +13,7 @@ require (
 	github.com/puppetlabs/pct/docs/md v0.0.0-20220422101006-289589bd4d5d
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/afero v1.8.2
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.2
 	go.opentelemetry.io/otel v1.7.0
