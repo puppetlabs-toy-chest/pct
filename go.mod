@@ -6,7 +6,7 @@ require (
 	github.com/charmbracelet/glamour v0.5.0
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gernest/front v0.0.0-20210301115436-8a0b0a782d0a
-	github.com/hashicorp/go-version v1.5.0
+	github.com/hashicorp/go-version v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
