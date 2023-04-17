@@ -12,7 +12,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/puppetlabs/pct/docs/md v0.0.0-20220422101006-289589bd4d5d
 	github.com/rs/zerolog v1.27.0
-	github.com/spf13/afero v1.8.2
+	github.com/spf13/afero v1.9.5
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.2
